@@ -87,7 +87,7 @@ fn generate_head(o: &mut String, elf: &ParsedElf) {
 
     w!(o, 0, "<!doctype html>");
     w!(o, 0, "<head>");
-    w!(o, 1, "<meta charset=\"utf-8\">");
+    w!(o, 1, "<meta charset='utf-8'>");
     w!(o, 1, "<title>{}</title>", basename(&elf.filename));
     w!(o, 1, "<style>\n{}</style>", stylesheet);
     w!(o, 0, "</head>");
@@ -96,12 +96,20 @@ fn generate_head(o: &mut String, elf: &ParsedElf) {
 fn generate_body(o: &mut String, elf: &ParsedElf) {
     let mut file = String::new();
 
-    for b in elf.contents.iter() {
-        write!(&mut file, "{:02x} ", b).unwrap();
+    for (i, b) in elf.contents.iter().take(192).enumerate() {
+        write!(&mut file, "{:02x}", b).unwrap();
+        write!(
+            &mut file,
+            "{}",
+            if (i + 1) % 16 == 0 { "</br>\n" } else { " " }
+        )
+        .unwrap();
     }
 
     w!(o, 0, "<body>");
-    w!(o, 1, "{}", file);
+    w!(o, 1, "<div class='box'>");
+    w!(o, 0, "{}", file);
+    w!(o, 1, "</div>");
     w!(o, 0, "</body>");
 }
 
