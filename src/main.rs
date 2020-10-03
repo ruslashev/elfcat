@@ -1,10 +1,8 @@
+mod elf;
+
 use std::fmt::Write;
 use std::path::Path;
-
-struct ParsedElf {
-    filename: String,
-    contents: Vec<u8>,
-}
+use elf::ParsedElf;
 
 fn main() {
     let filename = parse_arguments();
@@ -30,17 +28,6 @@ fn parse_arguments() -> String {
 fn usage() {
     println!("Usage: elfcat <filename>");
     println!("Writes <filename>.html to CWD.");
-}
-
-impl ParsedElf {
-    pub fn from_bytes(filename: &String, buf: Vec<u8>) -> ParsedElf {
-        // check header
-
-        ParsedElf {
-            filename: filename.clone(),
-            contents: buf,
-        }
-    }
 }
 
 fn basename(path: &str) -> &str {
