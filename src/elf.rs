@@ -36,9 +36,26 @@ struct Elf64Ehdr {
     e_shstrndx: Elf64Half,
 }
 
+#[derive(Clone, PartialEq)]
+pub enum RangeTypes {
+    None,
+    End,
+    FileHeader,
+}
+
+impl RangeTypes {
+    pub fn class(&self) -> &str {
+        match self {
+            RangeTypes::FileHeader => "ehdr",
+            _ => "",
+        }
+    }
+}
+
 pub struct ParsedElf {
     pub filename: String,
     pub contents: Vec<u8>,
+    pub ranges: Vec<RangeTypes>,
 }
 
 impl ParsedElf {
@@ -51,9 +68,21 @@ impl ParsedElf {
             return Err("mismatched magic: not an ELF file");
         }
 
+        let ehdr_size = std::mem::size_of::<Elf64Ehdr>();
+
+        if buf.len() < ehdr_size {
+            return Err("file smaller than ELF file header");
+        }
+
+        let mut ranges = vec![RangeTypes::None; buf.len()];
+
+        ranges[0] = RangeTypes::FileHeader;
+        ranges[ehdr_size] = RangeTypes::End;
+
         Ok(ParsedElf {
             filename: filename.clone(),
             contents: buf,
+            ranges: ranges,
         })
     }
 }

@@ -81,21 +81,23 @@ fn generate_head(o: &mut String, elf: &ParsedElf) {
 }
 
 fn generate_body(o: &mut String, elf: &ParsedElf) {
-    let mut file = String::new();
-
-    for (i, b) in elf.contents.iter().take(192).enumerate() {
-        write!(&mut file, "{:02x}", b).unwrap();
-        write!(
-            &mut file,
-            "{}",
-            if (i + 1) % 16 == 0 { "</br>\n" } else { " " }
-        )
-        .unwrap();
-    }
-
     w!(o, 0, "<body>");
     w!(o, 1, "<div class='box'>");
-    w!(o, 0, "{}", file);
+
+    for (i, b) in elf.contents.iter().take(192).enumerate() {
+        if elf.ranges[i] != elf::RangeTypes::None && elf.ranges[i] != elf::RangeTypes::End {
+            write!(o, "<span class='{}'>", elf.ranges[i].class()).unwrap();
+        }
+
+        write!(o, "{:02x}", b).unwrap();
+
+        if elf.ranges[i] == elf::RangeTypes::End {
+            write!(o, "</span>").unwrap();
+        }
+
+        write!(o, "{}", if (i + 1) % 16 == 0 { "</br>\n" } else { " " }).unwrap();
+    }
+
     w!(o, 1, "</div>");
     w!(o, 0, "</body>");
 }
