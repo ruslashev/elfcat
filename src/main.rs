@@ -62,18 +62,37 @@ fn construct_filename(filename: &String) -> String {
     stem(basename(filename)).to_string() + ".html"
 }
 
+const INDENT: &str = "  ";
+
+fn indent(level: usize, line: &str) -> String {
+    if line == "" {
+        String::new()
+    } else {
+        INDENT.repeat(level) + line
+    }
+}
+
 macro_rules! w {
-    ($dst:expr, $($arg:tt)*) => (write!($dst, $( $arg )* ).unwrap())
+    ($dst:expr, $indent_level:expr, $($arg:tt)*) => {
+        write!($dst, "{}", INDENT.repeat($indent_level)).unwrap();
+        writeln!($dst, $( $arg )* ).unwrap();
+    }
 }
 
 fn generate_report(elf: &ParsedElf) -> String {
     let mut output = String::new();
     let o = &mut output;
+    let stylesheet: String = include_str!("style.css")
+        .lines()
+        .map(|x| indent(2, x) + "\n")
+        .collect();
 
-    w!(o, "<!doctype html>\n");
-    w!(o, "<head>\n");
-    w!(o, "<title>{}</title>\n", basename(&elf.filename));
-    w!(o, "</head>\n");
+    w!(o, 0, "<!doctype html>");
+    w!(o, 0, "<head>");
+    w!(o, 1, "<meta charset=\"utf-8\">");
+    w!(o, 1, "<title>{}</title>", basename(&elf.filename));
+    w!(o, 1, "<style>\n{}</style>", stylesheet);
+    w!(o, 0, "</head>");
 
     output
 }

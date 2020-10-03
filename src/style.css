@@ -1,0 +1,8 @@
+* {
+  font-family: monospace;
+  font-size: 0.95em;
+}
+.box {
+  border: 1px solid;
+  width: 300px;
+}
