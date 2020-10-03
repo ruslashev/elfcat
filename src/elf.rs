@@ -18,8 +18,26 @@ const ELF_EI_ABIVERSION: u8 = 8;
 const ELF_EI_PAD: u8 = 9;
 const ELF_EI_NIDENT: u8 = 16;
 
+const ELF_CLASS32: u8 = 1;
+const ELF_CLASS64: u8 = 2;
+
+const ELF_DATA2LSB: u8 = 1;
+const ELF_DATA2MSB: u8 = 2;
+
+const ELF_EV_CURRENT: u8 = 1;
+
+const ELF_OSABI_SYSV: u8 = 0;
+const ELF_OSABI_HPUX: u8 = 1;
+const ELF_OSABI_STANDALONE: u8 = 255;
+
+const ELF_ET_NONE: u8 = 0;
+const ELF_ET_REL: u8 = 1;
+const ELF_ET_EXEC: u8 = 2;
+const ELF_ET_DYN: u8 = 3;
+const ELF_ET_CORE: u8 = 4;
+
 #[repr(packed)]
-struct Elf64Ehdr {
+struct ElfEhdr {
     e_ident: [u8; 16],
     e_type: Elf64Half,
     e_machine: Elf64Half,
@@ -54,6 +72,7 @@ impl RangeTypes {
 
 pub struct ParsedElf {
     pub filename: String,
+    pub identification: Vec<(String, String)>,
     pub contents: Vec<u8>,
     pub ranges: Vec<RangeTypes>,
 }
@@ -68,7 +87,51 @@ impl ParsedElf {
             return Err("mismatched magic: not an ELF file");
         }
 
-        let ehdr_size = std::mem::size_of::<Elf64Ehdr>();
+        let mut identification = vec![];
+
+        identification.push((
+            String::from("Class"),
+            match buf[ELF_EI_CLASS as usize] {
+                ELF_CLASS32 => String::from("32-bit objects"),
+                ELF_CLASS64 => String::from("64-bit objects"),
+                x => format!("Unknown: {}", x),
+            },
+        ));
+
+        identification.push((
+            String::from("Data encoding"),
+            match buf[ELF_EI_DATA as usize] {
+                ELF_DATA2LSB => String::from("Little endian"),
+                ELF_DATA2MSB => String::from("Big endian"),
+                x => format!("Unknown: {}", x),
+            },
+        ));
+
+        let ver = buf[ELF_EI_VERSION as usize];
+        if ver != ELF_EV_CURRENT {
+            identification.push((String::from("Uncommon version(!)"), format!("{}", ver)));
+        }
+
+        let abi = buf[ELF_EI_OSABI as usize];
+        identification.push((
+            String::from("ABI"),
+            match abi {
+                ELF_OSABI_SYSV => String::from("SysV"),
+                ELF_OSABI_HPUX => String::from("HP-UX"),
+                ELF_OSABI_STANDALONE => String::from("Standalone"),
+                x => format!("Unknown: {}", x),
+            },
+        ));
+
+        let abi_ver = buf[ELF_EI_ABIVERSION as usize];
+        if !(abi == ELF_OSABI_SYSV && abi_ver == 0) {
+            identification.push((
+                String::from("Uncommon ABI version(!)"),
+                format!("{}", abi_ver),
+            ));
+        }
+
+        let ehdr_size = std::mem::size_of::<ElfEhdr>();
 
         if buf.len() < ehdr_size {
             return Err("file smaller than ELF file header");
@@ -81,8 +144,9 @@ impl ParsedElf {
 
         Ok(ParsedElf {
             filename: filename.clone(),
+            identification,
             contents: buf,
-            ranges: ranges,
+            ranges,
         })
     }
 }
