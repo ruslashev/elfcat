@@ -1,6 +1,15 @@
+use std::path::Path;
+
+struct ParsedElf {
+    filename: String,
+    contents: Vec<u8>,
+}
+
 fn main() {
     let filename = parse_arguments();
-    println!("filename={}", filename);
+    let contents = std::fs::read(&filename).unwrap();
+    let elf = ParsedElf::from_bytes(&filename, contents);
+    let report = generate_report(&elf);
 }
 
 fn parse_arguments() -> String {
@@ -18,3 +27,21 @@ fn usage() {
     println!("Usage: elfcat <filename>")
 }
 
+impl ParsedElf {
+    pub fn from_bytes(filename: &String, buf: Vec<u8>) -> ParsedElf {
+        // check header
+
+        ParsedElf {
+            filename: filename.clone(),
+            contents: buf,
+        }
+    }
+}
+
+fn generate_report(elf: &ParsedElf) -> String {
+    let mut output: String = String::from("");
+
+    output.push_str("<!doctype html>\n");
+
+    output
+}
