@@ -1,13 +1,13 @@
 mod elf;
 
+use elf::ParsedElf;
 use std::fmt::Write;
 use std::path::Path;
-use elf::ParsedElf;
 
 fn main() {
     let filename = parse_arguments();
     let contents = std::fs::read(&filename).unwrap();
-    let elf = ParsedElf::from_bytes(&filename, contents);
+    let elf = ParsedElf::from_bytes(&filename, contents).unwrap();
     let report_filename = construct_filename(&filename);
     let report = generate_report(&elf);
 
