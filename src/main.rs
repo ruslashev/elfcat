@@ -79,9 +79,7 @@ macro_rules! w {
     }
 }
 
-fn generate_report(elf: &ParsedElf) -> String {
-    let mut output = String::new();
-    let o = &mut output;
+fn generate_head(o: &mut String, elf: &ParsedElf) {
     let stylesheet: String = include_str!("style.css")
         .lines()
         .map(|x| indent(2, x) + "\n")
@@ -93,6 +91,25 @@ fn generate_report(elf: &ParsedElf) -> String {
     w!(o, 1, "<title>{}</title>", basename(&elf.filename));
     w!(o, 1, "<style>\n{}</style>", stylesheet);
     w!(o, 0, "</head>");
+}
+
+fn generate_body(o: &mut String, elf: &ParsedElf) {
+    let mut file = String::new();
+
+    for b in elf.contents.iter() {
+        write!(&mut file, "{:02x} ", b).unwrap();
+    }
+
+    w!(o, 0, "<body>");
+    w!(o, 1, "{}", file);
+    w!(o, 0, "</body>");
+}
+
+fn generate_report(elf: &ParsedElf) -> String {
+    let mut output = String::new();
+
+    generate_head(&mut output, elf);
+    generate_body(&mut output, elf);
 
     output
 }
