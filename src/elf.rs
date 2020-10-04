@@ -33,11 +33,15 @@ const ELF_OSABI_SYSV: u8 = 0;
 const ELF_OSABI_HPUX: u8 = 1;
 const ELF_OSABI_STANDALONE: u8 = 255;
 
-const ELF_ET_NONE: u8 = 0;
-const ELF_ET_REL: u8 = 1;
-const ELF_ET_EXEC: u8 = 2;
-const ELF_ET_DYN: u8 = 3;
-const ELF_ET_CORE: u8 = 4;
+const ELF_ET_NONE: Elf64Half = 0;
+const ELF_ET_REL: Elf64Half = 1;
+const ELF_ET_EXEC: Elf64Half = 2;
+const ELF_ET_DYN: Elf64Half = 3;
+const ELF_ET_CORE: Elf64Half = 4;
+const ELF_ET_LOOS: Elf64Half = 0xfe00;
+const ELF_ET_HIOS: Elf64Half = 0xfeff;
+const ELF_ET_LOPROC: Elf64Half = 0xff00;
+const ELF_ET_HIPROC: Elf64Half = 0xffff;
 
 #[repr(packed)]
 #[derive(Deserialize)]
@@ -94,10 +98,10 @@ impl ParsedElf {
         let mut identification = vec![];
 
         identification.push((
-            String::from("Class"),
+            String::from("Object class"),
             match buf[ELF_EI_CLASS as usize] {
-                ELF_CLASS32 => String::from("32-bit objects"),
-                ELF_CLASS64 => String::from("64-bit objects"),
+                ELF_CLASS32 => String::from("32-bit"),
+                ELF_CLASS64 => String::from("64-bit"),
                 x => format!("Unknown: {}", x),
             },
         ));
@@ -158,6 +162,20 @@ impl ParsedElf {
             Ok(x) => x,
             Err(why) => return Err(format!("failed to deserialize into file header: {}", why)),
         };
+
+        identification.push((
+            String::from("Type"),
+            match ehdr.e_type {
+                ELF_ET_NONE => String::from("None (NONE)"),
+                ELF_ET_REL => String::from("Relocatable object file (REL)"),
+                ELF_ET_EXEC => String::from("Executable file (EXEC)"),
+                ELF_ET_DYN => String::from("Shared object file (DYN)"),
+                ELF_ET_CORE => String::from("Core file (CORE)"),
+                ELF_ET_LOOS | ELF_ET_HIOS => String::from("Environment-specific use"),
+                ELF_ET_LOPROC | ELF_ET_HIPROC => String::from("Processor-specific use"),
+                x => format!("Unknown {}", x),
+            },
+        ));
 
         let mut ranges = vec![RangeTypes::None; buf.len()];
 
