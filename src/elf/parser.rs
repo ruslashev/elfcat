@@ -1,13 +1,6 @@
 use bincode::Options;
 use serde::Deserialize;
-
-type Elf64Addr = u64;
-type Elf64Off = u64;
-type Elf64Half = u16;
-type Elf64Word = u32;
-type Elf64Sword = i32;
-type Elf64Xword = u64;
-type Elf64Sxword = i64;
+use super::types::*;
 
 const ELF_EI_MAG0: u8 = 0;
 const ELF_EI_MAG1: u8 = 1;
@@ -45,6 +38,7 @@ const ELF_ET_HIPROC: Elf64Half = 0xffff;
 
 #[repr(packed)]
 #[derive(Deserialize)]
+#[allow(dead_code)] // REMOVEME
 struct ElfEhdr {
     e_ident: [u8; 16],
     e_type: Elf64Half,
