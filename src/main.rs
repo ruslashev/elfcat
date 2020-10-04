@@ -1,6 +1,7 @@
 mod elf;
 
-use elf::ParsedElf;
+use elf::parser::ParsedElf;
+use elf::parser::RangeTypes as ElfRangeTypes;
 use std::fmt::Write;
 use std::path::Path;
 
@@ -103,13 +104,13 @@ fn generate_body(o: &mut String, elf: &ParsedElf) {
     w!(o, 1, "<div class='box'>");
 
     for (i, b) in elf.contents.iter().take(192).enumerate() {
-        if elf.ranges[i] != elf::RangeTypes::None && elf.ranges[i] != elf::RangeTypes::End {
+        if elf.ranges[i] != ElfRangeTypes::None && elf.ranges[i] != ElfRangeTypes::End {
             write!(o, "<span class='{}'>", elf.ranges[i].class()).unwrap();
         }
 
         write!(o, "{:02x}", b).unwrap();
 
-        if elf.ranges[i] == elf::RangeTypes::End {
+        if elf.ranges[i] == ElfRangeTypes::End {
             write!(o, "</span>").unwrap();
         }
 
