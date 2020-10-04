@@ -1,3 +1,6 @@
+use bincode::Options;
+use serde::Deserialize;
+
 type Elf64Addr = u64;
 type Elf64Off = u64;
 type Elf64Half = u16;
@@ -37,6 +40,7 @@ const ELF_ET_DYN: u8 = 3;
 const ELF_ET_CORE: u8 = 4;
 
 #[repr(packed)]
+#[derive(Deserialize)]
 struct ElfEhdr {
     e_ident: [u8; 16],
     e_type: Elf64Half,
@@ -78,13 +82,13 @@ pub struct ParsedElf {
 }
 
 impl ParsedElf {
-    pub fn from_bytes(filename: &String, buf: Vec<u8>) -> Result<ParsedElf, &str> {
+    pub fn from_bytes(filename: &String, buf: Vec<u8>) -> Result<ParsedElf, String> {
         if buf.len() < ELF_EI_NIDENT as usize {
-            return Err("file smaller than ELF file header");
+            return Err(String::from("file is smaller than ELF header's e_ident"));
         }
 
         if buf[0..=ELF_EI_MAG3 as usize] != [0x7f, 'E' as u8, 'L' as u8, 'F' as u8] {
-            return Err("mismatched magic: not an ELF file");
+            return Err(String::from("mismatched magic: not an ELF file"));
         }
 
         let mut identification = vec![];
@@ -98,12 +102,13 @@ impl ParsedElf {
             },
         ));
 
+        let endianness = buf[ELF_EI_DATA as usize];
         identification.push((
             String::from("Data encoding"),
-            match buf[ELF_EI_DATA as usize] {
+            match endianness {
                 ELF_DATA2LSB => String::from("Little endian"),
                 ELF_DATA2MSB => String::from("Big endian"),
-                x => format!("Unknown: {}", x),
+                x => return Err(format!("Unknown endianness: {}", x)),
             },
         ));
 
@@ -134,8 +139,25 @@ impl ParsedElf {
         let ehdr_size = std::mem::size_of::<ElfEhdr>();
 
         if buf.len() < ehdr_size {
-            return Err("file smaller than ELF file header");
+            return Err(String::from("file is smaller than ELF file header"));
         }
+
+        let ehdr_slice = &buf[0..ehdr_size];
+
+        let maybe: bincode::Result<ElfEhdr> = if endianness == ELF_DATA2LSB {
+            bincode::DefaultOptions::new()
+                .with_little_endian()
+                .deserialize_from(ehdr_slice)
+        } else {
+            bincode::DefaultOptions::new()
+                .with_big_endian()
+                .deserialize_from(ehdr_slice)
+        };
+
+        let ehdr: ElfEhdr = match maybe {
+            Ok(x) => x,
+            Err(why) => return Err(format!("failed to deserialize into file header: {}", why)),
+        };
 
         let mut ranges = vec![RangeTypes::None; buf.len()];
 
