@@ -61,16 +61,16 @@ impl Elf64Ehdr {
 }
 
 #[derive(Clone, PartialEq)]
-pub enum RangeTypes {
+pub enum RangeType {
     None,
     End,
     FileHeader,
 }
 
-impl RangeTypes {
+impl RangeType {
     pub fn class(&self) -> &str {
         match self {
-            RangeTypes::FileHeader => "ehdr",
+            RangeType::FileHeader => "ehdr",
             _ => "",
         }
     }
@@ -102,7 +102,7 @@ pub struct ParsedElf {
     pub filename: String,
     pub information: Vec<(&'static str, String)>,
     pub contents: Vec<u8>,
-    pub ranges: Vec<RangeTypes>,
+    pub ranges: Vec<RangeType>,
 }
 
 impl ParsedElf {
@@ -153,10 +153,10 @@ impl ParsedElf {
             ),
         ));
 
-        let mut ranges = vec![RangeTypes::None; buf.len()];
+        let mut ranges = vec![RangeType::None; buf.len()];
 
-        ranges[0] = RangeTypes::FileHeader;
-        ranges[ehdr_size - 1] = RangeTypes::End;
+        ranges[0] = RangeType::FileHeader;
+        ranges[ehdr_size - 1] = RangeType::End;
 
         Ok(ParsedElf {
             filename: filename.clone(),
