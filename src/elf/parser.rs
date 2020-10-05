@@ -3,7 +3,7 @@ use super::types::*;
 use std::convert::TryInto;
 
 #[allow(dead_code)] // REMOVEME
-struct ElfEhdr {
+struct Elf64Ehdr {
     e_ident: [u8; 16],
     e_type: Elf64Half,
     e_machine: Elf64Half,
@@ -21,9 +21,9 @@ struct ElfEhdr {
 }
 
 // All this just to avoid unsafe. This should be improved.
-impl ElfEhdr {
-    pub fn from_le_bytes(buf: &[u8]) -> ElfEhdr {
-        ElfEhdr {
+impl Elf64Ehdr {
+    pub fn from_le_bytes(buf: &[u8]) -> Elf64Ehdr {
+        Elf64Ehdr {
             e_ident: buf[0..16].try_into().unwrap(),
             e_type: Elf64Half::from_le_bytes(buf[16..18].try_into().unwrap()),
             e_machine: Elf64Half::from_le_bytes(buf[18..20].try_into().unwrap()),
@@ -40,8 +40,8 @@ impl ElfEhdr {
             e_shstrndx: Elf64Half::from_le_bytes(buf[62..64].try_into().unwrap()),
         }
     }
-    pub fn from_be_bytes(buf: &[u8]) -> ElfEhdr {
-        ElfEhdr {
+    pub fn from_be_bytes(buf: &[u8]) -> Elf64Ehdr {
+        Elf64Ehdr {
             e_ident: buf[0..16].try_into().unwrap(),
             e_type: Elf64Half::from_be_bytes(buf[16..18].try_into().unwrap()),
             e_machine: Elf64Half::from_be_bytes(buf[18..20].try_into().unwrap()),
@@ -121,7 +121,7 @@ impl ParsedElf {
 
         ParsedElf::push_ident_info(&ident, &mut information)?;
 
-        let ehdr_size = std::mem::size_of::<ElfEhdr>();
+        let ehdr_size = std::mem::size_of::<Elf64Ehdr>();
 
         if buf.len() < ehdr_size {
             return Err(String::from("file is smaller than ELF file header"));
@@ -130,9 +130,9 @@ impl ParsedElf {
         let ehdr_slice = &buf[0..ehdr_size];
 
         let ehdr = if ident.endianness == ELF_DATA2LSB {
-            ElfEhdr::from_le_bytes(ehdr_slice)
+            Elf64Ehdr::from_le_bytes(ehdr_slice)
         } else {
-            ElfEhdr::from_be_bytes(ehdr_slice)
+            Elf64Ehdr::from_be_bytes(ehdr_slice)
         };
 
         information.push(("Type", type_to_string(ehdr.e_type)));
