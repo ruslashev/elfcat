@@ -62,7 +62,6 @@ impl Elf64Ehdr {
 
 #[derive(Copy, Clone, PartialEq)]
 pub enum RangeType {
-    None,
     End,
     FileHeader,
 }
@@ -76,37 +75,42 @@ impl RangeType {
     }
 }
 
+// Interval tree that allows querying point for all intervals that intersect it should be better
 pub struct Ranges {
-    data: Vec<RangeType>,
+    data: Vec<Vec<RangeType>>,
 }
 
 impl Ranges {
     fn new(capacity: usize) -> Ranges {
         Ranges {
-            data: vec![RangeType::None; capacity],
+            data: vec![vec![]; capacity],
         }
     }
 
     fn add_range(&mut self, start: usize, end: usize, range_type: RangeType) {
-        self.data[start] = range_type;
-        self.data[start + end - 1] = RangeType::End;
+        self.data[start].push(range_type);
+        self.data[start + end - 1].push(RangeType::End);
     }
 
     // `init' is a Haskell term for everything but the last element in a list (like head + tail, and
     // init + last). Used here because we are interested in looking up ranges but not their ends.
     pub fn lookup_range_inits(&self, point: usize) -> Vec<RangeType> {
-        match self.data[point] {
-            RangeType::None | RangeType::End => vec![],
-            x => vec![x],
+        let mut result = vec![];
+
+        for range_type in self.data[point].clone() {
+            if range_type != RangeType::End {
+                result.push(range_type);
+            }
         }
+
+        result
     }
 
     pub fn lookup_range_ends(&self, point: usize) -> usize {
-        if self.data[point] == RangeType::End {
-            1
-        } else {
-            0
-        }
+        self.data[point]
+            .iter()
+            .filter(|&x| *x == RangeType::End)
+            .count()
     }
 }
 
