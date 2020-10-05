@@ -142,8 +142,22 @@ impl ParsedElf {
         };
 
         information.push(("Type", type_to_string(ehdr.e_type)));
-
         information.push(("Architecture", machine_to_string(ehdr.e_machine)));
+        information.push(("Entrypoint", format!("0x{:x}", ehdr.e_entry)));
+        information.push((
+            "Program headers",
+            format!(
+                "{} * 0x{:x} @ {}",
+                ehdr.e_phnum, ehdr.e_phentsize, ehdr.e_phoff
+            ),
+        ));
+        information.push((
+            "Section headers",
+            format!(
+                "{} * 0x{:x} @ {}",
+                ehdr.e_shnum, ehdr.e_shentsize, ehdr.e_shoff
+            ),
+        ));
 
         let mut ranges = vec![RangeTypes::None; buf.len()];
 
