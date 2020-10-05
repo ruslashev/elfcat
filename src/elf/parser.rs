@@ -22,41 +22,41 @@ struct Elf64Ehdr {
 
 // All this just to avoid unsafe. This should be improved.
 impl Elf64Ehdr {
-    pub fn from_le_bytes(buf: &[u8]) -> Elf64Ehdr {
-        Elf64Ehdr {
-            e_ident: buf[0..16].try_into().unwrap(),
-            e_type: Elf64Half::from_le_bytes(buf[16..18].try_into().unwrap()),
-            e_machine: Elf64Half::from_le_bytes(buf[18..20].try_into().unwrap()),
-            e_version: Elf64Word::from_le_bytes(buf[20..24].try_into().unwrap()),
-            e_entry: Elf64Addr::from_le_bytes(buf[24..32].try_into().unwrap()),
-            e_phoff: Elf64Off::from_le_bytes(buf[32..40].try_into().unwrap()),
-            e_shoff: Elf64Off::from_le_bytes(buf[40..48].try_into().unwrap()),
-            e_flags: Elf64Word::from_le_bytes(buf[48..52].try_into().unwrap()),
-            e_ehsize: Elf64Half::from_le_bytes(buf[52..54].try_into().unwrap()),
-            e_phentsize: Elf64Half::from_le_bytes(buf[54..56].try_into().unwrap()),
-            e_phnum: Elf64Half::from_le_bytes(buf[56..58].try_into().unwrap()),
-            e_shentsize: Elf64Half::from_le_bytes(buf[58..60].try_into().unwrap()),
-            e_shnum: Elf64Half::from_le_bytes(buf[60..62].try_into().unwrap()),
-            e_shstrndx: Elf64Half::from_le_bytes(buf[62..64].try_into().unwrap()),
-        }
+    pub fn from_le_bytes(buf: &[u8]) -> Result<Elf64Ehdr, std::array::TryFromSliceError> {
+        Ok(Elf64Ehdr {
+            e_ident: buf[0..16].try_into()?,
+            e_type: Elf64Half::from_le_bytes(buf[16..18].try_into()?),
+            e_machine: Elf64Half::from_le_bytes(buf[18..20].try_into()?),
+            e_version: Elf64Word::from_le_bytes(buf[20..24].try_into()?),
+            e_entry: Elf64Addr::from_le_bytes(buf[24..32].try_into()?),
+            e_phoff: Elf64Off::from_le_bytes(buf[32..40].try_into()?),
+            e_shoff: Elf64Off::from_le_bytes(buf[40..48].try_into()?),
+            e_flags: Elf64Word::from_le_bytes(buf[48..52].try_into()?),
+            e_ehsize: Elf64Half::from_le_bytes(buf[52..54].try_into()?),
+            e_phentsize: Elf64Half::from_le_bytes(buf[54..56].try_into()?),
+            e_phnum: Elf64Half::from_le_bytes(buf[56..58].try_into()?),
+            e_shentsize: Elf64Half::from_le_bytes(buf[58..60].try_into()?),
+            e_shnum: Elf64Half::from_le_bytes(buf[60..62].try_into()?),
+            e_shstrndx: Elf64Half::from_le_bytes(buf[62..64].try_into()?),
+        })
     }
-    pub fn from_be_bytes(buf: &[u8]) -> Elf64Ehdr {
-        Elf64Ehdr {
-            e_ident: buf[0..16].try_into().unwrap(),
-            e_type: Elf64Half::from_be_bytes(buf[16..18].try_into().unwrap()),
-            e_machine: Elf64Half::from_be_bytes(buf[18..20].try_into().unwrap()),
-            e_version: Elf64Word::from_be_bytes(buf[20..24].try_into().unwrap()),
-            e_entry: Elf64Addr::from_be_bytes(buf[24..32].try_into().unwrap()),
-            e_phoff: Elf64Off::from_be_bytes(buf[32..40].try_into().unwrap()),
-            e_shoff: Elf64Off::from_be_bytes(buf[40..48].try_into().unwrap()),
-            e_flags: Elf64Word::from_be_bytes(buf[48..52].try_into().unwrap()),
-            e_ehsize: Elf64Half::from_be_bytes(buf[52..54].try_into().unwrap()),
-            e_phentsize: Elf64Half::from_be_bytes(buf[54..56].try_into().unwrap()),
-            e_phnum: Elf64Half::from_be_bytes(buf[56..58].try_into().unwrap()),
-            e_shentsize: Elf64Half::from_be_bytes(buf[58..60].try_into().unwrap()),
-            e_shnum: Elf64Half::from_be_bytes(buf[60..62].try_into().unwrap()),
-            e_shstrndx: Elf64Half::from_be_bytes(buf[62..64].try_into().unwrap()),
-        }
+    pub fn from_be_bytes(buf: &[u8]) -> Result<Elf64Ehdr, std::array::TryFromSliceError> {
+        Ok(Elf64Ehdr {
+            e_ident: buf[0..16].try_into()?,
+            e_type: Elf64Half::from_be_bytes(buf[16..18].try_into()?),
+            e_machine: Elf64Half::from_be_bytes(buf[18..20].try_into()?),
+            e_version: Elf64Word::from_be_bytes(buf[20..24].try_into()?),
+            e_entry: Elf64Addr::from_be_bytes(buf[24..32].try_into()?),
+            e_phoff: Elf64Off::from_be_bytes(buf[32..40].try_into()?),
+            e_shoff: Elf64Off::from_be_bytes(buf[40..48].try_into()?),
+            e_flags: Elf64Word::from_be_bytes(buf[48..52].try_into()?),
+            e_ehsize: Elf64Half::from_be_bytes(buf[52..54].try_into()?),
+            e_phentsize: Elf64Half::from_be_bytes(buf[54..56].try_into()?),
+            e_phnum: Elf64Half::from_be_bytes(buf[56..58].try_into()?),
+            e_shentsize: Elf64Half::from_be_bytes(buf[58..60].try_into()?),
+            e_shnum: Elf64Half::from_be_bytes(buf[60..62].try_into()?),
+            e_shstrndx: Elf64Half::from_be_bytes(buf[62..64].try_into()?),
+        })
     }
 }
 
@@ -167,7 +167,8 @@ impl ParsedElf {
             Elf64Ehdr::from_le_bytes(ehdr_slice)
         } else {
             Elf64Ehdr::from_be_bytes(ehdr_slice)
-        };
+        }
+        .map_err(|a| String::from(format!("failed to read file header: {}", a)))?;
 
         information.push(("Type", type_to_string(ehdr.e_type)));
         information.push(("Architecture", machine_to_string(ehdr.e_machine)));
