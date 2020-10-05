@@ -55,8 +55,8 @@ fn generate_head(o: &mut String, elf: &ParsedElf) {
 fn generate_header(o: &mut String, elf: &ParsedElf) {
     w!(o, 1, "<table>");
 
-    for (desc, value) in elf.information.iter() {
-        w!(o, 2, "<tr>");
+    for (id, desc, value) in elf.information.iter() {
+        w!(o, 2, "<tr id='{}'>", id);
 
         w!(o, 3, "<td>{}:</td>", desc);
         w!(o, 3, "<td>{}</td>", value);

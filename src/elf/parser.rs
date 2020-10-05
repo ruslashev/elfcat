@@ -66,6 +66,7 @@ pub enum RangeType {
     End,
     Ident,
     FileHeader,
+    HeaderDetail(&'static str),
 }
 
 impl RangeType {
@@ -73,6 +74,7 @@ impl RangeType {
         match self {
             RangeType::Ident => "ident",
             RangeType::FileHeader => "ehdr",
+            RangeType::HeaderDetail(class) => class,
             _ => "",
         }
     }
@@ -141,7 +143,7 @@ impl ParsedIdent {
 
 pub struct ParsedElf {
     pub filename: String,
-    pub information: Vec<(&'static str, String)>,
+    pub information: Vec<(&'static str, &'static str, String)>,
     pub contents: Vec<u8>,
     pub ranges: Ranges,
 }
@@ -160,6 +162,8 @@ impl ParsedElf {
 
         let mut information = vec![];
 
+        let mut ranges = Ranges::new(buf.len());
+
         ParsedElf::push_ident_info(&ident, &mut information)?;
 
         let ehdr_size = std::mem::size_of::<Elf64Ehdr>();
@@ -177,17 +181,30 @@ impl ParsedElf {
         }
         .map_err(|a| String::from(format!("failed to read file header: {}", a)))?;
 
-        information.push(("Type", type_to_string(ehdr.e_type)));
-        information.push(("Architecture", machine_to_string(ehdr.e_machine)));
-        information.push(("Entrypoint", format!("0x{:x}", ehdr.e_entry)));
+        information.push(("e_type", "Type", type_to_string(ehdr.e_type)));
+        ranges.add_range(16, 2, RangeType::HeaderDetail("e_type"));
+
         information.push((
+            "e_machine",
+            "Architecture",
+            machine_to_string(ehdr.e_machine),
+        ));
+        ranges.add_range(18, 2, RangeType::HeaderDetail("e_machine"));
+
+        information.push(("e_entry", "Entrypoint", format!("0x{:x}", ehdr.e_entry)));
+        ranges.add_range(24, 8, RangeType::HeaderDetail("e_entry"));
+
+        information.push((
+            "",
             "Program headers",
             format!(
                 "{} * 0x{:x} @ {}",
                 ehdr.e_phnum, ehdr.e_phentsize, ehdr.e_phoff
             ),
         ));
+
         information.push((
+            "",
             "Section headers",
             format!(
                 "{} * 0x{:x} @ {}",
@@ -195,11 +212,16 @@ impl ParsedElf {
             ),
         ));
 
-        let mut ranges = Ranges::new(buf.len());
-
         ranges.add_range(0, ehdr_size, RangeType::FileHeader);
 
         ranges.add_range(0, ELF_EI_NIDENT as usize, RangeType::Ident);
+
+        ranges.add_range(0, 4, RangeType::HeaderDetail("magic"));
+        ranges.add_range(4, 1, RangeType::HeaderDetail("class"));
+        ranges.add_range(5, 1, RangeType::HeaderDetail("data"));
+        ranges.add_range(6, 1, RangeType::HeaderDetail("ver"));
+        ranges.add_range(7, 1, RangeType::HeaderDetail("abi"));
+        ranges.add_range(8, 1, RangeType::HeaderDetail("abi_ver"));
 
         Ok(ParsedElf {
             filename: filename.clone(),
@@ -211,9 +233,10 @@ impl ParsedElf {
 
     fn push_ident_info(
         ident: &ParsedIdent,
-        information: &mut Vec<(&'static str, String)>,
+        information: &mut Vec<(&'static str, &'static str, String)>,
     ) -> Result<(), String> {
         information.push((
+            "class",
             "Object class",
             match ident.class {
                 ELF_CLASS32 => String::from("32-bit"),
@@ -223,6 +246,7 @@ impl ParsedElf {
         ));
 
         information.push((
+            "data",
             "Data encoding",
             match ident.endianness {
                 ELF_DATA2LSB => String::from("Little endian"),
@@ -232,13 +256,17 @@ impl ParsedElf {
         ));
 
         if ident.version != ELF_EV_CURRENT {
-            information.push(("Uncommon version(!)", format!("{}", ident.version)));
+            information.push(("ver", "Uncommon version(!)", format!("{}", ident.version)));
         }
 
-        information.push(("ABI", abi_to_string(ident.abi)));
+        information.push(("abi", "ABI", abi_to_string(ident.abi)));
 
         if !(ident.abi == ELF_OSABI_SYSV && ident.abi_ver == 0) {
-            information.push(("Uncommon ABI version(!)", format!("{}", ident.abi_ver)));
+            information.push((
+                "abi_ver",
+                "Uncommon ABI version(!)",
+                format!("{}", ident.abi_ver),
+            ));
         }
 
         Ok(())
