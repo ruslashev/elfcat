@@ -155,10 +155,12 @@ impl ParsedElf {
             },
         ));
 
+        information.push(("Architecture", machine_to_string(ehdr.e_machine)));
+
         let mut ranges = vec![RangeTypes::None; buf.len()];
 
         ranges[0] = RangeTypes::FileHeader;
-        ranges[ehdr_size] = RangeTypes::End;
+        ranges[ehdr_size - 1] = RangeTypes::End;
 
         Ok(ParsedElf {
             filename: filename.clone(),
