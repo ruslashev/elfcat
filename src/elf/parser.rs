@@ -60,7 +60,7 @@ impl Elf64Ehdr {
     }
 }
 
-#[derive(Clone, PartialEq)]
+#[derive(Copy, Clone, PartialEq)]
 pub enum RangeType {
     None,
     End,
@@ -68,10 +68,44 @@ pub enum RangeType {
 }
 
 impl RangeType {
-    pub fn class(&self) -> &str {
+    pub fn span_class(&self) -> &str {
         match self {
             RangeType::FileHeader => "ehdr",
             _ => "",
+        }
+    }
+}
+
+pub struct Ranges {
+    data: Vec<RangeType>,
+}
+
+impl Ranges {
+    fn new(capacity: usize) -> Ranges {
+        Ranges {
+            data: vec![RangeType::None; capacity],
+        }
+    }
+
+    fn add_range(&mut self, start: usize, end: usize, range_type: RangeType) {
+        self.data[start] = range_type;
+        self.data[start + end - 1] = RangeType::End;
+    }
+
+    // `init' is a Haskell term for everything but the last element in a list (like head + tail, and
+    // init + last). Used here because we are interested in looking up ranges but not their ends.
+    pub fn lookup_range_inits(&self, point: usize) -> Vec<RangeType> {
+        match self.data[point] {
+            RangeType::None | RangeType::End => vec![],
+            x => vec![x],
+        }
+    }
+
+    pub fn lookup_range_ends(&self, point: usize) -> usize {
+        if self.data[point] == RangeType::End {
+            1
+        } else {
+            0
         }
     }
 }
@@ -102,7 +136,7 @@ pub struct ParsedElf {
     pub filename: String,
     pub information: Vec<(&'static str, String)>,
     pub contents: Vec<u8>,
-    pub ranges: Vec<RangeType>,
+    pub ranges: Ranges,
 }
 
 impl ParsedElf {
@@ -153,10 +187,9 @@ impl ParsedElf {
             ),
         ));
 
-        let mut ranges = vec![RangeType::None; buf.len()];
+        let mut ranges = Ranges::new(buf.len());
 
-        ranges[0] = RangeType::FileHeader;
-        ranges[ehdr_size - 1] = RangeType::End;
+        ranges.add_range(0, ehdr_size, RangeType::FileHeader);
 
         Ok(ParsedElf {
             filename: filename.clone(),
