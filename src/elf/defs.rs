@@ -33,6 +33,19 @@ pub const ELF_ET_HIOS: u16 = 0xfeff;
 pub const ELF_ET_LOPROC: u16 = 0xff00;
 pub const ELF_ET_HIPROC: u16 = 0xffff;
 
+pub fn type_to_string(e_type: u16) -> String {
+    match e_type {
+        ELF_ET_NONE => String::from("None (NONE)"),
+        ELF_ET_REL => String::from("Relocatable object file (REL)"),
+        ELF_ET_EXEC => String::from("Executable file (EXEC)"),
+        ELF_ET_DYN => String::from("Shared object file (DYN)"),
+        ELF_ET_CORE => String::from("Core file (CORE)"),
+        ELF_ET_LOOS | ELF_ET_HIOS => String::from("Environment-specific use"),
+        ELF_ET_LOPROC | ELF_ET_HIPROC => String::from("Processor-specific use"),
+        x => format!("Unknown {}", x),
+    }
+}
+
 pub fn abi_to_string(abi: u8) -> String {
     match abi {
         ELF_OSABI_SYSV => String::from("SysV"),

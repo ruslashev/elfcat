@@ -141,19 +141,7 @@ impl ParsedElf {
             ElfEhdr::from_be_bytes(ehdr_slice)
         };
 
-        information.push((
-            "Type",
-            match ehdr.e_type {
-                ELF_ET_NONE => String::from("None (NONE)"),
-                ELF_ET_REL => String::from("Relocatable object file (REL)"),
-                ELF_ET_EXEC => String::from("Executable file (EXEC)"),
-                ELF_ET_DYN => String::from("Shared object file (DYN)"),
-                ELF_ET_CORE => String::from("Core file (CORE)"),
-                ELF_ET_LOOS | ELF_ET_HIOS => String::from("Environment-specific use"),
-                ELF_ET_LOPROC | ELF_ET_HIPROC => String::from("Processor-specific use"),
-                x => format!("Unknown {}", x),
-            },
-        ));
+        information.push(("Type", type_to_string(ehdr.e_type)));
 
         information.push(("Architecture", machine_to_string(ehdr.e_machine)));
 
