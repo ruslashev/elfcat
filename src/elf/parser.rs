@@ -1,40 +1,7 @@
+use super::defs::*;
+use super::types::*;
 use bincode::Options;
 use serde::Deserialize;
-use super::types::*;
-
-const ELF_EI_MAG0: u8 = 0;
-const ELF_EI_MAG1: u8 = 1;
-const ELF_EI_MAG2: u8 = 2;
-const ELF_EI_MAG3: u8 = 3;
-const ELF_EI_CLASS: u8 = 4;
-const ELF_EI_DATA: u8 = 5;
-const ELF_EI_VERSION: u8 = 6;
-const ELF_EI_OSABI: u8 = 7;
-const ELF_EI_ABIVERSION: u8 = 8;
-const ELF_EI_PAD: u8 = 9;
-const ELF_EI_NIDENT: u8 = 16;
-
-const ELF_CLASS32: u8 = 1;
-const ELF_CLASS64: u8 = 2;
-
-const ELF_DATA2LSB: u8 = 1;
-const ELF_DATA2MSB: u8 = 2;
-
-const ELF_EV_CURRENT: u8 = 1;
-
-const ELF_OSABI_SYSV: u8 = 0;
-const ELF_OSABI_HPUX: u8 = 1;
-const ELF_OSABI_STANDALONE: u8 = 255;
-
-const ELF_ET_NONE: Elf64Half = 0;
-const ELF_ET_REL: Elf64Half = 1;
-const ELF_ET_EXEC: Elf64Half = 2;
-const ELF_ET_DYN: Elf64Half = 3;
-const ELF_ET_CORE: Elf64Half = 4;
-const ELF_ET_LOOS: Elf64Half = 0xfe00;
-const ELF_ET_HIOS: Elf64Half = 0xfeff;
-const ELF_ET_LOPROC: Elf64Half = 0xff00;
-const ELF_ET_HIPROC: Elf64Half = 0xffff;
 
 #[repr(packed)]
 #[derive(Deserialize)]
