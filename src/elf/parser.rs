@@ -76,6 +76,28 @@ impl RangeTypes {
     }
 }
 
+struct ParsedIdent {
+    magic: [u8; 4],
+    class: u8,
+    endianness: u8,
+    version: u8,
+    abi: u8,
+    abi_ver: u8,
+}
+
+impl ParsedIdent {
+    fn from_bytes(buf: &Vec<u8>) -> ParsedIdent {
+        ParsedIdent {
+            magic: [buf[0], buf[1], buf[2], buf[3]],
+            class: buf[ELF_EI_CLASS as usize],
+            endianness: buf[ELF_EI_DATA as usize],
+            version: buf[ELF_EI_VERSION as usize],
+            abi: buf[ELF_EI_OSABI as usize],
+            abi_ver: buf[ELF_EI_ABIVERSION as usize],
+        }
+    }
+}
+
 pub struct ParsedElf {
     pub filename: String,
     pub information: Vec<(&'static str, String)>,
@@ -89,7 +111,9 @@ impl ParsedElf {
             return Err(String::from("file is smaller than ELF header's e_ident"));
         }
 
-        if buf[0..=ELF_EI_MAG3 as usize] != [0x7f, 'E' as u8, 'L' as u8, 'F' as u8] {
+        let ident = ParsedIdent::from_bytes(&buf);
+
+        if ident.magic != [0x7f, 'E' as u8, 'L' as u8, 'F' as u8] {
             return Err(String::from("mismatched magic: not an ELF file"));
         }
 
@@ -97,34 +121,30 @@ impl ParsedElf {
 
         information.push((
             "Object class",
-            match buf[ELF_EI_CLASS as usize] {
+            match ident.class {
                 ELF_CLASS32 => String::from("32-bit"),
                 ELF_CLASS64 => String::from("64-bit"),
                 x => format!("Unknown: {}", x),
             },
         ));
 
-        let endianness = buf[ELF_EI_DATA as usize];
         information.push((
             "Data encoding",
-            match endianness {
+            match ident.endianness {
                 ELF_DATA2LSB => String::from("Little endian"),
                 ELF_DATA2MSB => String::from("Big endian"),
                 x => return Err(format!("Unknown endianness: {}", x)),
             },
         ));
 
-        let ver = buf[ELF_EI_VERSION as usize];
-        if ver != ELF_EV_CURRENT {
-            information.push(("Uncommon version(!)", format!("{}", ver)));
+        if ident.version != ELF_EV_CURRENT {
+            information.push(("Uncommon version(!)", format!("{}", ident.version)));
         }
 
-        let abi = buf[ELF_EI_OSABI as usize];
-        information.push(("ABI", abi_to_string(abi)));
+        information.push(("ABI", abi_to_string(ident.abi)));
 
-        let abi_ver = buf[ELF_EI_ABIVERSION as usize];
-        if !(abi == ELF_OSABI_SYSV && abi_ver == 0) {
-            information.push(("Uncommon ABI version(!)", format!("{}", abi_ver)));
+        if !(ident.abi == ELF_OSABI_SYSV && ident.abi_ver == 0) {
+            information.push(("Uncommon ABI version(!)", format!("{}", ident.abi_ver)));
         }
 
         let ehdr_size = std::mem::size_of::<ElfEhdr>();
@@ -135,7 +155,7 @@ impl ParsedElf {
 
         let ehdr_slice = &buf[0..ehdr_size];
 
-        let ehdr = if endianness == ELF_DATA2LSB {
+        let ehdr = if ident.endianness == ELF_DATA2LSB {
             ElfEhdr::from_le_bytes(ehdr_slice)
         } else {
             ElfEhdr::from_be_bytes(ehdr_slice)
