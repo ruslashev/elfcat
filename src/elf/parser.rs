@@ -119,33 +119,7 @@ impl ParsedElf {
 
         let mut information = vec![];
 
-        information.push((
-            "Object class",
-            match ident.class {
-                ELF_CLASS32 => String::from("32-bit"),
-                ELF_CLASS64 => String::from("64-bit"),
-                x => format!("Unknown: {}", x),
-            },
-        ));
-
-        information.push((
-            "Data encoding",
-            match ident.endianness {
-                ELF_DATA2LSB => String::from("Little endian"),
-                ELF_DATA2MSB => String::from("Big endian"),
-                x => return Err(format!("Unknown endianness: {}", x)),
-            },
-        ));
-
-        if ident.version != ELF_EV_CURRENT {
-            information.push(("Uncommon version(!)", format!("{}", ident.version)));
-        }
-
-        information.push(("ABI", abi_to_string(ident.abi)));
-
-        if !(ident.abi == ELF_OSABI_SYSV && ident.abi_ver == 0) {
-            information.push(("Uncommon ABI version(!)", format!("{}", ident.abi_ver)));
-        }
+        ParsedElf::push_ident_info(&ident, &mut information)?;
 
         let ehdr_size = std::mem::size_of::<ElfEhdr>();
 
@@ -190,5 +164,40 @@ impl ParsedElf {
             contents: buf,
             ranges,
         })
+    }
+
+    fn push_ident_info(
+        ident: &ParsedIdent,
+        information: &mut Vec<(&'static str, String)>,
+    ) -> Result<(), String> {
+        information.push((
+            "Object class",
+            match ident.class {
+                ELF_CLASS32 => String::from("32-bit"),
+                ELF_CLASS64 => String::from("64-bit"),
+                x => return Err(format!("Unknown bitness: {}", x)),
+            },
+        ));
+
+        information.push((
+            "Data encoding",
+            match ident.endianness {
+                ELF_DATA2LSB => String::from("Little endian"),
+                ELF_DATA2MSB => String::from("Big endian"),
+                x => return Err(format!("Unknown endianness: {}", x)),
+            },
+        ));
+
+        if ident.version != ELF_EV_CURRENT {
+            information.push(("Uncommon version(!)", format!("{}", ident.version)));
+        }
+
+        information.push(("ABI", abi_to_string(ident.abi)));
+
+        if !(ident.abi == ELF_OSABI_SYSV && ident.abi_ver == 0) {
+            information.push(("Uncommon ABI version(!)", format!("{}", ident.abi_ver)));
+        }
+
+        Ok(())
     }
 }
