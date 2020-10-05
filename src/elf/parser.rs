@@ -41,7 +41,7 @@ impl RangeTypes {
 
 pub struct ParsedElf {
     pub filename: String,
-    pub identification: Vec<(String, String)>,
+    pub information: Vec<(&'static str, String)>,
     pub contents: Vec<u8>,
     pub ranges: Vec<RangeTypes>,
 }
@@ -56,10 +56,10 @@ impl ParsedElf {
             return Err(String::from("mismatched magic: not an ELF file"));
         }
 
-        let mut identification = vec![];
+        let mut information = vec![];
 
-        identification.push((
-            String::from("Object class"),
+        information.push((
+            "Object class",
             match buf[ELF_EI_CLASS as usize] {
                 ELF_CLASS32 => String::from("32-bit"),
                 ELF_CLASS64 => String::from("64-bit"),
@@ -68,8 +68,8 @@ impl ParsedElf {
         ));
 
         let endianness = buf[ELF_EI_DATA as usize];
-        identification.push((
-            String::from("Data encoding"),
+        information.push((
+            "Data encoding",
             match endianness {
                 ELF_DATA2LSB => String::from("Little endian"),
                 ELF_DATA2MSB => String::from("Big endian"),
@@ -79,12 +79,12 @@ impl ParsedElf {
 
         let ver = buf[ELF_EI_VERSION as usize];
         if ver != ELF_EV_CURRENT {
-            identification.push((String::from("Uncommon version(!)"), format!("{}", ver)));
+            information.push(("Uncommon version(!)", format!("{}", ver)));
         }
 
         let abi = buf[ELF_EI_OSABI as usize];
-        identification.push((
-            String::from("ABI"),
+        information.push((
+            "ABI",
             match abi {
                 ELF_OSABI_SYSV => String::from("SysV"),
                 ELF_OSABI_HPUX => String::from("HP-UX"),
@@ -95,10 +95,7 @@ impl ParsedElf {
 
         let abi_ver = buf[ELF_EI_ABIVERSION as usize];
         if !(abi == ELF_OSABI_SYSV && abi_ver == 0) {
-            identification.push((
-                String::from("Uncommon ABI version(!)"),
-                format!("{}", abi_ver),
-            ));
+            information.push(("Uncommon ABI version(!)", format!("{}", abi_ver)));
         }
 
         let ehdr_size = std::mem::size_of::<ElfEhdr>();
@@ -124,8 +121,8 @@ impl ParsedElf {
             Err(why) => return Err(format!("failed to deserialize into file header: {}", why)),
         };
 
-        identification.push((
-            String::from("Type"),
+        information.push((
+            "Type",
             match ehdr.e_type {
                 ELF_ET_NONE => String::from("None (NONE)"),
                 ELF_ET_REL => String::from("Relocatable object file (REL)"),
@@ -145,7 +142,7 @@ impl ParsedElf {
 
         Ok(ParsedElf {
             filename: filename.clone(),
-            identification,
+            information,
             contents: buf,
             ranges,
         })
