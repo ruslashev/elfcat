@@ -83,15 +83,7 @@ impl ParsedElf {
         }
 
         let abi = buf[ELF_EI_OSABI as usize];
-        information.push((
-            "ABI",
-            match abi {
-                ELF_OSABI_SYSV => String::from("SysV"),
-                ELF_OSABI_HPUX => String::from("HP-UX"),
-                ELF_OSABI_STANDALONE => String::from("Standalone"),
-                x => format!("Unknown: {}", x),
-            },
-        ));
+        information.push(("ABI", abi_to_string(abi)));
 
         let abi_ver = buf[ELF_EI_ABIVERSION as usize];
         if !(abi == ELF_OSABI_SYSV && abi_ver == 0) {
