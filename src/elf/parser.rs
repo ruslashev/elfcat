@@ -60,15 +60,18 @@ impl Elf64Ehdr {
     }
 }
 
+#[repr(u8)]
 #[derive(Copy, Clone, PartialEq)]
 pub enum RangeType {
     End,
+    Ident,
     FileHeader,
 }
 
 impl RangeType {
     pub fn span_class(&self) -> &str {
         match self {
+            RangeType::Ident => "ident",
             RangeType::FileHeader => "ehdr",
             _ => "",
         }
@@ -195,6 +198,8 @@ impl ParsedElf {
         let mut ranges = Ranges::new(buf.len());
 
         ranges.add_range(0, ehdr_size, RangeType::FileHeader);
+
+        ranges.add_range(0, ELF_EI_NIDENT as usize, RangeType::Ident);
 
         Ok(ParsedElf {
             filename: filename.clone(),

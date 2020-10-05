@@ -6,6 +6,9 @@
   border: 1px solid;
   display: inline-block;
 }
+.ident {
+  background-color: #e99;
+}
 .ehdr {
   background-color: #99e;
 }
