@@ -33,8 +33,15 @@ fn indent(level: usize, line: &str) -> String {
 
 macro_rules! w {
     ($dst:expr, $indent_level:expr, $($arg:tt)*) => {
+        wnonl!($dst, $indent_level, $( $arg )* );
+        writeln!($dst, "").unwrap();
+    }
+}
+
+macro_rules! wnonl {
+    ($dst:expr, $indent_level:expr, $($arg:tt)*) => {
         write!($dst, "{}", INDENT.repeat($indent_level)).unwrap();
-        writeln!($dst, $( $arg )* ).unwrap();
+        write!($dst, $( $arg )* ).unwrap();
     }
 }
 
@@ -48,7 +55,9 @@ fn generate_head(o: &mut String, elf: &ParsedElf) {
     w!(o, 0, "<head>");
     w!(o, 1, "<meta charset='utf-8'>");
     w!(o, 1, "<title>{}</title>", basename(&elf.filename));
-    w!(o, 1, "<style>\n{}</style>", stylesheet);
+    w!(o, 1, "<style>");
+    wnonl!(o, 1, "{}", stylesheet);
+    w!(o, 1, "</style>");
     w!(o, 0, "</head>");
 }
 
@@ -76,16 +85,16 @@ fn generate_body(o: &mut String, elf: &ParsedElf) {
 
     for (i, b) in elf.contents.iter().take(192).enumerate() {
         for range_type in elf.ranges.lookup_range_inits(i) {
-            write!(o, "<span class='{}'>", range_type.span_class()).unwrap();
+            wnonl!(o, 0, "<span class='{}'>", range_type.span_class());
         }
 
-        write!(o, "{:02x}", b).unwrap();
+        wnonl!(o, 0, "{:02x}", b);
 
         for _ in 0..elf.ranges.lookup_range_ends(i) {
-            write!(o, "</span>").unwrap();
+            wnonl!(o, 0, "</span>");
         }
 
-        write!(o, "{}", if (i + 1) % 16 == 0 { "</br>\n" } else { " " }).unwrap();
+        wnonl!(o, 0, "{}", if (i + 1) % 16 == 0 { "</br>\n" } else { " " });
     }
 
     w!(o, 1, "</div>");
