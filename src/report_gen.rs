@@ -56,7 +56,7 @@ fn generate_head(o: &mut String, elf: &ParsedElf) {
     w!(o, 1, "<meta charset='utf-8'>");
     w!(o, 1, "<title>{}</title>", basename(&elf.filename));
     w!(o, 1, "<style>");
-    wnonl!(o, 1, "{}", stylesheet);
+    wnonl!(o, 0, "{}", stylesheet);
     w!(o, 1, "</style>");
     w!(o, 0, "</head>");
 }
@@ -65,7 +65,7 @@ fn generate_header(o: &mut String, elf: &ParsedElf) {
     w!(o, 1, "<table>");
 
     for (id, desc, value) in elf.information.iter() {
-        w!(o, 2, "<tr id='{}'>", id);
+        w!(o, 2, "<tr id='desc_{}'>", id);
 
         w!(o, 3, "<td>{}:</td>", desc);
         w!(o, 3, "<td>{}</td>", value);
@@ -74,6 +74,40 @@ fn generate_header(o: &mut String, elf: &ParsedElf) {
     }
 
     w!(o, 1, "</table>");
+}
+
+fn add_hover_scripts(o: &mut String) {
+    let template: &str = include_str!("hover-template.js");
+    let ids = [
+        "class",
+        "data",
+        "abi",
+        "abi_ver",
+        "e_type",
+        "e_machine",
+        "e_entry",
+        "ph",
+        "sh",
+    ];
+    let color = "#ee9";
+
+    w!(o, 1, "<script type='text/javascript'>");
+
+    for id in ids.iter() {
+        let desc = format!("desc_{}", id);
+
+        // this is really ugly
+        let code = template
+            .replace("primary_id", id)
+            .as_str()
+            .replace("secondary_id", desc.as_str())
+            .replace("color", color);
+        let indented: String = code.lines().map(|x| indent(2, x) + "\n").collect();
+
+        wnonl!(o, 0, "{}", indented);
+    }
+
+    w!(o, 1, "</script>");
 }
 
 fn generate_body(o: &mut String, elf: &ParsedElf) {
@@ -85,7 +119,7 @@ fn generate_body(o: &mut String, elf: &ParsedElf) {
 
     for (i, b) in elf.contents.iter().take(192).enumerate() {
         for range_type in elf.ranges.lookup_range_inits(i) {
-            wnonl!(o, 0, "<span class='{}'>", range_type.span_class());
+            wnonl!(o, 0, "<span id='{}'>", range_type.span_id());
         }
 
         wnonl!(o, 0, "{:02x}", b);
@@ -98,6 +132,8 @@ fn generate_body(o: &mut String, elf: &ParsedElf) {
     }
 
     w!(o, 1, "</div>");
+
+    add_hover_scripts(o);
 
     w!(o, 0, "</body>");
 }

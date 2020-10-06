@@ -70,7 +70,7 @@ pub enum RangeType {
 }
 
 impl RangeType {
-    pub fn span_class(&self) -> &str {
+    pub fn span_id(&self) -> &str {
         match self {
             RangeType::Ident => "ident",
             RangeType::FileHeader => "ehdr",
@@ -195,7 +195,7 @@ impl ParsedElf {
         ranges.add_range(24, 8, RangeType::HeaderDetail("e_entry"));
 
         information.push((
-            "",
+            "ph",
             "Program headers",
             format!(
                 "{} * 0x{:x} @ {}",
@@ -204,7 +204,7 @@ impl ParsedElf {
         ));
 
         information.push((
-            "",
+            "sh",
             "Section headers",
             format!(
                 "{} * 0x{:x} @ {}",

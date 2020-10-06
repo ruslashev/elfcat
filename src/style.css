@@ -6,9 +6,9 @@
   border: 1px solid;
   display: inline-block;
 }
-.ident {
+#ident {
   background-color: #e99;
 }
-.ehdr {
+#ehdr {
   background-color: #99e;
 }
