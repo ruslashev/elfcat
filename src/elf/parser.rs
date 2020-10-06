@@ -191,6 +191,8 @@ impl ParsedElf {
         ));
         ranges.add_range(18, 2, RangeType::HeaderDetail("e_machine"));
 
+        ranges.add_range(20, 4, RangeType::HeaderDetail("e_version"));
+
         information.push(("e_entry", "Entrypoint", format!("0x{:x}", ehdr.e_entry)));
         ranges.add_range(24, 8, RangeType::HeaderDetail("e_entry"));
 
@@ -222,6 +224,7 @@ impl ParsedElf {
         ranges.add_range(6, 1, RangeType::HeaderDetail("ver"));
         ranges.add_range(7, 1, RangeType::HeaderDetail("abi"));
         ranges.add_range(8, 1, RangeType::HeaderDetail("abi_ver"));
+        ranges.add_range(9, 7, RangeType::HeaderDetail("pad"));
 
         Ok(ParsedElf {
             filename: filename.clone(),

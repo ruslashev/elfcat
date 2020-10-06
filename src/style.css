@@ -6,7 +6,7 @@
   border: 1px solid;
   display: inline-block;
 }
-#magic:hover {
+#magic:hover, #ver:hover, #abi_ver:hover, #pad:hover, #e_version:hover {
   background-color: #ee9;
 }
 #ident {
