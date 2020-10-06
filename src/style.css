@@ -6,6 +6,9 @@
   border: 1px solid;
   display: inline-block;
 }
+#magic:hover {
+  background-color: #ee9;
+}
 #ident {
   background-color: #e99;
 }

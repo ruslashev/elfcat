@@ -110,6 +110,14 @@ fn add_hover_scripts(o: &mut String) {
     w!(o, 1, "</script>");
 }
 
+fn format_magic(byte: u8) -> String {
+    if byte.is_ascii_graphic() {
+        format!("&nbsp;{}", char::from(byte))
+    } else {
+        format!("{:02x}", byte)
+    }
+}
+
 fn generate_body(o: &mut String, elf: &ParsedElf) {
     w!(o, 0, "<body>");
 
@@ -122,7 +130,11 @@ fn generate_body(o: &mut String, elf: &ParsedElf) {
             wnonl!(o, 0, "<span id='{}'>", range_type.span_id());
         }
 
-        wnonl!(o, 0, "{:02x}", b);
+        if i < 4 {
+            wnonl!(o, 0, "{}", format_magic(*b));
+        } else {
+            wnonl!(o, 0, "{:02x}", b);
+        }
 
         for _ in 0..elf.ranges.lookup_range_ends(i) {
             wnonl!(o, 0, "</span>");
