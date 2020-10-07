@@ -1,64 +1,6 @@
 use super::defs::*;
-use super::types::*;
-use std::convert::TryInto;
-
-#[allow(dead_code)] // REMOVEME
-struct Elf64Ehdr {
-    e_ident: [u8; 16],
-    e_type: Elf64Half,
-    e_machine: Elf64Half,
-    e_version: Elf64Word,
-    e_entry: Elf64Addr,
-    e_phoff: Elf64Off,
-    e_shoff: Elf64Off,
-    e_flags: Elf64Word,
-    e_ehsize: Elf64Half,
-    e_phentsize: Elf64Half,
-    e_phnum: Elf64Half,
-    e_shentsize: Elf64Half,
-    e_shnum: Elf64Half,
-    e_shstrndx: Elf64Half,
-}
-
-// All this just to avoid unsafe. This should be improved.
-impl Elf64Ehdr {
-    pub fn from_le_bytes(buf: &[u8]) -> Result<Elf64Ehdr, std::array::TryFromSliceError> {
-        Ok(Elf64Ehdr {
-            e_ident: buf[0..16].try_into()?,
-            e_type: Elf64Half::from_le_bytes(buf[16..18].try_into()?),
-            e_machine: Elf64Half::from_le_bytes(buf[18..20].try_into()?),
-            e_version: Elf64Word::from_le_bytes(buf[20..24].try_into()?),
-            e_entry: Elf64Addr::from_le_bytes(buf[24..32].try_into()?),
-            e_phoff: Elf64Off::from_le_bytes(buf[32..40].try_into()?),
-            e_shoff: Elf64Off::from_le_bytes(buf[40..48].try_into()?),
-            e_flags: Elf64Word::from_le_bytes(buf[48..52].try_into()?),
-            e_ehsize: Elf64Half::from_le_bytes(buf[52..54].try_into()?),
-            e_phentsize: Elf64Half::from_le_bytes(buf[54..56].try_into()?),
-            e_phnum: Elf64Half::from_le_bytes(buf[56..58].try_into()?),
-            e_shentsize: Elf64Half::from_le_bytes(buf[58..60].try_into()?),
-            e_shnum: Elf64Half::from_le_bytes(buf[60..62].try_into()?),
-            e_shstrndx: Elf64Half::from_le_bytes(buf[62..64].try_into()?),
-        })
-    }
-    pub fn from_be_bytes(buf: &[u8]) -> Result<Elf64Ehdr, std::array::TryFromSliceError> {
-        Ok(Elf64Ehdr {
-            e_ident: buf[0..16].try_into()?,
-            e_type: Elf64Half::from_be_bytes(buf[16..18].try_into()?),
-            e_machine: Elf64Half::from_be_bytes(buf[18..20].try_into()?),
-            e_version: Elf64Word::from_be_bytes(buf[20..24].try_into()?),
-            e_entry: Elf64Addr::from_be_bytes(buf[24..32].try_into()?),
-            e_phoff: Elf64Off::from_be_bytes(buf[32..40].try_into()?),
-            e_shoff: Elf64Off::from_be_bytes(buf[40..48].try_into()?),
-            e_flags: Elf64Word::from_be_bytes(buf[48..52].try_into()?),
-            e_ehsize: Elf64Half::from_be_bytes(buf[52..54].try_into()?),
-            e_phentsize: Elf64Half::from_be_bytes(buf[54..56].try_into()?),
-            e_phnum: Elf64Half::from_be_bytes(buf[56..58].try_into()?),
-            e_shentsize: Elf64Half::from_be_bytes(buf[58..60].try_into()?),
-            e_shnum: Elf64Half::from_be_bytes(buf[60..62].try_into()?),
-            e_shstrndx: Elf64Half::from_be_bytes(buf[62..64].try_into()?),
-        })
-    }
-}
+use super::elf32::*;
+use super::elf64::*;
 
 #[repr(u8)]
 #[derive(Copy, Clone, PartialEq)]
@@ -160,9 +102,9 @@ impl ParsedElf {
             return Err(String::from("mismatched magic: not an ELF file"));
         }
 
-        let mut information = vec![];
-
         let mut ranges = Ranges::new(buf.len());
+
+        let mut information = vec![];
 
         ParsedElf::push_ident_info(&ident, &mut information)?;
 
