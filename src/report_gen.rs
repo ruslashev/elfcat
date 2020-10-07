@@ -90,8 +90,8 @@ fn generate_header(o: &mut String, elf: &ParsedElf) {
     w!(o, 1, "</table>");
 }
 
-fn add_hover_scripts(o: &mut String) {
-    let template: &str = include_str!("hover-template.js");
+fn add_highlight_script(o: &mut String) {
+    let template: &str = include_str!("highlight.js");
     let ids = [
         "class",
         "data",
@@ -159,7 +159,7 @@ fn generate_body(o: &mut String, elf: &ParsedElf) {
 
     w!(o, 1, "</div>");
 
-    add_hover_scripts(o);
+    add_highlight_script(o);
 
     w!(o, 0, "</body>");
 }
