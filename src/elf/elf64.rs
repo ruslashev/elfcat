@@ -1,36 +1,38 @@
 #![cfg_attr(debug_assertions, allow(dead_code))]
 
+use super::defs::*;
+use super::parser::*;
 use std::convert::TryInto;
 
-pub type Elf64Addr = u64;
-pub type Elf64Off = u64;
-pub type Elf64Half = u16;
-pub type Elf64Word = u32;
-pub type Elf64Sword = i32;
-pub type Elf64Xword = u64;
-pub type Elf64Sxword = i64;
+type Elf64Addr = u64;
+type Elf64Off = u64;
+type Elf64Half = u16;
+type Elf64Word = u32;
+type Elf64Sword = i32;
+type Elf64Xword = u64;
+type Elf64Sxword = i64;
 
 #[allow(dead_code)] // REMOVEME
-pub struct Elf64Ehdr {
-    pub e_ident: [u8; 16],
-    pub e_type: Elf64Half,
-    pub e_machine: Elf64Half,
-    pub e_version: Elf64Word,
-    pub e_entry: Elf64Addr,
-    pub e_phoff: Elf64Off,
-    pub e_shoff: Elf64Off,
-    pub e_flags: Elf64Word,
-    pub e_ehsize: Elf64Half,
-    pub e_phentsize: Elf64Half,
-    pub e_phnum: Elf64Half,
-    pub e_shentsize: Elf64Half,
-    pub e_shnum: Elf64Half,
-    pub e_shstrndx: Elf64Half,
+struct Elf64Ehdr {
+    e_ident: [u8; 16],
+    e_type: Elf64Half,
+    e_machine: Elf64Half,
+    e_version: Elf64Word,
+    e_entry: Elf64Addr,
+    e_phoff: Elf64Off,
+    e_shoff: Elf64Off,
+    e_flags: Elf64Word,
+    e_ehsize: Elf64Half,
+    e_phentsize: Elf64Half,
+    e_phnum: Elf64Half,
+    e_shentsize: Elf64Half,
+    e_shnum: Elf64Half,
+    e_shstrndx: Elf64Half,
 }
 
 // All this just to avoid unsafe. This should be improved.
 impl Elf64Ehdr {
-    pub fn from_le_bytes(buf: &[u8]) -> Result<Elf64Ehdr, std::array::TryFromSliceError> {
+    fn from_le_bytes(buf: &[u8]) -> Result<Elf64Ehdr, std::array::TryFromSliceError> {
         Ok(Elf64Ehdr {
             e_ident: buf[0..16].try_into()?,
             e_type: Elf64Half::from_le_bytes(buf[16..18].try_into()?),
@@ -48,7 +50,7 @@ impl Elf64Ehdr {
             e_shstrndx: Elf64Half::from_le_bytes(buf[62..64].try_into()?),
         })
     }
-    pub fn from_be_bytes(buf: &[u8]) -> Result<Elf64Ehdr, std::array::TryFromSliceError> {
+    fn from_be_bytes(buf: &[u8]) -> Result<Elf64Ehdr, std::array::TryFromSliceError> {
         Ok(Elf64Ehdr {
             e_ident: buf[0..16].try_into()?,
             e_type: Elf64Half::from_be_bytes(buf[16..18].try_into()?),
@@ -66,4 +68,63 @@ impl Elf64Ehdr {
             e_shstrndx: Elf64Half::from_be_bytes(buf[62..64].try_into()?),
         })
     }
+}
+
+pub fn parse(
+    buf: &Vec<u8>,
+    ident: &ParsedIdent,
+    information: &mut Vec<InfoTuple>,
+    ranges: &mut Ranges,
+) -> Result<(), String> {
+    let ehdr_size = std::mem::size_of::<Elf64Ehdr>();
+
+    if buf.len() < ehdr_size {
+        return Err(String::from("file is smaller than ELF file header"));
+    }
+
+    let ehdr_slice = &buf[0..ehdr_size];
+
+    let ehdr = if ident.endianness == ELF_DATA2LSB {
+        Elf64Ehdr::from_le_bytes(ehdr_slice)
+    } else {
+        Elf64Ehdr::from_be_bytes(ehdr_slice)
+    }
+    .map_err(|a| String::from(format!("failed to read file header: {}", a)))?;
+
+    information.push(("e_type", "Type", type_to_string(ehdr.e_type)));
+    ranges.add_range(16, 2, RangeType::HeaderDetail("e_type"));
+
+    information.push((
+        "e_machine",
+        "Architecture",
+        machine_to_string(ehdr.e_machine),
+    ));
+    ranges.add_range(18, 2, RangeType::HeaderDetail("e_machine"));
+
+    ranges.add_range(20, 4, RangeType::HeaderDetail("e_version"));
+
+    information.push(("e_entry", "Entrypoint", format!("0x{:x}", ehdr.e_entry)));
+    ranges.add_range(24, 8, RangeType::HeaderDetail("e_entry"));
+
+    information.push((
+        "ph",
+        "Program headers",
+        format!(
+            "{} * 0x{:x} @ {}",
+            ehdr.e_phnum, ehdr.e_phentsize, ehdr.e_phoff
+        ),
+    ));
+
+    information.push((
+        "sh",
+        "Section headers",
+        format!(
+            "{} * 0x{:x} @ {}",
+            ehdr.e_shnum, ehdr.e_shentsize, ehdr.e_shoff
+        ),
+    ));
+
+    ranges.add_range(0, ehdr_size, RangeType::FileHeader);
+
+    Ok(())
 }

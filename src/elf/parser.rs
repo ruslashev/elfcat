@@ -1,6 +1,8 @@
 use super::defs::*;
-use super::elf32::*;
-use super::elf64::*;
+use super::elf32;
+use super::elf64;
+
+pub type InfoTuple = (&'static str, &'static str, String);
 
 #[repr(u8)]
 #[derive(Copy, Clone, PartialEq)]
@@ -34,7 +36,7 @@ impl Ranges {
         }
     }
 
-    fn add_range(&mut self, start: usize, end: usize, range_type: RangeType) {
+    pub fn add_range(&mut self, start: usize, end: usize, range_type: RangeType) {
         self.data[start].push(range_type);
         self.data[start + end - 1].push(RangeType::End);
     }
@@ -61,13 +63,13 @@ impl Ranges {
     }
 }
 
-struct ParsedIdent {
-    magic: [u8; 4],
-    class: u8,
-    endianness: u8,
-    version: u8,
-    abi: u8,
-    abi_ver: u8,
+pub struct ParsedIdent {
+    pub magic: [u8; 4],
+    pub class: u8,
+    pub endianness: u8,
+    pub version: u8,
+    pub abi: u8,
+    pub abi_ver: u8,
 }
 
 impl ParsedIdent {
@@ -108,55 +110,11 @@ impl ParsedElf {
 
         ParsedElf::push_ident_info(&ident, &mut information)?;
 
-        let ehdr_size = std::mem::size_of::<Elf64Ehdr>();
-
-        if buf.len() < ehdr_size {
-            return Err(String::from("file is smaller than ELF file header"));
-        }
-
-        let ehdr_slice = &buf[0..ehdr_size];
-
-        let ehdr = if ident.endianness == ELF_DATA2LSB {
-            Elf64Ehdr::from_le_bytes(ehdr_slice)
+        if ident.class == ELF_CLASS32 {
+            elf32::parse(&buf, &ident, &mut information, &mut ranges)?;
         } else {
-            Elf64Ehdr::from_be_bytes(ehdr_slice)
+            elf64::parse(&buf, &ident, &mut information, &mut ranges)?;
         }
-        .map_err(|a| String::from(format!("failed to read file header: {}", a)))?;
-
-        information.push(("e_type", "Type", type_to_string(ehdr.e_type)));
-        ranges.add_range(16, 2, RangeType::HeaderDetail("e_type"));
-
-        information.push((
-            "e_machine",
-            "Architecture",
-            machine_to_string(ehdr.e_machine),
-        ));
-        ranges.add_range(18, 2, RangeType::HeaderDetail("e_machine"));
-
-        ranges.add_range(20, 4, RangeType::HeaderDetail("e_version"));
-
-        information.push(("e_entry", "Entrypoint", format!("0x{:x}", ehdr.e_entry)));
-        ranges.add_range(24, 8, RangeType::HeaderDetail("e_entry"));
-
-        information.push((
-            "ph",
-            "Program headers",
-            format!(
-                "{} * 0x{:x} @ {}",
-                ehdr.e_phnum, ehdr.e_phentsize, ehdr.e_phoff
-            ),
-        ));
-
-        information.push((
-            "sh",
-            "Section headers",
-            format!(
-                "{} * 0x{:x} @ {}",
-                ehdr.e_shnum, ehdr.e_shentsize, ehdr.e_shoff
-            ),
-        ));
-
-        ranges.add_range(0, ehdr_size, RangeType::FileHeader);
 
         ranges.add_range(0, ELF_EI_NIDENT as usize, RangeType::Ident);
 
@@ -178,7 +136,7 @@ impl ParsedElf {
 
     fn push_ident_info(
         ident: &ParsedIdent,
-        information: &mut Vec<(&'static str, &'static str, String)>,
+        information: &mut Vec<InfoTuple>,
     ) -> Result<(), String> {
         information.push((
             "class",
