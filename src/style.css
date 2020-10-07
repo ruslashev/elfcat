@@ -2,6 +2,10 @@
   font-family: monospace;
   font-size: 0.8rem;
 }
+#desc {
+  vertical-align: top;
+  padding-left: 2em;
+}
 .box {
   border: 1px solid;
   display: inline-block;

@@ -61,18 +61,32 @@ fn generate_head(o: &mut String, elf: &ParsedElf) {
     w!(o, 0, "</head>");
 }
 
-fn generate_header(o: &mut String, elf: &ParsedElf) {
-    w!(o, 1, "<table>");
+fn generate_info_table(o: &mut String, elf: &ParsedElf) {
+    w!(o, 4, "<table>");
 
     for (id, desc, value) in elf.information.iter() {
-        w!(o, 2, "<tr id='desc_{}'>", id);
+        w!(o, 5, "<tr id='info_{}'>", id);
 
-        w!(o, 3, "<td>{}:</td>", desc);
-        w!(o, 3, "<td>{}</td>", value);
+        w!(o, 6, "<td>{}:</td>", desc);
+        w!(o, 6, "<td>{}</td>", value);
 
-        w!(o, 2, "</tr>");
+        w!(o, 5, "</tr>");
     }
 
+    w!(o, 4, "</table>");
+}
+
+fn generate_header(o: &mut String, elf: &ParsedElf) {
+    w!(o, 1, "<table>");
+    w!(o, 2, "<tr>");
+
+    w!(o, 3, "<td>");
+    generate_info_table(o, elf);
+    w!(o, 3, "</td>");
+
+    w!(o, 3, "<td id='desc'></td>");
+
+    w!(o, 2, "</tr>");
     w!(o, 1, "</table>");
 }
 
@@ -94,13 +108,13 @@ fn add_hover_scripts(o: &mut String) {
     w!(o, 1, "<script type='text/javascript'>");
 
     for id in ids.iter() {
-        let desc = format!("desc_{}", id);
+        let info = format!("info_{}", id);
 
         // this is really ugly
         let code = template
             .replace("primary_id", id)
             .as_str()
-            .replace("secondary_id", desc.as_str())
+            .replace("secondary_id", info.as_str())
             .replace("color", color);
         let indented: String = code.lines().map(|x| indent(2, x) + "\n").collect();
 
