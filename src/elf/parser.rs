@@ -13,6 +13,28 @@ pub enum RangeType {
     HeaderDetail(&'static str),
 }
 
+// Interval tree that allows querying point for all intervals that intersect it may be better.
+// We can't beat O(n * m) but the average case should be better.
+pub struct Ranges {
+    pub data: Vec<Vec<RangeType>>,
+}
+
+pub struct ParsedIdent {
+    pub magic: [u8; 4],
+    pub class: u8,
+    pub endianness: u8,
+    pub version: u8,
+    pub abi: u8,
+    pub abi_ver: u8,
+}
+
+pub struct ParsedElf {
+    pub filename: String,
+    pub information: Vec<(&'static str, &'static str, String)>,
+    pub contents: Vec<u8>,
+    pub ranges: Ranges,
+}
+
 impl RangeType {
     pub fn span_id(&self) -> &str {
         match self {
@@ -22,11 +44,6 @@ impl RangeType {
             _ => "",
         }
     }
-}
-
-// Interval tree that allows querying point for all intervals that intersect it should be better
-pub struct Ranges {
-    pub data: Vec<Vec<RangeType>>,
 }
 
 impl Ranges {
@@ -49,15 +66,6 @@ impl Ranges {
     }
 }
 
-pub struct ParsedIdent {
-    pub magic: [u8; 4],
-    pub class: u8,
-    pub endianness: u8,
-    pub version: u8,
-    pub abi: u8,
-    pub abi_ver: u8,
-}
-
 impl ParsedIdent {
     fn from_bytes(buf: &Vec<u8>) -> ParsedIdent {
         ParsedIdent {
@@ -69,13 +77,6 @@ impl ParsedIdent {
             abi_ver: buf[ELF_EI_ABIVERSION as usize],
         }
     }
-}
-
-pub struct ParsedElf {
-    pub filename: String,
-    pub information: Vec<(&'static str, &'static str, String)>,
-    pub contents: Vec<u8>,
-    pub ranges: Ranges,
 }
 
 impl ParsedElf {
