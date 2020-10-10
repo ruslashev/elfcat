@@ -159,6 +159,30 @@ fn format_magic(byte: u8) -> String {
     }
 }
 
+fn generate_file_dump(elf: &ParsedElf) -> String {
+    let mut dump = String::new();
+
+    for (i, b) in elf.contents.iter().take(192).enumerate() {
+        for range_type in elf.ranges.lookup_range_inits(i) {
+            dump += format!("<span id='{}'>", range_type.span_id()).as_str();
+        }
+
+        if i < 4 {
+            dump += format!("{}", format_magic(*b)).as_str();
+        } else {
+            dump += format!("{:02x}", b).as_str();
+        }
+
+        for _ in 0..elf.ranges.lookup_range_ends(i) {
+            dump += "</span>";
+        }
+
+        dump += format!("{}", if (i + 1) % 16 == 0 { "</br>\n" } else { " " }).as_str();
+    }
+
+    dump
+}
+
 fn generate_body(o: &mut String, elf: &ParsedElf) {
     w!(o, 1, "<body>");
 
@@ -166,23 +190,7 @@ fn generate_body(o: &mut String, elf: &ParsedElf) {
 
     w!(o, 2, "<div class='box'>");
 
-    for (i, b) in elf.contents.iter().take(192).enumerate() {
-        for range_type in elf.ranges.lookup_range_inits(i) {
-            wnonl!(o, 0, "<span id='{}'>", range_type.span_id());
-        }
-
-        if i < 4 {
-            wnonl!(o, 0, "{}", format_magic(*b));
-        } else {
-            wnonl!(o, 0, "{:02x}", b);
-        }
-
-        for _ in 0..elf.ranges.lookup_range_ends(i) {
-            wnonl!(o, 0, "</span>");
-        }
-
-        wnonl!(o, 0, "{}", if (i + 1) % 16 == 0 { "</br>\n" } else { " " });
-    }
+    wnonl!(o, 0, "{}", generate_file_dump(elf));
 
     w!(o, 2, "</div>");
 
