@@ -10,6 +10,7 @@ pub enum RangeType {
     End,
     Ident,
     FileHeader,
+    ProgramHeader,
     HeaderDetail(&'static str),
 }
 
@@ -40,6 +41,7 @@ impl RangeType {
         match self {
             RangeType::Ident => "ident",
             RangeType::FileHeader => "ehdr",
+            RangeType::ProgramHeader => "phdr",
             RangeType::HeaderDetail(class) => class,
             _ => "",
         }

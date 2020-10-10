@@ -274,30 +274,12 @@ fn parse_phdrs(
     let phsize = size_of::<Elf64Phdr>();
 
     for i in 1..=ehdr.e_phnum {
-        parse_phdr(
-            i,
-            &buf[start..start + phsize],
-            endianness,
-            information,
-            ranges,
-        )?;
+        let phdr = Elf64Phdr::from_bytes(&buf[start..start + phsize], endianness)?;
+
+        ranges.add_range(start, phsize, RangeType::ProgramHeader);
 
         start += phsize;
     }
-
-    Ok(())
-}
-
-fn parse_phdr(
-    index: u16,
-    slice: &[u8],
-    endianness: u8,
-    information: &mut Vec<InfoTuple>,
-    ranges: &mut Ranges,
-) -> Result<(), String> {
-    let phdr = Elf64Phdr::from_bytes(slice, endianness)?;
-
-    println!("phdr.p_offset={:x}", phdr.p_offset);
 
     Ok(())
 }

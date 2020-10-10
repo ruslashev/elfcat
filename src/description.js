@@ -22,6 +22,7 @@ let descriptions = {
     e_shentsize: "Size of a section header table entry (e_shentsize)",
     e_shnum: "Number of section header table entries (e_shnum)",
     e_shstrndx: "What section is a string table (e_shstrndx)",
+    phdr: "Program header",
 }
 let separator = "</br>&#x2193</br>";
 

@@ -115,6 +115,7 @@ fn add_highlight_script(o: &mut String) {
         "e_shentsize",
         "e_shnum",
         "e_shstrndx",
+        "phdr",
     ];
     let color = "#ee9";
 
