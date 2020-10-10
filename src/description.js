@@ -59,19 +59,10 @@ function listOfParents(el) {
     return txt;
 }
 
-// var prevElem;
-
 document.onmouseover = function (e) {
     var event = e || window.event;
-
-    // if (prevElem) {
-    //     prevElem.style.border = "";
-    // }
 
     var target = event.target || event.srcElement;
 
     document.getElementById('desc').innerHTML = listOfParents(target);
-
-    // target.style.border = "1px solid";
-    // prevElem = target;
 };
