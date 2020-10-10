@@ -15,6 +15,13 @@ let descriptions = {
     e_entry: "Entrypoint vaddr (e_entry)",
     e_phoff: "Offset in file to program header table (e_phoff)",
     e_shoff: "Offset in file to section header table (e_shoff)",
+    e_flags: "Processor-specific flags (e_flags)",
+    e_ehsize: "Size of ELF file header (e_ehsize)",
+    e_phentsize: "Size of a program header table entry (e_phentsize)",
+    e_phnum: "Number of program header table entries (e_phnum)",
+    e_shentsize: "Size of a section header table entry (e_shentsize)",
+    e_shnum: "Number of section header table entries (e_shnum)",
+    e_shstrndx: "What section is a string table (e_shstrndx)",
 }
 let separator = "</br>&#x2193</br>";
 

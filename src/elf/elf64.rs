@@ -110,7 +110,9 @@ pub fn parse(
         "ph",
         "Program headers",
         format!(
-            "{} * 0x{:x} @ <span id='info_e_phoff'>{}</span>",
+            "<span id='info_e_phnum'>{}</span> * \
+             <span id='info_e_phentsize'>0x{:x}</span> @ \
+             <span id='info_e_phoff'>{}</span>",
             ehdr.e_phnum, ehdr.e_phentsize, ehdr.e_phoff
         ),
     ));
@@ -119,13 +121,27 @@ pub fn parse(
         "sh",
         "Section headers",
         format!(
-            "{} * 0x{:x} @ <span id='info_e_shoff'>{}</span>",
+            "<span id='info_e_shnum'>{}</span> * \
+             <span id='info_e_shentsize'>0x{:x}</span> @ \
+             <span id='info_e_shoff'>{}</span>",
             ehdr.e_shnum, ehdr.e_shentsize, ehdr.e_shoff
         ),
     ));
 
     ranges.add_range(32, 8, RangeType::HeaderDetail("e_phoff"));
     ranges.add_range(40, 8, RangeType::HeaderDetail("e_shoff"));
+
+    if ehdr.e_flags != 0 {
+        information.push(("e_flags", "Flags", format!("0x{:x}", ehdr.e_flags)));
+    }
+    ranges.add_range(48, 4, RangeType::HeaderDetail("e_flags"));
+    ranges.add_range(52, 2, RangeType::HeaderDetail("e_ehsize"));
+
+    ranges.add_range(54, 2, RangeType::HeaderDetail("e_phentsize"));
+    ranges.add_range(56, 2, RangeType::HeaderDetail("e_phnum"));
+    ranges.add_range(58, 2, RangeType::HeaderDetail("e_shentsize"));
+    ranges.add_range(60, 2, RangeType::HeaderDetail("e_shnum"));
+    ranges.add_range(62, 2, RangeType::HeaderDetail("e_shstrndx"));
 
     ranges.add_range(0, ehdr_size, RangeType::FileHeader);
 
