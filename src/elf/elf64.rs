@@ -3,6 +3,7 @@
 use super::defs::*;
 use super::parser::*;
 use std::convert::TryInto;
+use std::mem::size_of;
 
 type Elf64Addr = u64;
 type Elf64Off = u64;
@@ -160,7 +161,7 @@ pub fn parse(
     information: &mut Vec<InfoTuple>,
     ranges: &mut Ranges,
 ) -> Result<(), String> {
-    let ehdr_size = std::mem::size_of::<Elf64Ehdr>();
+    let ehdr_size = size_of::<Elf64Ehdr>();
 
     if buf.len() < ehdr_size {
         return Err(String::from("file is smaller than ELF file header"));
@@ -176,6 +177,8 @@ pub fn parse(
     .map_err(|a| String::from(format!("failed to read file header: {}", a)))?;
 
     parse_ehdr(&ehdr, information, ranges);
+
+    parse_phdrs(buf, ident.endianness, &ehdr, information, ranges)?;
 
     Ok(())
 }
@@ -239,4 +242,48 @@ fn add_ehdr_ranges(ehdr: &Elf64Ehdr, ranges: &mut Ranges) {
     ranges.add_range(58, 2, RangeType::HeaderDetail("e_shentsize"));
     ranges.add_range(60, 2, RangeType::HeaderDetail("e_shnum"));
     ranges.add_range(62, 2, RangeType::HeaderDetail("e_shstrndx"));
+}
+
+fn parse_phdrs(
+    buf: &Vec<u8>,
+    endianness: u8,
+    ehdr: &Elf64Ehdr,
+    information: &mut Vec<InfoTuple>,
+    ranges: &mut Ranges,
+) -> Result<(), String> {
+    let mut start = ehdr.e_phoff as usize;
+    let phsize = size_of::<Elf64Phdr>();
+
+    for i in 1..=ehdr.e_phnum {
+        parse_phdr(
+            i,
+            &buf[start..start + phsize],
+            endianness,
+            information,
+            ranges,
+        )?;
+
+        start += phsize;
+    }
+
+    Ok(())
+}
+
+fn parse_phdr(
+    index: u16,
+    slice: &[u8],
+    endianness: u8,
+    information: &mut Vec<InfoTuple>,
+    ranges: &mut Ranges,
+) -> Result<(), String> {
+    let phdr = if endianness == ELF_DATA2LSB {
+        Elf64Phdr::from_le_bytes(slice)
+    } else {
+        Elf64Phdr::from_be_bytes(slice)
+    }
+    .map_err(|a| String::from(format!("failed to read file header: {}", a)))?;
+
+    println!("phdr.p_offset={:x}", phdr.p_offset);
+
+    Ok(())
 }
