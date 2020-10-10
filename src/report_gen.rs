@@ -1,4 +1,4 @@
-use crate::elf::parser::ParsedElf;
+use crate::elf::parser::{ParsedElf, RangeType};
 use std::fmt::Write;
 use std::path::Path;
 
@@ -183,8 +183,10 @@ fn generate_file_dump(elf: &ParsedElf) -> String {
     let mut dump = String::new();
 
     for (i, b) in elf.contents.iter().take(192).enumerate() {
-        for range_type in elf.ranges.lookup_range_inits(i) {
-            dump += format!("<span id='{}'>", range_type.span_id()).as_str();
+        for range_type in &elf.ranges.data[i] {
+            if *range_type != RangeType::End {
+                dump += format!("<span id='{}'>", range_type.span_id()).as_str();
+            }
         }
 
         if i < 4 {

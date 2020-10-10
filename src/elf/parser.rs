@@ -26,7 +26,7 @@ impl RangeType {
 
 // Interval tree that allows querying point for all intervals that intersect it should be better
 pub struct Ranges {
-    data: Vec<Vec<RangeType>>,
+    pub data: Vec<Vec<RangeType>>,
 }
 
 impl Ranges {
@@ -39,20 +39,6 @@ impl Ranges {
     pub fn add_range(&mut self, start: usize, end: usize, range_type: RangeType) {
         self.data[start].push(range_type);
         self.data[start + end - 1].push(RangeType::End);
-    }
-
-    // `init' is a Haskell term for everything but the last element in a list (like head + tail, and
-    // init + last). Used here because we are interested in looking up ranges but not their ends.
-    pub fn lookup_range_inits(&self, point: usize) -> Vec<RangeType> {
-        let mut result = vec![];
-
-        for range_type in self.data[point].clone() {
-            if range_type != RangeType::End {
-                result.push(range_type);
-            }
-        }
-
-        result
     }
 
     pub fn lookup_range_ends(&self, point: usize) -> usize {
