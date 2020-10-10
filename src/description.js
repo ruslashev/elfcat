@@ -23,6 +23,14 @@ let descriptions = {
     e_shnum: "Number of section header table entries (e_shnum)",
     e_shstrndx: "What section is a string table (e_shstrndx)",
     phdr: "Program header",
+    p_type: "Segment type",
+    p_flags: "Segment attributes",
+    p_offset: "Offset in file",
+    p_vaddr: "Virtual address in memory",
+    p_paddr: "Reserved for physical address in memory",
+    p_filesz: "Size of segment in file",
+    p_memsz: "Size of segment in memory",
+    p_align: "Alignment",
 }
 let separator = "</br>&#x2193</br>";
 

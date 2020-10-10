@@ -278,8 +278,21 @@ fn parse_phdrs(
 
         ranges.add_range(start, phsize, RangeType::ProgramHeader);
 
+        add_phdr_ranges(start, ranges);
+
         start += phsize;
     }
 
     Ok(())
+}
+
+fn add_phdr_ranges(start: usize, ranges: &mut Ranges) {
+    ranges.add_range(start + 0, 4, RangeType::HeaderDetail("p_type"));
+    ranges.add_range(start + 4, 4, RangeType::HeaderDetail("p_flags"));
+    ranges.add_range(start + 8, 8, RangeType::HeaderDetail("p_offset"));
+    ranges.add_range(start + 16, 8, RangeType::HeaderDetail("p_vaddr"));
+    ranges.add_range(start + 24, 8, RangeType::HeaderDetail("p_paddr"));
+    ranges.add_range(start + 32, 8, RangeType::HeaderDetail("p_filesz"));
+    ranges.add_range(start + 40, 8, RangeType::HeaderDetail("p_memsz"));
+    ranges.add_range(start + 48, 8, RangeType::HeaderDetail("p_align"));
 }
