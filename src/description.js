@@ -25,12 +25,24 @@ let descriptions = {
 }
 let separator = "</br>&#x2193</br>";
 
+function stripInfoPrefix(str) {
+    return str.replace("info_", "");
+}
+
+function hasDescription(id) {
+    return descriptions[id] !== undefined || descriptions[stripInfoPrefix(id)] !== undefined;
+}
+
 function isValid(id) {
-    return id !== "" && descriptions[id] !== undefined;
+    return id !== "" && hasDescription(id);
 }
 
 function formatDesc(id) {
-    return descriptions[id];
+    if (descriptions[id] !== undefined) {
+        return descriptions[id];
+    }
+
+    return descriptions[stripInfoPrefix(id)];
 }
 
 function listOfParents(el) {
