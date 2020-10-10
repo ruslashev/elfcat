@@ -10,8 +10,7 @@
   border: 1px solid;
   display: inline-block;
 }
-#magic:hover, #ver:hover, #abi_ver:hover, #pad:hover, #e_version:hover,
-#e_flags:hover, #e_ehsize:hover, #e_shstrndx:hover {
+.hover:hover {
   background-color: #ee9;
 }
 #ident {
@@ -20,6 +19,6 @@
 #ehdr {
   background-color: #99e;
 }
-#phdr {
+.phdr {
   background-color: #eb9;
 }

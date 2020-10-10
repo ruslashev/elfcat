@@ -37,13 +37,68 @@ pub struct ParsedElf {
 }
 
 impl RangeType {
-    pub fn span_id(&self) -> &str {
+    fn id(&self) -> &str {
         match self {
             RangeType::Ident => "ident",
             RangeType::FileHeader => "ehdr",
             RangeType::ProgramHeader => "phdr",
             RangeType::HeaderDetail(class) => class,
             _ => "",
+        }
+    }
+
+    fn always_highlight(&self) -> bool {
+        match self {
+            RangeType::ProgramHeader => true,
+            RangeType::HeaderDetail(class) => match *class {
+                "magic" => true,
+                "ver" => true,
+                "abi_ver" => true,
+                "pad" => true,
+                "e_version" => true,
+                "e_flags" => true,
+                "e_ehsize" => true,
+                "e_shstrndx" => true,
+                _ => false,
+            },
+            _ => false,
+        }
+    }
+
+    fn needs_class(&self) -> bool {
+        match self {
+            RangeType::ProgramHeader => true,
+            _ => false,
+        }
+    }
+
+    fn class(&self) -> &str {
+        match self {
+            RangeType::ProgramHeader => "phdr",
+            _ => "",
+        }
+    }
+
+    pub fn span_attributes(&self) -> String {
+        if self.needs_class() {
+            // put id anyway for description
+            format!(
+                "id='{}' class='{}{}'",
+                self.id(),
+                self.class(),
+                if self.always_highlight() {
+                    " hover"
+                } else {
+                    ""
+                }
+            )
+        } else {
+            format!("id='{}'", self.id())
+                + if self.always_highlight() {
+                    " class='hover'"
+                } else {
+                    ""
+                }
         }
     }
 }

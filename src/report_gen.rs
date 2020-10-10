@@ -115,7 +115,6 @@ fn add_highlight_script(o: &mut String) {
         "e_shentsize",
         "e_shnum",
         "e_shstrndx",
-        "phdr",
     ];
     let color = "#ee9";
 
@@ -186,7 +185,7 @@ fn generate_file_dump(elf: &ParsedElf) -> String {
     for (i, b) in elf.contents.iter().take(192).enumerate() {
         for range_type in &elf.ranges.data[i] {
             if *range_type != RangeType::End {
-                dump += format!("<span id='{}'>", range_type.span_id()).as_str();
+                dump += format!("<span {}>", range_type.span_attributes()).as_str();
             }
         }
 
