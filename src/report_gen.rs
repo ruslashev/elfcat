@@ -106,8 +106,8 @@ fn add_highlight_script(o: &mut String) {
         "e_type",
         "e_machine",
         "e_entry",
-        "ph",
-        "sh",
+        "e_phoff",
+        "e_shoff",
     ];
     let color = "#ee9";
 

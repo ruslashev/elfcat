@@ -13,6 +13,8 @@ let descriptions = {
     e_machine: "Object file type (e_machine)",
     e_version: "File version, should be 1 (e_version)",
     e_entry: "Entrypoint vaddr (e_entry)",
+    e_phoff: "Offset in file to program header table (e_phoff)",
+    e_shoff: "Offset in file to section header table (e_shoff)",
 }
 let separator = "</br>&#x2193</br>";
 

@@ -110,7 +110,7 @@ pub fn parse(
         "ph",
         "Program headers",
         format!(
-            "{} * 0x{:x} @ {}",
+            "{} * 0x{:x} @ <span id='info_e_phoff'>{}</span>",
             ehdr.e_phnum, ehdr.e_phentsize, ehdr.e_phoff
         ),
     ));
@@ -119,10 +119,13 @@ pub fn parse(
         "sh",
         "Section headers",
         format!(
-            "{} * 0x{:x} @ {}",
+            "{} * 0x{:x} @ <span id='info_e_shoff'>{}</span>",
             ehdr.e_shnum, ehdr.e_shentsize, ehdr.e_shoff
         ),
     ));
+
+    ranges.add_range(32, 8, RangeType::HeaderDetail("e_phoff"));
+    ranges.add_range(40, 8, RangeType::HeaderDetail("e_shoff"));
 
     ranges.add_range(0, ehdr_size, RangeType::FileHeader);
 
