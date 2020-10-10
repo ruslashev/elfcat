@@ -70,23 +70,48 @@ impl Elf64Ehdr {
     }
 }
 
-fn add_ehdr_info(ehdr: &Elf64Ehdr, information: &mut Vec<InfoTuple>, ranges: &mut Ranges) {
-    ranges.add_range(0, ehdr.e_ehsize as usize, RangeType::FileHeader);
+pub fn parse(
+    buf: &Vec<u8>,
+    ident: &ParsedIdent,
+    information: &mut Vec<InfoTuple>,
+    ranges: &mut Ranges,
+) -> Result<(), String> {
+    let ehdr_size = std::mem::size_of::<Elf64Ehdr>();
 
+    if buf.len() < ehdr_size {
+        return Err(String::from("file is smaller than ELF file header"));
+    }
+
+    let ehdr_slice = &buf[0..ehdr_size];
+
+    let ehdr = if ident.endianness == ELF_DATA2LSB {
+        Elf64Ehdr::from_le_bytes(ehdr_slice)
+    } else {
+        Elf64Ehdr::from_be_bytes(ehdr_slice)
+    }
+    .map_err(|a| String::from(format!("failed to read file header: {}", a)))?;
+
+    parse_ehdr(&ehdr, information, ranges);
+
+    Ok(())
+}
+
+fn parse_ehdr(ehdr: &Elf64Ehdr, information: &mut Vec<InfoTuple>, ranges: &mut Ranges) {
+    push_ehdr_info(ehdr, information);
+
+    add_ehdr_ranges(ehdr, ranges);
+}
+
+fn push_ehdr_info(ehdr: &Elf64Ehdr, information: &mut Vec<InfoTuple>) {
     information.push(("e_type", "Type", type_to_string(ehdr.e_type)));
-    ranges.add_range(16, 2, RangeType::HeaderDetail("e_type"));
 
     information.push((
         "e_machine",
         "Architecture",
         machine_to_string(ehdr.e_machine),
     ));
-    ranges.add_range(18, 2, RangeType::HeaderDetail("e_machine"));
-
-    ranges.add_range(20, 4, RangeType::HeaderDetail("e_version"));
 
     information.push(("e_entry", "Entrypoint", format!("0x{:x}", ehdr.e_entry)));
-    ranges.add_range(24, 8, RangeType::HeaderDetail("e_entry"));
 
     information.push((
         "ph",
@@ -110,44 +135,24 @@ fn add_ehdr_info(ehdr: &Elf64Ehdr, information: &mut Vec<InfoTuple>, ranges: &mu
         ),
     ));
 
-    ranges.add_range(32, 8, RangeType::HeaderDetail("e_phoff"));
-    ranges.add_range(40, 8, RangeType::HeaderDetail("e_shoff"));
-
     if ehdr.e_flags != 0 {
         information.push(("e_flags", "Flags", format!("0x{:x}", ehdr.e_flags)));
     }
+}
+
+fn add_ehdr_ranges(ehdr: &Elf64Ehdr, ranges: &mut Ranges) {
+    ranges.add_range(0, ehdr.e_ehsize as usize, RangeType::FileHeader);
+    ranges.add_range(16, 2, RangeType::HeaderDetail("e_type"));
+    ranges.add_range(18, 2, RangeType::HeaderDetail("e_machine"));
+    ranges.add_range(20, 4, RangeType::HeaderDetail("e_version"));
+    ranges.add_range(24, 8, RangeType::HeaderDetail("e_entry"));
+    ranges.add_range(32, 8, RangeType::HeaderDetail("e_phoff"));
+    ranges.add_range(40, 8, RangeType::HeaderDetail("e_shoff"));
     ranges.add_range(48, 4, RangeType::HeaderDetail("e_flags"));
     ranges.add_range(52, 2, RangeType::HeaderDetail("e_ehsize"));
-
     ranges.add_range(54, 2, RangeType::HeaderDetail("e_phentsize"));
     ranges.add_range(56, 2, RangeType::HeaderDetail("e_phnum"));
     ranges.add_range(58, 2, RangeType::HeaderDetail("e_shentsize"));
     ranges.add_range(60, 2, RangeType::HeaderDetail("e_shnum"));
     ranges.add_range(62, 2, RangeType::HeaderDetail("e_shstrndx"));
-}
-
-pub fn parse(
-    buf: &Vec<u8>,
-    ident: &ParsedIdent,
-    information: &mut Vec<InfoTuple>,
-    ranges: &mut Ranges,
-) -> Result<(), String> {
-    let ehdr_size = std::mem::size_of::<Elf64Ehdr>();
-
-    if buf.len() < ehdr_size {
-        return Err(String::from("file is smaller than ELF file header"));
-    }
-
-    let ehdr_slice = &buf[0..ehdr_size];
-
-    let ehdr = if ident.endianness == ELF_DATA2LSB {
-        Elf64Ehdr::from_le_bytes(ehdr_slice)
-    } else {
-        Elf64Ehdr::from_be_bytes(ehdr_slice)
-    }
-    .map_err(|a| String::from(format!("failed to read file header: {}", a)))?;
-
-    add_ehdr_info(&ehdr, information, ranges);
-
-    Ok(())
 }
