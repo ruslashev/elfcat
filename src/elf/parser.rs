@@ -162,12 +162,24 @@ impl ParsedElf {
             information.push(("ver", "Uncommon version(!)", format!("{}", ident.version)));
         }
 
-        information.push(("abi", "ABI", abi_to_string(ident.abi)));
+        information.push((
+            "abi",
+            if ident.abi == ELF_OSABI_SYSV {
+                "ABI"
+            } else {
+                "Uncommon ABI(!)"
+            },
+            abi_to_string(ident.abi),
+        ));
 
         if !(ident.abi == ELF_OSABI_SYSV && ident.abi_ver == 0) {
             information.push((
                 "abi_ver",
-                "Uncommon ABI version(!)",
+                if ident.abi == ELF_OSABI_SYSV && ident.abi_ver != 0 {
+                    "Uncommon ABI version(!)"
+                } else {
+                    "ABI version"
+                },
                 format!("{}", ident.abi_ver),
             ));
         }
