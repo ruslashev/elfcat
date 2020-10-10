@@ -5,7 +5,7 @@ use super::elf64;
 pub type InfoTuple = (&'static str, &'static str, String);
 
 #[repr(u8)]
-#[derive(Copy, Clone, PartialEq)]
+#[derive(Clone, PartialEq)]
 pub enum RangeType {
     End,
     Ident,
@@ -13,8 +13,8 @@ pub enum RangeType {
     HeaderDetail(&'static str),
 }
 
-// Interval tree that allows querying point for all intervals that intersect it may be better.
-// We can't beat O(n * m) but the average case should be better.
+// Interval tree that allows querying point for all intervals that intersect it should be better.
+// We can't beat O(n * m) but the average case should improve.
 pub struct Ranges {
     pub data: Vec<Vec<RangeType>>,
 }
