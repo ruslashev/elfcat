@@ -52,7 +52,11 @@ function listOfParents(el) {
         el = el.parentNode;
 
         if (isValid(el.id)) {
-            txt = formatDesc(el.id) + separator + txt;
+            if (txt === "") {
+                txt = formatDesc(el.id);
+            } else {
+                txt = formatDesc(el.id) + separator + txt;
+            }
         }
     }
 
