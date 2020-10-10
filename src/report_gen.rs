@@ -159,6 +159,26 @@ fn format_magic(byte: u8) -> String {
     }
 }
 
+fn digit_to_hex(digit: u8) -> char {
+    [
+        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f',
+    ][digit as usize]
+}
+
+fn append_hex_byte(s: &mut String, byte: u8) {
+    if byte < 0x10 {
+        s.push('0');
+
+        s.push(digit_to_hex(byte));
+    } else {
+        let trailing_digit = byte % 16;
+        let leading_digit = byte / 16;
+
+        s.push(digit_to_hex(leading_digit));
+        s.push(digit_to_hex(trailing_digit));
+    }
+}
+
 fn generate_file_dump(elf: &ParsedElf) -> String {
     let mut dump = String::new();
 
@@ -170,14 +190,14 @@ fn generate_file_dump(elf: &ParsedElf) -> String {
         if i < 4 {
             dump += format!("{}", format_magic(*b)).as_str();
         } else {
-            dump += format!("{:02x}", b).as_str();
+            append_hex_byte(&mut dump, *b);
         }
 
         for _ in 0..elf.ranges.lookup_range_ends(i) {
             dump += "</span>";
         }
 
-        dump += format!("{}", if (i + 1) % 16 == 0 { "</br>\n" } else { " " }).as_str();
+        dump += if (i + 1) % 16 == 0 { "</br>\n" } else { " " };
     }
 
     dump
