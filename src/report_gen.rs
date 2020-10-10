@@ -31,6 +31,16 @@ fn indent(level: usize, line: &str) -> String {
     }
 }
 
+trait Indentable {
+    fn indent_lines(&self, level: usize) -> String;
+}
+
+impl Indentable for str {
+    fn indent_lines(&self, level: usize) -> String {
+        self.lines().map(|x| indent(level, x) + "\n").collect()
+    }
+}
+
 macro_rules! w {
     ($dst:expr, $indent_level:expr, $($arg:tt)*) => {
         wnonl!($dst, $indent_level, $( $arg )* );
@@ -46,10 +56,7 @@ macro_rules! wnonl {
 }
 
 fn generate_head(o: &mut String, elf: &ParsedElf) {
-    let stylesheet: String = include_str!("style.css")
-        .lines()
-        .map(|x| indent(3, x) + "\n")
-        .collect();
+    let stylesheet: String = include_str!("style.css").indent_lines(3);
 
     w!(o, 1, "<head>");
     w!(o, 2, "<meta charset='utf-8'>");
@@ -115,12 +122,26 @@ fn add_highlight_script(o: &mut String) {
             .as_str()
             .replace("secondary_id", info.as_str())
             .replace("color", color);
-        let indented: String = code.lines().map(|x| indent(3, x) + "\n").collect();
+        let indented: String = code.indent_lines(3);
 
         wnonl!(o, 0, "{}", indented);
     }
 
     w!(o, 2, "</script>");
+}
+
+fn add_description_script(o: &mut String) {
+    w!(o, 2, "<script type='text/javascript'>");
+
+    wnonl!(o, 0, "{}", include_str!("description.js").indent_lines(3));
+
+    w!(o, 2, "</script>");
+}
+
+fn add_scripts(o: &mut String) {
+    add_highlight_script(o);
+
+    add_description_script(o);
 }
 
 fn format_magic(byte: u8) -> String {
@@ -158,7 +179,7 @@ fn generate_body(o: &mut String, elf: &ParsedElf) {
 
     w!(o, 2, "</div>");
 
-    add_highlight_script(o);
+    add_scripts(o);
 
     w!(o, 1, "</body>");
 }
