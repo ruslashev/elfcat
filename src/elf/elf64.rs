@@ -13,6 +13,8 @@ type Elf64Sword = i32;
 type Elf64Xword = u64;
 type Elf64Sxword = i64;
 
+type ReadErr = std::array::TryFromSliceError;
+
 #[allow(dead_code)] // REMOVEME
 struct Elf64Ehdr {
     e_ident: [u8; 16],
@@ -59,7 +61,15 @@ struct Elf64Shdr {
 
 // All this just to avoid unsafe. This should be improved.
 impl Elf64Ehdr {
-    fn from_le_bytes(buf: &[u8]) -> Result<Elf64Ehdr, std::array::TryFromSliceError> {
+    fn from_bytes(buf: &[u8], endianness: u8) -> Result<Elf64Ehdr, String> {
+        if endianness == ELF_DATA2LSB {
+            Elf64Ehdr::from_le_bytes(buf)
+        } else {
+            Elf64Ehdr::from_be_bytes(buf)
+        }
+        .map_err(|a| String::from(format!("failed to read file header: {}", a)))
+    }
+    fn from_le_bytes(buf: &[u8]) -> Result<Elf64Ehdr, ReadErr> {
         Ok(Elf64Ehdr {
             e_ident: buf[0..16].try_into()?,
             e_type: Elf64Half::from_le_bytes(buf[16..18].try_into()?),
@@ -77,7 +87,7 @@ impl Elf64Ehdr {
             e_shstrndx: Elf64Half::from_le_bytes(buf[62..64].try_into()?),
         })
     }
-    fn from_be_bytes(buf: &[u8]) -> Result<Elf64Ehdr, std::array::TryFromSliceError> {
+    fn from_be_bytes(buf: &[u8]) -> Result<Elf64Ehdr, ReadErr> {
         Ok(Elf64Ehdr {
             e_ident: buf[0..16].try_into()?,
             e_type: Elf64Half::from_be_bytes(buf[16..18].try_into()?),
@@ -98,7 +108,15 @@ impl Elf64Ehdr {
 }
 
 impl Elf64Phdr {
-    fn from_le_bytes(buf: &[u8]) -> Result<Elf64Phdr, std::array::TryFromSliceError> {
+    fn from_bytes(buf: &[u8], endianness: u8) -> Result<Elf64Phdr, String> {
+        if endianness == ELF_DATA2LSB {
+            Elf64Phdr::from_le_bytes(buf)
+        } else {
+            Elf64Phdr::from_be_bytes(buf)
+        }
+        .map_err(|a| String::from(format!("failed to read program header: {}", a)))
+    }
+    fn from_le_bytes(buf: &[u8]) -> Result<Elf64Phdr, ReadErr> {
         Ok(Elf64Phdr {
             p_type: Elf64Word::from_le_bytes(buf[0..4].try_into()?),
             p_flags: Elf64Word::from_le_bytes(buf[4..8].try_into()?),
@@ -110,7 +128,7 @@ impl Elf64Phdr {
             p_align: Elf64Xword::from_le_bytes(buf[48..56].try_into()?),
         })
     }
-    fn from_be_bytes(buf: &[u8]) -> Result<Elf64Phdr, std::array::TryFromSliceError> {
+    fn from_be_bytes(buf: &[u8]) -> Result<Elf64Phdr, ReadErr> {
         Ok(Elf64Phdr {
             p_type: Elf64Word::from_be_bytes(buf[0..4].try_into()?),
             p_flags: Elf64Word::from_be_bytes(buf[4..8].try_into()?),
@@ -125,7 +143,15 @@ impl Elf64Phdr {
 }
 
 impl Elf64Shdr {
-    fn from_le_bytes(buf: &[u8]) -> Result<Elf64Shdr, std::array::TryFromSliceError> {
+    fn from_bytes(buf: &[u8], endianness: u8) -> Result<Elf64Shdr, String> {
+        if endianness == ELF_DATA2LSB {
+            Elf64Shdr::from_le_bytes(buf)
+        } else {
+            Elf64Shdr::from_be_bytes(buf)
+        }
+        .map_err(|a| String::from(format!("failed to read section header: {}", a)))
+    }
+    fn from_le_bytes(buf: &[u8]) -> Result<Elf64Shdr, ReadErr> {
         Ok(Elf64Shdr {
             sh_name: Elf64Word::from_le_bytes(buf[0..4].try_into()?),
             sh_type: Elf64Word::from_le_bytes(buf[4..8].try_into()?),
@@ -139,7 +165,7 @@ impl Elf64Shdr {
             sh_entsize: Elf64Xword::from_le_bytes(buf[56..64].try_into()?),
         })
     }
-    fn from_be_bytes(buf: &[u8]) -> Result<Elf64Shdr, std::array::TryFromSliceError> {
+    fn from_be_bytes(buf: &[u8]) -> Result<Elf64Shdr, ReadErr> {
         Ok(Elf64Shdr {
             sh_name: Elf64Word::from_be_bytes(buf[0..4].try_into()?),
             sh_type: Elf64Word::from_be_bytes(buf[4..8].try_into()?),
@@ -167,14 +193,7 @@ pub fn parse(
         return Err(String::from("file is smaller than ELF file header"));
     }
 
-    let ehdr_slice = &buf[0..ehdr_size];
-
-    let ehdr = if ident.endianness == ELF_DATA2LSB {
-        Elf64Ehdr::from_le_bytes(ehdr_slice)
-    } else {
-        Elf64Ehdr::from_be_bytes(ehdr_slice)
-    }
-    .map_err(|a| String::from(format!("failed to read file header: {}", a)))?;
+    let ehdr = Elf64Ehdr::from_bytes(&buf[0..ehdr_size], ident.endianness)?;
 
     parse_ehdr(&ehdr, information, ranges);
 
@@ -276,12 +295,7 @@ fn parse_phdr(
     information: &mut Vec<InfoTuple>,
     ranges: &mut Ranges,
 ) -> Result<(), String> {
-    let phdr = if endianness == ELF_DATA2LSB {
-        Elf64Phdr::from_le_bytes(slice)
-    } else {
-        Elf64Phdr::from_be_bytes(slice)
-    }
-    .map_err(|a| String::from(format!("failed to read file header: {}", a)))?;
+    let phdr = Elf64Phdr::from_bytes(slice, endianness)?;
 
     println!("phdr.p_offset={:x}", phdr.p_offset);
 
