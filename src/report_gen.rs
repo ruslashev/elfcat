@@ -93,7 +93,7 @@ fn generate_phdr_info_table(o: &mut String, phdr: &ParsedPhdr, idx: usize) {
         ("Alignment", &format!("{:#x}", phdr.alignment)),
     ];
 
-    w!(o, 4, "<table id='info_phdr{}'>", idx);
+    w!(o, 4, "<table class='info_phdr' id='info_phdr{}'>", idx);
 
     for (desc, value) in items.iter() {
         w!(o, 5, "<tr>");
@@ -114,7 +114,7 @@ fn generate_phdr_info_tables(o: &mut String, elf: &ParsedElf) {
 }
 
 fn generate_header(o: &mut String, elf: &ParsedElf) {
-    w!(o, 2, "<table>");
+    w!(o, 2, "<table class='header'>");
     w!(o, 3, "<tr>");
 
     w!(o, 4, "<td>");
@@ -180,10 +180,20 @@ fn add_description_script(o: &mut String) {
     w!(o, 2, "</script>");
 }
 
+fn add_conceal_script(o: &mut String) {
+    w!(o, 2, "<script type='text/javascript'>");
+
+    wnonl!(o, 0, "{}", include_str!("conceal.js").indent_lines(3));
+
+    w!(o, 2, "</script>");
+}
+
 fn add_scripts(o: &mut String) {
     add_highlight_script(o);
 
     add_description_script(o);
+
+    add_conceal_script(o);
 }
 
 fn format_magic(byte: u8) -> String {
