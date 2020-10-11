@@ -33,6 +33,18 @@ pub const ELF_ET_HIOS: u16 = 0xfeff;
 pub const ELF_ET_LOPROC: u16 = 0xff00;
 pub const ELF_ET_HIPROC: u16 = 0xffff;
 
+pub const PT_NULL: u32 = 0;
+pub const PT_LOAD: u32 = 1;
+pub const PT_DYNAMIC: u32 = 2;
+pub const PT_INTERP: u32 = 3;
+pub const PT_NOTE: u32 = 4;
+pub const PT_SHLIB: u32 = 5;
+pub const PT_PHDR: u32 = 6;
+pub const PT_LOOS: u32 = 0x6000_0000;
+pub const PT_HIOS: u32 = 0x6fff_ffff;
+pub const PT_LOPROC: u32 = 0x7000_0000;
+pub const PT_HIPROC: u32 = 0x7fff_ffff;
+
 pub fn type_to_string(e_type: u16) -> String {
     match e_type {
         ELF_ET_NONE => String::from("None (NONE)"),
@@ -91,6 +103,23 @@ pub fn machine_to_string(e_machine: u16) -> String {
         190 => String::from("CUDA"),
         224 => String::from("AMDGPU"),
         243 => String::from("RISC-V"),
+        x => format!("Unknown: {}", x),
+    }
+}
+
+pub fn flags_to_string(flags: u32) -> String {
+    match flags {
+        PT_NULL => String::from("NULL"),
+        PT_LOAD => String::from("LOAD"),
+        PT_DYNAMIC => String::from("DYNAMIC"),
+        PT_INTERP => String::from("INTERP"),
+        PT_NOTE => String::from("NOTE"),
+        PT_SHLIB => String::from("SHLIB"),
+        PT_PHDR => String::from("PHDR"),
+        PT_LOOS => String::from("LOOS"),
+        PT_HIOS => String::from("HIOS"),
+        PT_LOPROC => String::from("LOPROC"),
+        PT_HIPROC => String::from("HIPROC"),
         x => format!("Unknown: {}", x),
     }
 }

@@ -275,6 +275,8 @@ fn parse_phdrs(
 
         add_phdr_ranges(start, &mut elf.ranges);
 
+        elf.phdrs.push(parse_phdr(&phdr));
+
         start += phsize;
     }
 
@@ -290,4 +292,16 @@ fn add_phdr_ranges(start: usize, ranges: &mut Ranges) {
     ranges.add_range(start + 32, 8, RangeType::HeaderDetail("p_filesz"));
     ranges.add_range(start + 40, 8, RangeType::HeaderDetail("p_memsz"));
     ranges.add_range(start + 48, 8, RangeType::HeaderDetail("p_align"));
+}
+
+fn parse_phdr(phdr: &Elf64Phdr) -> ParsedPhdr {
+    ParsedPhdr {
+        ptype: phdr.p_type,
+        flags: flags_to_string(phdr.p_flags),
+        file_offset: phdr.p_offset as usize,
+        file_size: phdr.p_filesz as usize,
+        vaddr: phdr.p_vaddr as usize,
+        memsz: phdr.p_memsz as usize,
+        alignment: phdr.p_align as usize,
+    }
 }

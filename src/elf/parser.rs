@@ -34,6 +34,17 @@ pub struct ParsedElf {
     pub information: Vec<(&'static str, &'static str, String)>,
     pub contents: Vec<u8>,
     pub ranges: Ranges,
+    pub phdrs: Vec<ParsedPhdr>,
+}
+
+pub struct ParsedPhdr {
+    pub ptype: u32,
+    pub flags: String,
+    pub file_offset: usize,
+    pub file_size: usize,
+    pub vaddr: usize,
+    pub memsz: usize,
+    pub alignment: usize,
 }
 
 impl RangeType {
@@ -153,6 +164,7 @@ impl ParsedElf {
             information: vec![],
             contents: vec![],
             ranges: Ranges::new(buf.len()),
+            phdrs: vec![],
         };
 
         if ident.class == ELF_CLASS32 {
