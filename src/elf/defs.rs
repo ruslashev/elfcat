@@ -45,6 +45,12 @@ pub const PT_HIOS: u32 = 0x6fff_ffff;
 pub const PT_LOPROC: u32 = 0x7000_0000;
 pub const PT_HIPROC: u32 = 0x7fff_ffff;
 
+pub const PF_X: u32 = 0b001;
+pub const PF_W: u32 = 0b010;
+pub const PF_R: u32 = 0b100;
+pub const PF_MASKOS: u32 = 0x00ff_0000;
+pub const PF_MASKPROC: u32 = 0xff00_0000;
+
 pub fn type_to_string(e_type: u16) -> String {
     match e_type {
         ELF_ET_NONE => String::from("None (NONE)"),
@@ -107,8 +113,8 @@ pub fn machine_to_string(e_machine: u16) -> String {
     }
 }
 
-pub fn flags_to_string(flags: u32) -> String {
-    match flags {
+pub fn ptype_to_string(ptype: u32) -> String {
+    match ptype {
         PT_NULL => String::from("NULL"),
         PT_LOAD => String::from("LOAD"),
         PT_DYNAMIC => String::from("DYNAMIC"),
@@ -122,4 +128,22 @@ pub fn flags_to_string(flags: u32) -> String {
         PT_HIPROC => String::from("HIPROC"),
         x => format!("Unknown: {}", x),
     }
+}
+
+pub fn pflags_to_string(flags: u32) -> String {
+    let mut s = String::new();
+
+    if flags & PF_R != 0 {
+        s.push('R');
+    }
+
+    if flags & PF_W != 0 {
+        s.push('W');
+    }
+
+    if flags & PF_X != 0 {
+        s.push('X');
+    }
+
+    s
 }
