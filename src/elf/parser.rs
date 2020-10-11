@@ -167,25 +167,19 @@ impl ParsedElf {
             phdrs: vec![],
         };
 
+        elf.push_ident_info(&ident)?;
+
         if ident.class == ELF_CLASS32 {
             elf32::parse(&buf, &ident, &mut elf)?;
         } else {
             elf64::parse(&buf, &ident, &mut elf)?;
         }
 
-        elf.parse_ident(&ident)?;
+        elf.add_ident_ranges();
 
         elf.contents = buf;
 
         Ok(elf)
-    }
-
-    fn parse_ident(&mut self, ident: &ParsedIdent) -> Result<(), String> {
-        self.push_ident_info(ident)?;
-
-        self.add_ident_ranges();
-
-        Ok(())
     }
 
     fn push_ident_info(&mut self, ident: &ParsedIdent) -> Result<(), String> {
