@@ -82,7 +82,7 @@ fn generate_info_table(o: &mut String, elf: &ParsedElf) {
     w!(o, 5, "</table>");
 }
 
-fn generate_phdr(o: &mut String, phdr: &ParsedPhdr) {
+fn generate_phdr_info_table(o: &mut String, phdr: &ParsedPhdr, idx: usize) {
     let items = [
         ("Type", &phdr.ptype),
         ("Flags", &phdr.flags),
@@ -93,7 +93,7 @@ fn generate_phdr(o: &mut String, phdr: &ParsedPhdr) {
         ("Alignment", &format!("{:#x}", phdr.alignment)),
     ];
 
-    w!(o, 4, "<table>");
+    w!(o, 4, "<table id='info_phdr{}'>", idx);
 
     for (desc, value) in items.iter() {
         w!(o, 5, "<tr>");
@@ -107,9 +107,9 @@ fn generate_phdr(o: &mut String, phdr: &ParsedPhdr) {
     w!(o, 4, "</table>");
 }
 
-fn generate_phdrs(o: &mut String, elf: &ParsedElf) {
-    for phdr in &elf.phdrs {
-        generate_phdr(o, &phdr);
+fn generate_phdr_info_tables(o: &mut String, elf: &ParsedElf) {
+    for (idx, phdr) in elf.phdrs.iter().enumerate() {
+        generate_phdr_info_table(o, &phdr, idx);
     }
 }
 
@@ -124,7 +124,7 @@ fn generate_header(o: &mut String, elf: &ParsedElf) {
     w!(o, 4, "<td id='desc'></td>");
 
     w!(o, 4, "<td>");
-    generate_phdrs(o, elf);
+    generate_phdr_info_tables(o, elf);
     w!(o, 4, "</td>");
 
     w!(o, 3, "</tr>");

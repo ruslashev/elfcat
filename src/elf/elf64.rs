@@ -271,7 +271,7 @@ fn parse_phdrs(
         let phdr = Elf64Phdr::from_bytes(&buf[start..start + phsize], endianness)?;
 
         elf.ranges
-            .add_range(start, phsize, RangeType::ProgramHeader);
+            .add_range(start, phsize, RangeType::ProgramHeader(i as u32));
 
         add_phdr_ranges(start, &mut elf.ranges);
 

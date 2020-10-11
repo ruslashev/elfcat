@@ -10,7 +10,7 @@ pub enum RangeType {
     End,
     Ident,
     FileHeader,
-    ProgramHeader,
+    ProgramHeader(u32),
     HeaderDetail(&'static str),
 }
 
@@ -48,19 +48,19 @@ pub struct ParsedPhdr {
 }
 
 impl RangeType {
-    fn id(&self) -> &str {
+    fn id(&self) -> String {
         match self {
-            RangeType::Ident => "ident",
-            RangeType::FileHeader => "ehdr",
-            RangeType::ProgramHeader => "phdr",
-            RangeType::HeaderDetail(class) => class,
-            _ => "",
+            RangeType::Ident => String::from("ident"),
+            RangeType::FileHeader => String::from("ehdr"),
+            RangeType::ProgramHeader(idx) => format!("phdr phdr{}", idx),
+            RangeType::HeaderDetail(class) => String::from(*class),
+            _ => String::new(),
         }
     }
 
     fn always_highlight(&self) -> bool {
         match self {
-            RangeType::ProgramHeader => true,
+            RangeType::ProgramHeader(_) => true,
             RangeType::HeaderDetail(class) => match *class {
                 "magic" => true,
                 "ver" => true,
@@ -78,14 +78,14 @@ impl RangeType {
 
     fn needs_class(&self) -> bool {
         match self {
-            RangeType::ProgramHeader => true,
+            RangeType::ProgramHeader(_) => true,
             _ => false,
         }
     }
 
     fn class(&self) -> &str {
         match self {
-            RangeType::ProgramHeader => "phdr",
+            RangeType::ProgramHeader(_) => "phdr",
             _ => "",
         }
     }
