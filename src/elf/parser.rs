@@ -148,42 +148,37 @@ impl ParsedElf {
             return Err(String::from("mismatched magic: not an ELF file"));
         }
 
-        let mut ranges = Ranges::new(buf.len());
-
-        let mut information = vec![];
+        let mut elf = ParsedElf {
+            filename: filename.clone(),
+            information: vec![],
+            contents: vec![],
+            ranges: Ranges::new(buf.len()),
+        };
 
         if ident.class == ELF_CLASS32 {
-            elf32::parse(&buf, &ident, &mut information, &mut ranges)?;
+            elf32::parse(&buf, &ident, &mut elf)?;
         } else {
-            elf64::parse(&buf, &ident, &mut information, &mut ranges)?;
+            elf64::parse(&buf, &ident, &mut elf)?;
         }
 
-        ParsedElf::parse_ident(&ident, &mut information, &mut ranges)?;
+        elf.parse_ident(&ident)?;
 
-        Ok(ParsedElf {
-            filename: filename.clone(),
-            information,
-            contents: buf,
-            ranges,
-        })
+        elf.contents = buf;
+
+        Ok(elf)
     }
 
-    fn parse_ident(
-        ident: &ParsedIdent,
-        information: &mut Vec<InfoTuple>,
-        ranges: &mut Ranges,
-    ) -> Result<(), String> {
-        ParsedElf::push_ident_info(ident, information)?;
+    fn parse_ident(&mut self, ident: &ParsedIdent) -> Result<(), String> {
+        self.push_ident_info(ident)?;
 
-        ParsedElf::add_ident_ranges(ranges);
+        self.add_ident_ranges();
 
         Ok(())
     }
 
-    fn push_ident_info(
-        ident: &ParsedIdent,
-        information: &mut Vec<InfoTuple>,
-    ) -> Result<(), String> {
+    fn push_ident_info(&mut self, ident: &ParsedIdent) -> Result<(), String> {
+        let information = &mut self.information;
+
         information.push((
             "class",
             "Object class",
@@ -233,7 +228,9 @@ impl ParsedElf {
         Ok(())
     }
 
-    fn add_ident_ranges(ranges: &mut Ranges) {
+    fn add_ident_ranges(&mut self) {
+        let ranges = &mut self.ranges;
+
         ranges.add_range(0, ELF_EI_NIDENT as usize, RangeType::Ident);
 
         ranges.add_range(0, 4, RangeType::HeaderDetail("magic"));

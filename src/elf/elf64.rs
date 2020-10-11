@@ -181,12 +181,7 @@ impl Elf64Shdr {
     }
 }
 
-pub fn parse(
-    buf: &Vec<u8>,
-    ident: &ParsedIdent,
-    information: &mut Vec<InfoTuple>,
-    ranges: &mut Ranges,
-) -> Result<(), String> {
+pub fn parse(buf: &Vec<u8>, ident: &ParsedIdent, elf: &mut ParsedElf) -> Result<(), String> {
     let ehdr_size = size_of::<Elf64Ehdr>();
 
     if buf.len() < ehdr_size {
@@ -195,17 +190,17 @@ pub fn parse(
 
     let ehdr = Elf64Ehdr::from_bytes(&buf[0..ehdr_size], ident.endianness)?;
 
-    parse_ehdr(&ehdr, information, ranges);
+    parse_ehdr(&ehdr, elf);
 
-    parse_phdrs(buf, ident.endianness, &ehdr, information, ranges)?;
+    parse_phdrs(buf, ident.endianness, &ehdr, elf)?;
 
     Ok(())
 }
 
-fn parse_ehdr(ehdr: &Elf64Ehdr, information: &mut Vec<InfoTuple>, ranges: &mut Ranges) {
-    push_ehdr_info(ehdr, information);
+fn parse_ehdr(ehdr: &Elf64Ehdr, elf: &mut ParsedElf) {
+    push_ehdr_info(ehdr, &mut elf.information);
 
-    add_ehdr_ranges(ehdr, ranges);
+    add_ehdr_ranges(ehdr, &mut elf.ranges);
 }
 
 fn push_ehdr_info(ehdr: &Elf64Ehdr, information: &mut Vec<InfoTuple>) {
@@ -267,8 +262,7 @@ fn parse_phdrs(
     buf: &Vec<u8>,
     endianness: u8,
     ehdr: &Elf64Ehdr,
-    information: &mut Vec<InfoTuple>,
-    ranges: &mut Ranges,
+    elf: &mut ParsedElf,
 ) -> Result<(), String> {
     let mut start = ehdr.e_phoff as usize;
     let phsize = size_of::<Elf64Phdr>();
@@ -276,9 +270,10 @@ fn parse_phdrs(
     for i in 1..=ehdr.e_phnum {
         let phdr = Elf64Phdr::from_bytes(&buf[start..start + phsize], endianness)?;
 
-        ranges.add_range(start, phsize, RangeType::ProgramHeader);
+        elf.ranges
+            .add_range(start, phsize, RangeType::ProgramHeader);
 
-        add_phdr_ranges(start, ranges);
+        add_phdr_ranges(start, &mut elf.ranges);
 
         start += phsize;
     }
