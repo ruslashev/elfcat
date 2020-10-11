@@ -38,14 +38,14 @@ function stripInfoPrefix(str) {
     return str.replace("info_", "");
 }
 
-function stripBinSuffix(str) {
-    return str.replace(/bin[0-9]+?/, "");
+function stripBinPrefix(str) {
+    return str.replace("bin", "");
 }
 
 function hasDescription(id) {
     return descriptions[id] !== undefined
         || descriptions[stripInfoPrefix(id)] !== undefined
-        || descriptions[stripBinSuffix(id)] !== undefined;
+        || descriptions[stripBinPrefix(id)] !== undefined;
 }
 
 function isValid(id) {
@@ -57,14 +57,14 @@ function formatDesc(id) {
         return descriptions[id];
     }
 
-    if (descriptions[stripBinSuffix(id)] !== undefined) {
-        return descriptions[stripBinSuffix(id)];
+    if (descriptions[stripBinPrefix(id)] !== undefined) {
+        return descriptions[stripBinPrefix(id)];
     }
 
     return descriptions[stripInfoPrefix(id)];
 }
 
-function listOfParents(el) {
+function iterateParents(el) {
     var txt = isValid(el.id) ? formatDesc(el.id) : "";
 
     while (el.tagName !== "HTML") {
@@ -87,5 +87,5 @@ document.addEventListener("mouseover", function (e) {
 
     var target = event.target || event.srcElement;
 
-    document.getElementById('desc').innerHTML = listOfParents(target);
+    document.getElementById('desc').innerHTML = iterateParents(target);
 }, false);

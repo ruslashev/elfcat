@@ -52,7 +52,7 @@ impl RangeType {
         match self {
             RangeType::Ident => String::from("ident"),
             RangeType::FileHeader => String::from("ehdr"),
-            RangeType::ProgramHeader(idx) => format!("phdrbin{}", idx),
+            RangeType::ProgramHeader(idx) => format!("binphdr{}", idx),
             RangeType::HeaderDetail(class) => String::from(*class),
             _ => String::new(),
         }

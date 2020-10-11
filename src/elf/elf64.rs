@@ -267,7 +267,7 @@ fn parse_phdrs(
     let mut start = ehdr.e_phoff as usize;
     let phsize = size_of::<Elf64Phdr>();
 
-    for i in 1..=ehdr.e_phnum {
+    for i in 0..ehdr.e_phnum {
         let phdr = Elf64Phdr::from_bytes(&buf[start..start + phsize], endianness)?;
 
         elf.ranges
