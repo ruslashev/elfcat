@@ -152,23 +152,13 @@ impl ParsedElf {
 
         let mut information = vec![];
 
-        ParsedElf::push_ident_info(&ident, &mut information)?;
-
         if ident.class == ELF_CLASS32 {
             elf32::parse(&buf, &ident, &mut information, &mut ranges)?;
         } else {
             elf64::parse(&buf, &ident, &mut information, &mut ranges)?;
         }
 
-        ranges.add_range(0, ELF_EI_NIDENT as usize, RangeType::Ident);
-
-        ranges.add_range(0, 4, RangeType::HeaderDetail("magic"));
-        ranges.add_range(4, 1, RangeType::HeaderDetail("class"));
-        ranges.add_range(5, 1, RangeType::HeaderDetail("data"));
-        ranges.add_range(6, 1, RangeType::HeaderDetail("ver"));
-        ranges.add_range(7, 1, RangeType::HeaderDetail("abi"));
-        ranges.add_range(8, 1, RangeType::HeaderDetail("abi_ver"));
-        ranges.add_range(9, 7, RangeType::HeaderDetail("pad"));
+        ParsedElf::parse_ident(&ident, &mut information, &mut ranges)?;
 
         Ok(ParsedElf {
             filename: filename.clone(),
@@ -176,6 +166,18 @@ impl ParsedElf {
             contents: buf,
             ranges,
         })
+    }
+
+    fn parse_ident(
+        ident: &ParsedIdent,
+        information: &mut Vec<InfoTuple>,
+        ranges: &mut Ranges,
+    ) -> Result<(), String> {
+        ParsedElf::push_ident_info(ident, information)?;
+
+        ParsedElf::add_ident_ranges(ranges);
+
+        Ok(())
     }
 
     fn push_ident_info(
@@ -229,5 +231,17 @@ impl ParsedElf {
         }
 
         Ok(())
+    }
+
+    fn add_ident_ranges(ranges: &mut Ranges) {
+        ranges.add_range(0, ELF_EI_NIDENT as usize, RangeType::Ident);
+
+        ranges.add_range(0, 4, RangeType::HeaderDetail("magic"));
+        ranges.add_range(4, 1, RangeType::HeaderDetail("class"));
+        ranges.add_range(5, 1, RangeType::HeaderDetail("data"));
+        ranges.add_range(6, 1, RangeType::HeaderDetail("ver"));
+        ranges.add_range(7, 1, RangeType::HeaderDetail("abi"));
+        ranges.add_range(8, 1, RangeType::HeaderDetail("abi_ver"));
+        ranges.add_range(9, 7, RangeType::HeaderDetail("pad"));
     }
 }
