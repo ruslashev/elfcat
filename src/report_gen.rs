@@ -1,4 +1,4 @@
-use crate::elf::parser::{ParsedElf, RangeType};
+use crate::elf::parser::{ParsedElf, ParsedPhdr, RangeType};
 use std::fmt::Write;
 use std::path::Path;
 
@@ -82,6 +82,37 @@ fn generate_info_table(o: &mut String, elf: &ParsedElf) {
     w!(o, 5, "</table>");
 }
 
+fn generate_phdr(o: &mut String, phdr: &ParsedPhdr) {
+    let items = [
+        ("Type", &phdr.ptype),
+        ("Flags", &phdr.flags),
+        ("Offset in file", &format!("{:#x}", phdr.file_offset)),
+        ("Size in file", &format!("{:#x}", phdr.file_size)),
+        ("Vaddr in memory", &format!("{:#x}", phdr.vaddr)),
+        ("Size in memory", &format!("{:#x}", phdr.memsz)),
+        ("Alignment", &format!("{:#x}", phdr.alignment)),
+    ];
+
+    w!(o, 4, "<table>");
+
+    for (desc, value) in items.iter() {
+        w!(o, 5, "<tr>");
+
+        w!(o, 6, "<td>{}:</td>", desc);
+        w!(o, 6, "<td>{}</td>", value);
+
+        w!(o, 5, "</tr>");
+    }
+
+    w!(o, 4, "</table>");
+}
+
+fn generate_phdrs(o: &mut String, elf: &ParsedElf) {
+    for phdr in &elf.phdrs {
+        generate_phdr(o, &phdr);
+    }
+}
+
 fn generate_header(o: &mut String, elf: &ParsedElf) {
     w!(o, 2, "<table>");
     w!(o, 3, "<tr>");
@@ -91,6 +122,10 @@ fn generate_header(o: &mut String, elf: &ParsedElf) {
     w!(o, 4, "</td>");
 
     w!(o, 4, "<td id='desc'></td>");
+
+    w!(o, 4, "<td>");
+    generate_phdrs(o, elf);
+    w!(o, 4, "</td>");
 
     w!(o, 3, "</tr>");
     w!(o, 2, "</table>");
