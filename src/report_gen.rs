@@ -132,7 +132,7 @@ fn generate_header(o: &mut String, elf: &ParsedElf) {
 }
 
 fn add_highlight_script(o: &mut String) {
-    let template: &str = include_str!("highlight.js");
+    let template: &str = include_str!("js/highlight.js");
     let ids = [
         "class",
         "data",
@@ -175,7 +175,7 @@ fn add_highlight_script(o: &mut String) {
 fn add_description_script(o: &mut String) {
     w!(o, 2, "<script type='text/javascript'>");
 
-    wnonl!(o, 0, "{}", include_str!("description.js").indent_lines(3));
+    wnonl!(o, 0, "{}", include_str!("js/description.js").indent_lines(3));
 
     w!(o, 2, "</script>");
 }
@@ -183,7 +183,7 @@ fn add_description_script(o: &mut String) {
 fn add_conceal_script(o: &mut String) {
     w!(o, 2, "<script type='text/javascript'>");
 
-    wnonl!(o, 0, "{}", include_str!("conceal.js").indent_lines(3));
+    wnonl!(o, 0, "{}", include_str!("js/conceal.js").indent_lines(3));
 
     w!(o, 2, "</script>");
 }
