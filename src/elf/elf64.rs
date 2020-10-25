@@ -243,19 +243,19 @@ fn push_ehdr_info(ehdr: &Elf64Ehdr, information: &mut Vec<InfoTuple>) {
 
 fn add_ehdr_ranges(ehdr: &Elf64Ehdr, ranges: &mut Ranges) {
     ranges.add_range(0, ehdr.e_ehsize as usize, RangeType::FileHeader);
-    ranges.add_range(16, 2, RangeType::HeaderDetail("e_type"));
-    ranges.add_range(18, 2, RangeType::HeaderDetail("e_machine"));
-    ranges.add_range(20, 4, RangeType::HeaderDetail("e_version"));
-    ranges.add_range(24, 8, RangeType::HeaderDetail("e_entry"));
-    ranges.add_range(32, 8, RangeType::HeaderDetail("e_phoff"));
-    ranges.add_range(40, 8, RangeType::HeaderDetail("e_shoff"));
-    ranges.add_range(48, 4, RangeType::HeaderDetail("e_flags"));
-    ranges.add_range(52, 2, RangeType::HeaderDetail("e_ehsize"));
-    ranges.add_range(54, 2, RangeType::HeaderDetail("e_phentsize"));
-    ranges.add_range(56, 2, RangeType::HeaderDetail("e_phnum"));
-    ranges.add_range(58, 2, RangeType::HeaderDetail("e_shentsize"));
-    ranges.add_range(60, 2, RangeType::HeaderDetail("e_shnum"));
-    ranges.add_range(62, 2, RangeType::HeaderDetail("e_shstrndx"));
+    ranges.add_range(16, 2, RangeType::HeaderField("e_type"));
+    ranges.add_range(18, 2, RangeType::HeaderField("e_machine"));
+    ranges.add_range(20, 4, RangeType::HeaderField("e_version"));
+    ranges.add_range(24, 8, RangeType::HeaderField("e_entry"));
+    ranges.add_range(32, 8, RangeType::HeaderField("e_phoff"));
+    ranges.add_range(40, 8, RangeType::HeaderField("e_shoff"));
+    ranges.add_range(48, 4, RangeType::HeaderField("e_flags"));
+    ranges.add_range(52, 2, RangeType::HeaderField("e_ehsize"));
+    ranges.add_range(54, 2, RangeType::HeaderField("e_phentsize"));
+    ranges.add_range(56, 2, RangeType::HeaderField("e_phnum"));
+    ranges.add_range(58, 2, RangeType::HeaderField("e_shentsize"));
+    ranges.add_range(60, 2, RangeType::HeaderField("e_shnum"));
+    ranges.add_range(62, 2, RangeType::HeaderField("e_shstrndx"));
 }
 
 fn parse_phdrs(
@@ -284,14 +284,14 @@ fn parse_phdrs(
 }
 
 fn add_phdr_ranges(start: usize, ranges: &mut Ranges) {
-    ranges.add_range(start + 0, 4, RangeType::HeaderDetail("p_type"));
-    ranges.add_range(start + 4, 4, RangeType::HeaderDetail("p_flags"));
-    ranges.add_range(start + 8, 8, RangeType::HeaderDetail("p_offset"));
-    ranges.add_range(start + 16, 8, RangeType::HeaderDetail("p_vaddr"));
-    ranges.add_range(start + 24, 8, RangeType::HeaderDetail("p_paddr"));
-    ranges.add_range(start + 32, 8, RangeType::HeaderDetail("p_filesz"));
-    ranges.add_range(start + 40, 8, RangeType::HeaderDetail("p_memsz"));
-    ranges.add_range(start + 48, 8, RangeType::HeaderDetail("p_align"));
+    ranges.add_range(start + 0, 4, RangeType::PhdrField("p_type"));
+    ranges.add_range(start + 4, 4, RangeType::PhdrField("p_flags"));
+    ranges.add_range(start + 8, 8, RangeType::PhdrField("p_offset"));
+    ranges.add_range(start + 16, 8, RangeType::PhdrField("p_vaddr"));
+    ranges.add_range(start + 24, 8, RangeType::PhdrField("p_paddr"));
+    ranges.add_range(start + 32, 8, RangeType::PhdrField("p_filesz"));
+    ranges.add_range(start + 40, 8, RangeType::PhdrField("p_memsz"));
+    ranges.add_range(start + 48, 8, RangeType::PhdrField("p_align"));
 }
 
 fn parse_phdr(phdr: &Elf64Phdr) -> ParsedPhdr {

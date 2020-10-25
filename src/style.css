@@ -51,5 +51,8 @@
   background-color: #eb9;
 }
 .phdr:hover > * {
-  background-color: #ec9;
+  background-color: #ed9;
+}
+.phdr_hover:hover {
+  background-color: #ef9;
 }

@@ -10,8 +10,9 @@ pub enum RangeType {
     End,
     Ident,
     FileHeader,
+    HeaderField(&'static str),
     ProgramHeader(u32),
-    HeaderDetail(&'static str),
+    PhdrField(&'static str),
 }
 
 // Interval tree that allows querying point for all intervals that intersect it should be better.
@@ -53,14 +54,15 @@ impl RangeType {
             RangeType::Ident => String::from("ident"),
             RangeType::FileHeader => String::from("ehdr"),
             RangeType::ProgramHeader(idx) => format!("binphdr{}", idx),
-            RangeType::HeaderDetail(class) => String::from(*class),
+            RangeType::HeaderField(class) => String::from(*class),
+            RangeType::PhdrField(class) => String::from(*class),
             _ => String::new(),
         }
     }
 
     fn always_highlight(&self) -> bool {
         match self {
-            RangeType::HeaderDetail(class) => match *class {
+            RangeType::HeaderField(class) => match *class {
                 "magic" => true,
                 "ver" => true,
                 "abi_ver" => true,
@@ -78,6 +80,7 @@ impl RangeType {
     fn needs_class(&self) -> bool {
         match self {
             RangeType::ProgramHeader(_) => true,
+            RangeType::PhdrField(_) => true,
             _ => false,
         }
     }
@@ -85,6 +88,7 @@ impl RangeType {
     fn class(&self) -> &str {
         match self {
             RangeType::ProgramHeader(_) => "phdr",
+            RangeType::PhdrField(_) => "phdr_hover",
             _ => "",
         }
     }
@@ -238,12 +242,12 @@ impl ParsedElf {
 
         ranges.add_range(0, ELF_EI_NIDENT as usize, RangeType::Ident);
 
-        ranges.add_range(0, 4, RangeType::HeaderDetail("magic"));
-        ranges.add_range(4, 1, RangeType::HeaderDetail("class"));
-        ranges.add_range(5, 1, RangeType::HeaderDetail("data"));
-        ranges.add_range(6, 1, RangeType::HeaderDetail("ver"));
-        ranges.add_range(7, 1, RangeType::HeaderDetail("abi"));
-        ranges.add_range(8, 1, RangeType::HeaderDetail("abi_ver"));
-        ranges.add_range(9, 7, RangeType::HeaderDetail("pad"));
+        ranges.add_range(0, 4, RangeType::HeaderField("magic"));
+        ranges.add_range(4, 1, RangeType::HeaderField("class"));
+        ranges.add_range(5, 1, RangeType::HeaderField("data"));
+        ranges.add_range(6, 1, RangeType::HeaderField("ver"));
+        ranges.add_range(7, 1, RangeType::HeaderField("abi"));
+        ranges.add_range(8, 1, RangeType::HeaderField("abi_ver"));
+        ranges.add_range(9, 7, RangeType::HeaderField("pad"));
     }
 }
