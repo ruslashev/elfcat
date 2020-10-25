@@ -67,6 +67,28 @@ fn generate_head(o: &mut String, elf: &ParsedElf) {
     w!(o, 1, "</head>");
 }
 
+fn generate_svg_element(o: &mut String) {
+    w!(o, 2, "<svg width='100%' height='100%'>");
+
+    w!(o, 3, "<defs>");
+
+    wnonl!(o, 4, "<marker id='arrowhead' viewBox='0 0 10 10' ");
+    wnonl!(o, 0, "refX='10' refY='5' ");
+    w!(o, 0, "markerWidth='10' markerHeight='10' orient='auto'>");
+
+    w!(o, 5, "<path d='M 0 0 L 10 5 L 0 10 z' />");
+
+    w!(o, 4, "</marker>");
+
+    w!(o, 3, "</defs>");
+
+    wnonl!(o, 3, "<g id='arrows' stroke='black' ");
+    wnonl!(o, 0, "stroke-width='1' marker-end='url(#arrowhead)'>");
+    w!(o, 0, "</g>");
+
+    w!(o, 2, "</svg>");
+}
+
 fn generate_info_table(o: &mut String, elf: &ParsedElf) {
     w!(o, 5, "<table>");
 
@@ -175,7 +197,12 @@ fn add_highlight_script(o: &mut String) {
 fn add_description_script(o: &mut String) {
     w!(o, 2, "<script type='text/javascript'>");
 
-    wnonl!(o, 0, "{}", include_str!("js/description.js").indent_lines(3));
+    wnonl!(
+        o,
+        0,
+        "{}",
+        include_str!("js/description.js").indent_lines(3)
+    );
 
     w!(o, 2, "</script>");
 }
@@ -188,12 +215,29 @@ fn add_conceal_script(o: &mut String) {
     w!(o, 2, "</script>");
 }
 
-fn add_scripts(o: &mut String) {
+fn add_arrows_script(o: &mut String, elf: &ParsedElf) {
+    w!(o, 2, "<script type='text/javascript'>");
+
+    wnonl!(o, 0, "{}", include_str!("js/arrows.js").indent_lines(3));
+
+    w!(o, 3, "connect('#e_phoff', '#pdata0');");
+    w!(o, 3, "connect('#e_shoff', '#sdata0');");
+
+    for i in 0..elf.phdrs.len() {
+        w!(o, 3, "connect('#binphdr{} > #p_offset', '#pdata{}');", i, i);
+    }
+
+    w!(o, 2, "</script>");
+}
+
+fn add_scripts(o: &mut String, elf: &ParsedElf) {
     add_highlight_script(o);
 
     add_description_script(o);
 
     add_conceal_script(o);
+
+    add_arrows_script(o, elf);
 }
 
 fn format_magic(byte: u8) -> String {
@@ -253,6 +297,8 @@ fn generate_file_dump(elf: &ParsedElf) -> String {
 fn generate_body(o: &mut String, elf: &ParsedElf) {
     w!(o, 1, "<body>");
 
+    generate_svg_element(o);
+
     generate_header(o, elf);
 
     w!(o, 2, "<div class='box'>");
@@ -261,7 +307,7 @@ fn generate_body(o: &mut String, elf: &ParsedElf) {
 
     w!(o, 2, "</div>");
 
-    add_scripts(o);
+    add_scripts(o, elf);
 
     w!(o, 1, "</body>");
 }

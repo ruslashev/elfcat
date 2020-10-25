@@ -60,3 +60,10 @@
 .pdata {
   background-color: #f99;
 }
+
+svg {
+  position: absolute;
+  left: 0px;
+  right: 0px;
+  pointer-events: none;
+}
