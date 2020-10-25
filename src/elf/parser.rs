@@ -60,7 +60,6 @@ impl RangeType {
 
     fn always_highlight(&self) -> bool {
         match self {
-            RangeType::ProgramHeader(_) => true,
             RangeType::HeaderDetail(class) => match *class {
                 "magic" => true,
                 "ver" => true,

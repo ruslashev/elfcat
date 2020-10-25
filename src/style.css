@@ -21,12 +21,35 @@
 .hover:hover {
   background-color: #ee9;
 }
+
 #ident {
   background-color: #e99;
 }
+/* highlight children */
+#ident:hover > * {
+  background-color: #ebb;
+}
+/* duplicate of .hover:hover with more specifity.
+ * used for elements like #magic, for whom
+ * rule #ident:hover > * would override .hover:hover rule */
+#ident:hover > *.hover:hover {
+  background-color: #ee9;
+}
+
+/* same for #ehdr, but we also don't want to highlight #ident */
 #ehdr {
   background-color: #99e;
 }
+#ehdr:hover > *:not(#ident) {
+  background-color: #bbe;
+}
+#ehdr:hover > *.hover:hover:not(#ident) {
+  background-color: #ee9;
+}
+
 .phdr {
   background-color: #eb9;
+}
+.phdr:hover > * {
+  background-color: #ec9;
 }
