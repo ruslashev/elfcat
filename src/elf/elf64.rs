@@ -270,12 +270,19 @@ fn parse_phdrs(
     for i in 0..ehdr.e_phnum {
         let phdr = Elf64Phdr::from_bytes(&buf[start..start + phsize], endianness)?;
 
+        let parsed = parse_phdr(&phdr);
+
+        if parsed.file_offset != 0 && parsed.file_size != 0 {
+            elf.ranges
+                .add_range(parsed.file_offset, parsed.file_size, RangeType::PhdrData(i));
+        }
+
         elf.ranges
             .add_range(start, phsize, RangeType::ProgramHeader(i as u32));
 
         add_phdr_ranges(start, &mut elf.ranges);
 
-        elf.phdrs.push(parse_phdr(&phdr));
+        elf.phdrs.push(parsed);
 
         start += phsize;
     }
