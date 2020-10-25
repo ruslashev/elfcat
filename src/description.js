@@ -24,7 +24,7 @@ let descriptions = {
     e_shstrndx: "What section is a string table (e_shstrndx)",
     phdr: "Program header",
     p_type: "Segment type",
-    p_flags: "Segment attributes",
+    p_flags: "Segment flags",
     p_offset: "Offset in file",
     p_vaddr: "Virtual address in memory",
     p_paddr: "Reserved for physical address in memory",

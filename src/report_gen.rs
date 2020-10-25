@@ -86,7 +86,7 @@ fn generate_phdr_info_table(o: &mut String, phdr: &ParsedPhdr, idx: usize) {
     let items = [
         ("Type", &phdr.ptype),
         ("Flags", &phdr.flags),
-        ("Offset in file", &format!("{:#x}", phdr.file_offset)),
+        ("Offset in file", &format!("{}", phdr.file_offset)),
         ("Size in file", &format!("{:#x}", phdr.file_size)),
         ("Vaddr in memory", &format!("{:#x}", phdr.vaddr)),
         ("Size in memory", &format!("{:#x}", phdr.memsz)),
