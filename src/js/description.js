@@ -32,7 +32,7 @@ let descriptions = {
     p_memsz: "Size of segment in memory",
     p_align: "Alignment",
 }
-let separator = "</br>&#x2193</br>";
+let separator = "<br>&#x2193<br>";
 
 function stripInfoPrefix(str) {
     return str.replace("info_", "");
