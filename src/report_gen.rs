@@ -87,7 +87,7 @@ fn generate_phdr_info_table(o: &mut String, phdr: &ParsedPhdr, idx: usize) {
         ("Type", &phdr.ptype),
         ("Flags", &phdr.flags),
         ("Offset in file", &format!("{}", phdr.file_offset)),
-        ("Size in file", &format!("{:#x}", phdr.file_size)),
+        ("Size in file", &format!("{}", phdr.file_size)),
         ("Vaddr in memory", &format!("{:#x}", phdr.vaddr)),
         ("Size in memory", &format!("{:#x}", phdr.memsz)),
         ("Alignment", &format!("{:#x}", phdr.alignment)),
@@ -227,7 +227,7 @@ fn append_hex_byte(s: &mut String, byte: u8) {
 fn generate_file_dump(elf: &ParsedElf) -> String {
     let mut dump = String::new();
 
-    for (i, b) in elf.contents.iter().take(192).enumerate() {
+    for (i, b) in elf.contents.iter().take(2000).enumerate() {
         for range_type in &elf.ranges.data[i] {
             if *range_type != RangeType::End {
                 dump += format!("<span {}>", range_type.span_attributes()).as_str();

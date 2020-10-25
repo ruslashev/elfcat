@@ -219,7 +219,7 @@ fn push_ehdr_info(ehdr: &Elf64Ehdr, information: &mut Vec<InfoTuple>) {
         "Program headers",
         format!(
             "<span id='info_e_phnum'>{}</span> * \
-             <span id='info_e_phentsize'>0x{:x}</span> @ \
+             <span id='info_e_phentsize'>{}</span> @ \
              <span id='info_e_phoff'>{}</span>",
             ehdr.e_phnum, ehdr.e_phentsize, ehdr.e_phoff
         ),
@@ -230,7 +230,7 @@ fn push_ehdr_info(ehdr: &Elf64Ehdr, information: &mut Vec<InfoTuple>) {
         "Section headers",
         format!(
             "<span id='info_e_shnum'>{}</span> * \
-             <span id='info_e_shentsize'>0x{:x}</span> @ \
+             <span id='info_e_shentsize'>{}</span> @ \
              <span id='info_e_shoff'>{}</span>",
             ehdr.e_shnum, ehdr.e_shentsize, ehdr.e_shoff
         ),
