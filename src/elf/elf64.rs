@@ -271,7 +271,7 @@ fn parse_phdrs(
         let ranges = &mut elf.ranges;
 
         if parsed.file_offset != 0 && parsed.file_size != 0 {
-            ranges.add_range(parsed.file_offset, parsed.file_size, RangeType::PhdrData(i));
+            ranges.add_range(parsed.file_offset, parsed.file_size, RangeType::Segment(i));
         }
 
         ranges.add_range(start, phsize, RangeType::ProgramHeader(i as u32));

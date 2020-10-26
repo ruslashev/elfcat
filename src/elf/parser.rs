@@ -16,7 +16,7 @@ pub enum RangeType {
     HeaderField(&'static str),
     ProgramHeader(u32),
     PhdrField(&'static str),
-    PhdrData(u16),
+    Segment(u16),
 }
 
 // Interval tree that allows querying point for all intervals that intersect it should be better.
@@ -67,7 +67,7 @@ impl RangeType {
             RangeType::ProgramHeader(idx) => format!("binphdr{}", idx),
             RangeType::HeaderField(class) => String::from(*class),
             RangeType::PhdrField(class) => String::from(*class),
-            RangeType::PhdrData(idx) => format!("binpdata{}", idx),
+            RangeType::Segment(idx) => format!("binsegment{}", idx),
             _ => String::new(),
         }
     }
@@ -85,7 +85,7 @@ impl RangeType {
                 "e_shstrndx" => true,
                 _ => false,
             },
-            RangeType::PhdrData(_) => true,
+            RangeType::Segment(_) => true,
             _ => false,
         }
     }
@@ -94,7 +94,7 @@ impl RangeType {
         match self {
             RangeType::ProgramHeader(_) => true,
             RangeType::PhdrField(_) => true,
-            RangeType::PhdrData(_) => true,
+            RangeType::Segment(_) => true,
             _ => false,
         }
     }
@@ -103,7 +103,7 @@ impl RangeType {
         match self {
             RangeType::ProgramHeader(_) => "phdr",
             RangeType::PhdrField(_) => "phdr_hover",
-            RangeType::PhdrData(_) => "pdata",
+            RangeType::Segment(_) => "segment",
             _ => "",
         }
     }

@@ -188,7 +188,7 @@ fn generate_note_data(o: &mut String, note: &Note) {
     }
 }
 
-fn generate_phdr_data_info_table(o: &mut String, elf: &ParsedElf, phdr: &ParsedPhdr) {
+fn generate_segment_info_table(o: &mut String, elf: &ParsedElf, phdr: &ParsedPhdr) {
     match phdr.ptype {
         PT_INTERP => {
             w!(o, 5, "<tr>");
@@ -220,7 +220,7 @@ fn generate_phdr_data_info_table(o: &mut String, elf: &ParsedElf, phdr: &ParsedP
 }
 
 // this is ugly
-fn has_phdr_data_detail(ptype: u32) -> bool {
+fn has_segment_detail(ptype: u32) -> bool {
     match ptype {
         PT_INTERP => true,
         PT_NOTE => true,
@@ -228,14 +228,14 @@ fn has_phdr_data_detail(ptype: u32) -> bool {
     }
 }
 
-fn generate_phdr_data_info_tables(o: &mut String, elf: &ParsedElf) {
+fn generate_segment_info_tables(o: &mut String, elf: &ParsedElf) {
     for (idx, phdr) in elf.phdrs.iter().enumerate() {
-        if !has_phdr_data_detail(phdr.ptype) {
+        if !has_segment_detail(phdr.ptype) {
             continue;
         }
 
-        w!(o, 4, "<table class='conceal' id='info_pdata{}'>", idx);
-        generate_phdr_data_info_table(o, elf, &phdr);
+        w!(o, 4, "<table class='conceal' id='info_segment{}'>", idx);
+        generate_segment_info_table(o, elf, &phdr);
         w!(o, 4, "</table>");
     }
 }
@@ -255,7 +255,7 @@ fn generate_header(o: &mut String, elf: &ParsedElf) {
     w!(o, 4, "</td>");
 
     w!(o, 4, "<td>");
-    generate_phdr_data_info_tables(o, elf);
+    generate_segment_info_tables(o, elf);
     w!(o, 4, "</td>");
 
     w!(o, 3, "</tr>");
@@ -329,14 +329,14 @@ fn add_arrows_script(o: &mut String, elf: &ParsedElf) {
 
     wnonl!(o, 0, "{}", include_str!("js/arrows.js").indent_lines(3));
 
-    w!(o, 3, "connect('#e_phoff', '#binpdata0');");
-    w!(o, 3, "connect('#e_shoff', '#sdata0');");
+    w!(o, 3, "connect('#e_phoff', '#binsegment0');");
+    w!(o, 3, "connect('#e_shoff', '#binsection0');");
 
     for i in 0..elf.phdrs.len() {
         w!(
             o,
             3,
-            "connect('#binphdr{} > #p_offset', '#binpdata{}');",
+            "connect('#binphdr{} > #p_offset', '#binsegment{}');",
             i,
             i
         );
