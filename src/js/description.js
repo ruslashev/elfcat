@@ -23,14 +23,15 @@ let descriptions = {
     e_shnum: "Number of section header table entries (e_shnum)",
     e_shstrndx: "What section is a string table (e_shstrndx)",
     phdr: "Program header",
-    p_type: "Segment type",
-    p_flags: "Segment flags",
-    p_offset: "Offset in file",
-    p_vaddr: "Virtual address in memory",
-    p_paddr: "Reserved for physical address in memory",
-    p_filesz: "Size of segment in file",
-    p_memsz: "Size of segment in memory",
-    p_align: "Alignment",
+    p_type: "Segment type (p_type)",
+    p_flags: "Segment flags (p_flags)",
+    p_offset: "Offset in file (p_offset)",
+    p_vaddr: "Virtual address in memory (p_vaddr)",
+    p_paddr: "Reserved for physical address in memory (p_paddr)",
+    p_filesz: "Size of segment in file (p_filesz)",
+    p_memsz: "Size of segment in memory (p_memsz)",
+    p_align: "Alignment (p_align)",
+    segment: "Segment",
 }
 let separator = "<br>&#x2193<br>";
 
@@ -65,19 +66,36 @@ function formatDesc(id) {
 }
 
 function iterateParents(el) {
-    var txt = isValid(el.id) ? formatDesc(el.id) : "";
+    var txt = "";
 
-    while (el.tagName !== "HTML") {
-        el = el.parentNode;
+    do {
+        var keywords = [];
 
-        if (isValid(el.id)) {
-            if (txt === "") {
-                txt = formatDesc(el.id);
-            } else {
-                txt = formatDesc(el.id) + separator + txt;
+        if (el.id !== undefined) {
+            keywords.push(el.id);
+        }
+
+        var classList = el.classList;
+        if (classList !== undefined) {
+            for (var i = 0; i < classList.length; ++i) {
+                keywords.push(classList[i]);
             }
         }
-    }
+
+        for (var i = 0; i < keywords.length; i++) {
+            var keyword = keywords[i];
+
+            if (isValid(keyword)) {
+                if (txt === "") {
+                    txt = formatDesc(keyword);
+                } else {
+                    txt = formatDesc(keyword) + separator + txt;
+                }
+            }
+        }
+
+        el = el.parentNode;
+    } while (el !== null && el.tagName !== "HTML")
 
     return txt;
 }
