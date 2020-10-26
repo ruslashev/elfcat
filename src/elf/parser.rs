@@ -1,8 +1,11 @@
 use super::defs::*;
 use super::elf32;
 use super::elf64;
+use std::convert::TryInto;
 
 pub type InfoTuple = (&'static str, &'static str, String);
+
+pub type ReadErr = std::array::TryFromSliceError;
 
 #[repr(u8)]
 #[derive(Clone, PartialEq)]
@@ -47,6 +50,13 @@ pub struct ParsedPhdr {
     pub vaddr: usize,
     pub memsz: usize,
     pub alignment: usize,
+    pub notes: Vec<Note>,
+}
+
+pub struct Note {
+    pub name: Vec<u8>,
+    pub desc: Vec<u8>,
+    pub ntype: u32,
 }
 
 impl RangeType {
@@ -254,4 +264,60 @@ impl ParsedElf {
         ranges.add_range(8, 1, RangeType::HeaderField("abi_ver"));
         ranges.add_range(9, 7, RangeType::HeaderField("pad"));
     }
+}
+
+impl Note {
+    fn from_bytes(buf: &[u8], endianness: u8) -> Option<(Note, usize)> {
+        let (namesz, descsz, ntype) = Note::read_header(buf, endianness).ok()?;
+        let (namesz, descsz) = (namesz as usize, descsz as usize);
+
+        let name = buf[12..12 + namesz].to_vec();
+        let desc = buf[12 + namesz..12 + namesz + descsz].to_vec();
+
+        let mut len: usize = 12 + namesz + descsz;
+
+        while len % 4 != 0 {
+            len += 1;
+        }
+
+        Some((Note { name, desc, ntype }, len))
+    }
+
+    fn read_header(buf: &[u8], endianness: u8) -> Result<(u32, u32, u32), ReadErr> {
+        Ok(if endianness == ELF_DATA2LSB {
+            (
+                u32::from_le_bytes(buf[0..4].try_into()?),
+                u32::from_le_bytes(buf[4..8].try_into()?),
+                u32::from_le_bytes(buf[8..12].try_into()?),
+            )
+        } else {
+            (
+                u32::from_be_bytes(buf[0..4].try_into()?),
+                u32::from_be_bytes(buf[4..8].try_into()?),
+                u32::from_be_bytes(buf[8..12].try_into()?),
+            )
+        })
+    }
+}
+
+// this is pretty ugly
+pub fn parse_notes(segment: &[u8], segment_size: usize, endianness: u8) -> Vec<Note> {
+    let mut start = 0;
+    let mut notes = vec![];
+
+    loop {
+        if start >= segment_size {
+            break;
+        }
+
+        match Note::from_bytes(&segment[start..segment_size], endianness) {
+            None => break,
+            Some((note, len_taken)) => {
+                notes.push(note);
+                start += len_taken;
+            }
+        }
+    }
+
+    notes
 }
