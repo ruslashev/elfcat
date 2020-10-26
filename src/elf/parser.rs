@@ -60,14 +60,40 @@ pub struct Note {
 }
 
 impl RangeType {
+    fn needs_class(&self) -> bool {
+        match self {
+            RangeType::ProgramHeader(_) => true,
+            RangeType::PhdrField(_) => true,
+            RangeType::Segment(_) => true,
+            _ => false,
+        }
+    }
+
+    // for those who need_class()
+    fn needs_id(&self) -> bool {
+        match self {
+            RangeType::ProgramHeader(_) => true,
+            RangeType::Segment(_) => true,
+            _ => false,
+        }
+    }
+
     fn id(&self) -> String {
         match self {
             RangeType::Ident => String::from("ident"),
             RangeType::FileHeader => String::from("ehdr"),
             RangeType::ProgramHeader(idx) => format!("bin_phdr{}", idx),
             RangeType::HeaderField(class) => String::from(*class),
-            RangeType::PhdrField(class) => String::from(*class),
             RangeType::Segment(idx) => format!("bin_segment{}", idx),
+            _ => String::new(),
+        }
+    }
+
+    fn class(&self) -> String {
+        match self {
+            RangeType::ProgramHeader(_) => String::from("phdr"),
+            RangeType::PhdrField(field) => format!("{} phdr_hover", field),
+            RangeType::Segment(_) => String::from("segment"),
             _ => String::new(),
         }
     }
@@ -90,30 +116,15 @@ impl RangeType {
         }
     }
 
-    fn needs_class(&self) -> bool {
-        match self {
-            RangeType::ProgramHeader(_) => true,
-            RangeType::PhdrField(_) => true,
-            RangeType::Segment(_) => true,
-            _ => false,
-        }
-    }
-
-    fn class(&self) -> &str {
-        match self {
-            RangeType::ProgramHeader(_) => "phdr",
-            RangeType::PhdrField(_) => "phdr_hover",
-            RangeType::Segment(_) => "segment",
-            _ => "",
-        }
-    }
-
     pub fn span_attributes(&self) -> String {
         if self.needs_class() {
-            // put id anyway for description
             format!(
-                "id='{}' class='{}{}'",
-                self.id(),
+                "{}class='{}{}'",
+                if self.needs_id() {
+                    format!("id='{}' ", self.id())
+                } else {
+                    String::new()
+                },
                 self.class(),
                 if self.always_highlight() {
                     " hover"

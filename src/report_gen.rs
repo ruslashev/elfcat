@@ -336,7 +336,7 @@ fn add_arrows_script(o: &mut String, elf: &ParsedElf) {
         w!(
             o,
             3,
-            "connect('#bin_phdr{} > #p_offset', '#bin_segment{}');",
+            "connect('#bin_phdr{} > .p_offset', '#bin_segment{}');",
             i,
             i
         );
