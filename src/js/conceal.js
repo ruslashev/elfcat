@@ -15,7 +15,7 @@ var prevTableId;
 document.addEventListener("mouseover", function (e) {
     var event = e || window.event;
     var target = event.target || event.srcElement;
-    var prefix = 'bin';
+    var prefix = 'bin_';
 
     if (prevTableId) {
         prevTableId.style.display = "none";

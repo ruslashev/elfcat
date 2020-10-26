@@ -329,14 +329,14 @@ fn add_arrows_script(o: &mut String, elf: &ParsedElf) {
 
     wnonl!(o, 0, "{}", include_str!("js/arrows.js").indent_lines(3));
 
-    w!(o, 3, "connect('#e_phoff', '#binsegment0');");
-    w!(o, 3, "connect('#e_shoff', '#binsection0');");
+    w!(o, 3, "connect('#e_phoff', '#bin_segment0');");
+    w!(o, 3, "connect('#e_shoff', '#bin_section0');");
 
     for i in 0..elf.phdrs.len() {
         w!(
             o,
             3,
-            "connect('#binphdr{} > #p_offset', '#binsegment{}');",
+            "connect('#bin_phdr{} > #p_offset', '#bin_segment{}');",
             i,
             i
         );

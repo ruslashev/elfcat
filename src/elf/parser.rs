@@ -64,10 +64,10 @@ impl RangeType {
         match self {
             RangeType::Ident => String::from("ident"),
             RangeType::FileHeader => String::from("ehdr"),
-            RangeType::ProgramHeader(idx) => format!("binphdr{}", idx),
+            RangeType::ProgramHeader(idx) => format!("bin_phdr{}", idx),
             RangeType::HeaderField(class) => String::from(*class),
             RangeType::PhdrField(class) => String::from(*class),
-            RangeType::Segment(idx) => format!("binsegment{}", idx),
+            RangeType::Segment(idx) => format!("bin_segment{}", idx),
             _ => String::new(),
         }
     }

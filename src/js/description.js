@@ -39,7 +39,7 @@ function stripInfoPrefix(str) {
 }
 
 function stripBinPrefix(str) {
-    return str.replace("bin", "");
+    return str.replace("bin_", "");
 }
 
 function hasDescription(id) {
