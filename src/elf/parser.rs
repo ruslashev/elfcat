@@ -40,7 +40,7 @@ pub struct ParsedElf {
 }
 
 pub struct ParsedPhdr {
-    pub ptype: String,
+    pub ptype: u32,
     pub flags: String,
     pub file_offset: usize,
     pub file_size: usize,

@@ -301,7 +301,7 @@ fn add_phdr_ranges(start: usize, ranges: &mut Ranges) {
 
 fn parse_phdr(phdr: &Elf64Phdr) -> ParsedPhdr {
     ParsedPhdr {
-        ptype: ptype_to_string(phdr.p_type),
+        ptype: phdr.p_type,
         flags: pflags_to_string(phdr.p_flags),
         file_offset: phdr.p_offset as usize,
         file_size: phdr.p_filesz as usize,

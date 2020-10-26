@@ -1,3 +1,4 @@
+use crate::elf::defs::*;
 use crate::elf::parser::{ParsedElf, ParsedPhdr, RangeType};
 use std::fmt::Write;
 use std::path::Path;
@@ -106,7 +107,7 @@ fn generate_info_table(o: &mut String, elf: &ParsedElf) {
 
 fn generate_phdr_info_table(o: &mut String, phdr: &ParsedPhdr, idx: usize) {
     let items = [
-        ("Type", &phdr.ptype),
+        ("Type", &ptype_to_string(phdr.ptype)),
         ("Flags", &phdr.flags),
         ("Offset in file", &format!("{}", phdr.file_offset)),
         ("Size in file", &format!("{}", phdr.file_size)),
