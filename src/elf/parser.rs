@@ -164,7 +164,7 @@ impl Ranges {
 }
 
 impl ParsedIdent {
-    fn from_bytes(buf: &Vec<u8>) -> ParsedIdent {
+    fn from_bytes(buf: &[u8]) -> ParsedIdent {
         ParsedIdent {
             magic: [buf[0], buf[1], buf[2], buf[3]],
             class: buf[ELF_EI_CLASS as usize],
@@ -177,19 +177,19 @@ impl ParsedIdent {
 }
 
 impl ParsedElf {
-    pub fn from_bytes(filename: &String, buf: Vec<u8>) -> Result<ParsedElf, String> {
+    pub fn from_bytes(filename: &str, buf: Vec<u8>) -> Result<ParsedElf, String> {
         if buf.len() < ELF_EI_NIDENT as usize {
             return Err(String::from("file is smaller than ELF header's e_ident"));
         }
 
         let ident = ParsedIdent::from_bytes(&buf);
 
-        if ident.magic != [0x7f, 'E' as u8, 'L' as u8, 'F' as u8] {
+        if ident.magic != [0x7f, b'E', b'L', b'F'] {
             return Err(String::from("mismatched magic: not an ELF file"));
         }
 
         let mut elf = ParsedElf {
-            filename: filename.clone(),
+            filename: filename.to_string(),
             information: vec![],
             contents: vec![],
             ranges: Ranges::new(buf.len()),

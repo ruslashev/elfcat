@@ -20,7 +20,7 @@ fn stem(path: &str) -> &str {
     }
 }
 
-pub fn construct_filename(filename: &String) -> String {
+pub fn construct_filename(filename: &str) -> String {
     stem(basename(filename)).to_string() + ".html"
 }
 
@@ -394,7 +394,7 @@ fn generate_file_dump(elf: &ParsedElf) -> String {
         }
 
         if i < 4 {
-            dump += format!("{}", format_magic(*b)).as_str();
+            dump += format_magic(*b).as_str();
         } else {
             append_hex_byte(&mut dump, *b);
         }

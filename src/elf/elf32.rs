@@ -8,6 +8,6 @@ type Elf32Off = u32;
 type Elf32Sword = i32;
 type Elf32Word = u32;
 
-pub fn parse(buf: &Vec<u8>, ident: &ParsedIdent, elf: &mut ParsedElf) -> Result<(), String> {
+pub fn parse(buf: &[u8], ident: &ParsedIdent, elf: &mut ParsedElf) -> Result<(), String> {
     unimplemented!();
 }

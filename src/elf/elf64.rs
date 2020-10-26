@@ -65,7 +65,7 @@ impl Elf64Ehdr {
         } else {
             Elf64Ehdr::from_be_bytes(buf)
         }
-        .map_err(|a| String::from(format!("failed to read file header: {}", a)))
+        .map_err(|a| format!("failed to read file header: {}", a))
     }
     fn from_le_bytes(buf: &[u8]) -> Result<Elf64Ehdr, ReadErr> {
         Ok(Elf64Ehdr {
@@ -112,7 +112,7 @@ impl Elf64Phdr {
         } else {
             Elf64Phdr::from_be_bytes(buf)
         }
-        .map_err(|a| String::from(format!("failed to read program header: {}", a)))
+        .map_err(|a| format!("failed to read program header: {}", a))
     }
     fn from_le_bytes(buf: &[u8]) -> Result<Elf64Phdr, ReadErr> {
         Ok(Elf64Phdr {
@@ -147,7 +147,7 @@ impl Elf64Shdr {
         } else {
             Elf64Shdr::from_be_bytes(buf)
         }
-        .map_err(|a| String::from(format!("failed to read section header: {}", a)))
+        .map_err(|a| format!("failed to read section header: {}", a))
     }
     fn from_le_bytes(buf: &[u8]) -> Result<Elf64Shdr, ReadErr> {
         Ok(Elf64Shdr {
@@ -179,7 +179,7 @@ impl Elf64Shdr {
     }
 }
 
-pub fn parse(buf: &Vec<u8>, ident: &ParsedIdent, elf: &mut ParsedElf) -> Result<(), String> {
+pub fn parse(buf: &[u8], ident: &ParsedIdent, elf: &mut ParsedElf) -> Result<(), String> {
     let ehdr_size = size_of::<Elf64Ehdr>();
 
     if buf.len() < ehdr_size {
@@ -257,7 +257,7 @@ fn add_ehdr_ranges(ehdr: &Elf64Ehdr, ranges: &mut Ranges) {
 }
 
 fn parse_phdrs(
-    buf: &Vec<u8>,
+    buf: &[u8],
     endianness: u8,
     ehdr: &Elf64Ehdr,
     elf: &mut ParsedElf,
@@ -297,7 +297,7 @@ fn add_phdr_ranges(start: usize, ranges: &mut Ranges) {
     ranges.add_range(start + 48, 8, RangeType::PhdrField("p_align"));
 }
 
-fn parse_phdr(buf: &Vec<u8>, endianness: u8, phdr: &Elf64Phdr) -> ParsedPhdr {
+fn parse_phdr(buf: &[u8], endianness: u8, phdr: &Elf64Phdr) -> ParsedPhdr {
     let ptype = phdr.p_type;
     let file_offset = phdr.p_offset as usize;
     let file_size = phdr.p_filesz as usize;
