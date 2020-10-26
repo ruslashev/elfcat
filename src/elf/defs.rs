@@ -55,6 +55,8 @@ pub const PF_R: u32 = 0b100;
 pub const PF_MASKOS: u32 = 0x00ff_0000;
 pub const PF_MASKPROC: u32 = 0xff00_0000;
 
+pub const NT_GNU_BUILD_ID: u32 = 0x3;
+
 pub fn type_to_string(e_type: u16) -> String {
     match e_type {
         ELF_ET_NONE => String::from("None (NONE)"),

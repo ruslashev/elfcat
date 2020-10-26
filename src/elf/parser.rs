@@ -67,7 +67,7 @@ impl RangeType {
             RangeType::ProgramHeader(idx) => format!("binphdr{}", idx),
             RangeType::HeaderField(class) => String::from(*class),
             RangeType::PhdrField(class) => String::from(*class),
-            RangeType::PhdrData(idx) => format!("pdata{}", idx),
+            RangeType::PhdrData(idx) => format!("binpdata{}", idx),
             _ => String::new(),
         }
     }
@@ -85,6 +85,7 @@ impl RangeType {
                 "e_shstrndx" => true,
                 _ => false,
             },
+            RangeType::PhdrData(_) => true,
             _ => false,
         }
     }

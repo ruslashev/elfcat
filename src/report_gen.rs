@@ -1,5 +1,5 @@
 use crate::elf::defs::*;
-use crate::elf::parser::{ParsedElf, ParsedPhdr, RangeType};
+use crate::elf::parser::{Note, ParsedElf, ParsedPhdr, RangeType};
 use std::fmt::Write;
 use std::path::Path;
 
@@ -116,7 +116,7 @@ fn generate_phdr_info_table(o: &mut String, phdr: &ParsedPhdr, idx: usize) {
         ("Alignment", &format!("{:#x}", phdr.alignment)),
     ];
 
-    w!(o, 4, "<table class='info_phdr' id='info_phdr{}'>", idx);
+    w!(o, 4, "<table class='conceal' id='info_phdr{}'>", idx);
 
     for (desc, value) in items.iter() {
         w!(o, 5, "<tr>");
@@ -136,6 +136,110 @@ fn generate_phdr_info_tables(o: &mut String, elf: &ParsedElf) {
     }
 }
 
+fn format_string_byte(byte: u8) -> String {
+    if byte.is_ascii_graphic() {
+        format!("{}", char::from(byte))
+    } else {
+        format!("<b>{:02x}</b> ", byte)
+    }
+}
+
+fn format_string_slice(slice: &[u8]) -> String {
+    slice
+        .iter()
+        .fold(String::new(), |s, b| s + &format_string_byte(*b))
+}
+
+fn generate_note_data(o: &mut String, note: &Note) {
+    w!(o, 5, "<tr>");
+    w!(o, 6, "<td>Name:</td>");
+    w!(
+        o,
+        6,
+        "<td>{}</td>",
+        format_string_slice(&note.name[0..note.name.len() - 1])
+    );
+    w!(o, 5, "</tr>");
+
+    w!(o, 5, "<tr>");
+    w!(o, 6, "<td>Type:</td>");
+    w!(o, 6, "<td>{:#x}</td>", note.ntype);
+    w!(o, 5, "</tr>");
+
+    match note.ntype {
+        NT_GNU_BUILD_ID => {
+            let mut hash = String::new();
+
+            for byte in note.desc.iter() {
+                append_hex_byte(&mut hash, *byte);
+            }
+
+            w!(o, 5, "<tr>");
+            w!(o, 6, "<td>Build ID:</td>");
+            w!(o, 6, "<td>{}</td>", hash);
+            w!(o, 5, "</tr>");
+        }
+        _ => {
+            w!(o, 5, "<tr>");
+            w!(o, 6, "<td>Desc:</td>");
+            w!(o, 6, "<td>{}</td>", format_string_slice(&note.desc[..]));
+            w!(o, 5, "</tr>");
+        }
+    }
+}
+
+fn generate_phdr_data_info_table(o: &mut String, elf: &ParsedElf, phdr: &ParsedPhdr) {
+    match phdr.ptype {
+        PT_INTERP => {
+            w!(o, 5, "<tr>");
+            w!(o, 6, "<td>Interpreter:</td>");
+            w!(
+                o,
+                6,
+                "<td>{}</td>",
+                format_string_slice(
+                    &elf.contents[phdr.file_offset..phdr.file_offset + phdr.file_size - 1]
+                )
+            );
+            w!(o, 6, "</td>");
+            w!(o, 5, "</tr>");
+        }
+        PT_NOTE => {
+            for i in 0..phdr.notes.len() {
+                let note = &phdr.notes[i];
+
+                generate_note_data(o, note);
+
+                if i != phdr.notes.len() - 1 {
+                    w!(o, 5, "<tr><td><br></td></tr>");
+                }
+            }
+        }
+        _ => {}
+    }
+}
+
+// this is ugly
+fn has_phdr_data_detail(ptype: u32) -> bool {
+    match ptype {
+        PT_INTERP => true,
+        PT_NOTE => true,
+        _ => false,
+    }
+}
+
+fn generate_phdr_data_info_tables(o: &mut String, elf: &ParsedElf) {
+    for (idx, phdr) in elf.phdrs.iter().enumerate() {
+        if !has_phdr_data_detail(phdr.ptype) {
+            continue;
+        }
+
+        w!(o, 4, "<table class='conceal' id='info_pdata{}'>", idx);
+        generate_phdr_data_info_table(o, elf, &phdr);
+        w!(o, 4, "</table>");
+    }
+}
+
 fn generate_header(o: &mut String, elf: &ParsedElf) {
     w!(o, 2, "<table class='header'>");
     w!(o, 3, "<tr>");
@@ -148,6 +252,10 @@ fn generate_header(o: &mut String, elf: &ParsedElf) {
 
     w!(o, 4, "<td>");
     generate_phdr_info_tables(o, elf);
+    w!(o, 4, "</td>");
+
+    w!(o, 4, "<td>");
+    generate_phdr_data_info_tables(o, elf);
     w!(o, 4, "</td>");
 
     w!(o, 3, "</tr>");
@@ -221,11 +329,17 @@ fn add_arrows_script(o: &mut String, elf: &ParsedElf) {
 
     wnonl!(o, 0, "{}", include_str!("js/arrows.js").indent_lines(3));
 
-    w!(o, 3, "connect('#e_phoff', '#pdata0');");
+    w!(o, 3, "connect('#e_phoff', '#binpdata0');");
     w!(o, 3, "connect('#e_shoff', '#sdata0');");
 
     for i in 0..elf.phdrs.len() {
-        w!(o, 3, "connect('#binphdr{} > #p_offset', '#pdata{}');", i, i);
+        w!(
+            o,
+            3,
+            "connect('#binphdr{} > #p_offset', '#binpdata{}');",
+            i,
+            i
+        );
     }
 
     w!(o, 2, "</script>");
