@@ -41,6 +41,16 @@ function addSvgArrow(elem1, elem2) {
         + '/>';
 }
 
+function jumpToElem(elem) {
+    elem.scrollIntoView();
+}
+
+function setJumpCallback(elemFrom, elemTo) {
+    elemFrom.addEventListener("click", function(e) {
+        jumpToElem(elemTo);
+    }, true);
+}
+
 function connect(sel1, sel2) {
     var elem1 = document.querySelector(sel1);
     var elem2 = document.querySelector(sel2);
@@ -50,5 +60,8 @@ function connect(sel1, sel2) {
     }
 
     addSvgArrow(elem1, elem2);
+
+    setJumpCallback(elem1, elem2);
+    setJumpCallback(elem2, elem1);
 }
 
