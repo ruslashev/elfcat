@@ -42,6 +42,15 @@ impl Indentable for str {
     }
 }
 
+macro_rules! wrow {
+    ($dst:expr, $indent_level:expr, $lhs:expr, $rhs:expr) => {
+        wnonl!($dst, $indent_level, "<tr> ");
+        wnonl!($dst, 0, "<td>{}:</td> ", $lhs);
+        wnonl!($dst, 0, "<td>{}</td> ", $rhs);
+        w!($dst, 0, "</tr>");
+    }
+}
+
 macro_rules! w {
     ($dst:expr, $indent_level:expr, $($arg:tt)*) => {
         wnonl!($dst, $indent_level, $( $arg )* );
@@ -94,12 +103,10 @@ fn generate_info_table(o: &mut String, elf: &ParsedElf) {
     w!(o, 5, "<table>");
 
     for (id, desc, value) in elf.information.iter() {
-        w!(o, 6, "<tr id='info_{}'>", id);
-
-        w!(o, 7, "<td>{}:</td>", desc);
-        w!(o, 7, "<td>{}</td>", value);
-
-        w!(o, 6, "</tr>");
+        wnonl!(o, 6, "<tr id='info_{}'> ", id);
+        wnonl!(o, 0, "<td>{}:</td> ", desc);
+        wnonl!(o, 0, "<td>{}</td> ", value);
+        w!(o, 0, "</tr>");
     }
 
     w!(o, 5, "</table>");
@@ -119,12 +126,7 @@ fn generate_phdr_info_table(o: &mut String, phdr: &ParsedPhdr, idx: usize) {
     w!(o, 4, "<table class='conceal' id='info_phdr{}'>", idx);
 
     for (desc, value) in items.iter() {
-        w!(o, 5, "<tr>");
-
-        w!(o, 6, "<td>{}:</td>", desc);
-        w!(o, 6, "<td>{}</td>", value);
-
-        w!(o, 5, "</tr>");
+        wrow!(o, 5, desc, value);
     }
 
     w!(o, 4, "</table>");
@@ -151,20 +153,9 @@ fn format_string_slice(slice: &[u8]) -> String {
 }
 
 fn generate_note_data(o: &mut String, note: &Note) {
-    w!(o, 5, "<tr>");
-    w!(o, 6, "<td>Name:</td>");
-    w!(
-        o,
-        6,
-        "<td>{}</td>",
-        format_string_slice(&note.name[0..note.name.len() - 1])
-    );
-    w!(o, 5, "</tr>");
+    wrow!(o, 5, "Name", format_string_slice(&note.name[0..note.name.len() - 1]));
 
-    w!(o, 5, "<tr>");
-    w!(o, 6, "<td>Type:</td>");
-    w!(o, 6, "<td>{:#x}</td>", note.ntype);
-    w!(o, 5, "</tr>");
+    wrow!(o, 5, "Type", format!("{:#x}", note.ntype));
 
     match note.ntype {
         NT_GNU_BUILD_ID => {
@@ -174,16 +165,10 @@ fn generate_note_data(o: &mut String, note: &Note) {
                 append_hex_byte(&mut hash, *byte);
             }
 
-            w!(o, 5, "<tr>");
-            w!(o, 6, "<td>Build ID:</td>");
-            w!(o, 6, "<td>{}</td>", hash);
-            w!(o, 5, "</tr>");
+            wrow!(o, 5, "Build ID", hash);
         }
         _ => {
-            w!(o, 5, "<tr>");
-            w!(o, 6, "<td>Desc:</td>");
-            w!(o, 6, "<td>{}</td>", format_string_slice(&note.desc[..]));
-            w!(o, 5, "</tr>");
+            wrow!(o, 5, "Desc", format_string_slice(&note.desc[..]));
         }
     }
 }
@@ -191,18 +176,7 @@ fn generate_note_data(o: &mut String, note: &Note) {
 fn generate_segment_info_table(o: &mut String, elf: &ParsedElf, phdr: &ParsedPhdr) {
     match phdr.ptype {
         PT_INTERP => {
-            w!(o, 5, "<tr>");
-            w!(o, 6, "<td>Interpreter:</td>");
-            w!(
-                o,
-                6,
-                "<td>{}</td>",
-                format_string_slice(
-                    &elf.contents[phdr.file_offset..phdr.file_offset + phdr.file_size - 1]
-                )
-            );
-            w!(o, 6, "</td>");
-            w!(o, 5, "</tr>");
+            wrow!(o, 5, "Interpreter", format_string_slice(&elf.contents[phdr.file_offset..phdr.file_offset + phdr.file_size - 1]));
         }
         PT_NOTE => {
             for i in 0..phdr.notes.len() {
