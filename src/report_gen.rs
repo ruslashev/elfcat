@@ -335,12 +335,22 @@ fn add_arrows_script(o: &mut String, elf: &ParsedElf) {
     w!(o, 2, "</script>");
 }
 
+fn add_collapsible_script(o: &mut String) {
+    w!(o, 2, "<script type='text/javascript'>");
+
+    wnonl!(o, 0, "{}", include_str!("js/collapsible.js").indent_lines(3));
+
+    w!(o, 2, "</script>");
+}
+
 fn add_scripts(o: &mut String, elf: &ParsedElf) {
     add_highlight_script(o);
 
     add_description_script(o);
 
     add_conceal_script(o);
+
+    add_collapsible_script(o);
 
     add_arrows_script(o, elf);
 }
