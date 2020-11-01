@@ -263,7 +263,6 @@ fn generate_header(o: &mut String, elf: &ParsedElf) {
 }
 
 fn add_highlight_script(o: &mut String) {
-    let template: &str = include_str!("js/highlight.js");
     let ids = [
         "class",
         "data",
@@ -282,22 +281,13 @@ fn add_highlight_script(o: &mut String) {
         "e_shnum",
         "e_shstrndx",
     ];
-    let color = "#ee9";
 
     w!(o, 2, "<script type='text/javascript'>");
 
+    wnonl!(o, 0, "{}", include_str!("js/highlight.js").indent_lines(3));
+
     for id in ids.iter() {
-        let info = format!("info_{}", id);
-
-        // this is really ugly
-        let code = template
-            .replace("primary_id", id)
-            .as_str()
-            .replace("secondary_id", info.as_str())
-            .replace("color", color);
-        let indented: String = code.indent_lines(3);
-
-        wnonl!(o, 0, "{}", indented);
+        w!(o, 3, "highlightIds('{}', 'info_{}')", id, id);
     }
 
     w!(o, 2, "</script>");

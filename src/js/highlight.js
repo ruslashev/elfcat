@@ -1,20 +1,26 @@
-let primary_id_elem = document.getElementById("primary_id")
-let secondary_id_elem = document.getElementById("secondary_id")
-if (primary_id_elem !== null && secondary_id_elem !== null) {
-    primary_id_elem.addEventListener("mouseenter", function(event) {
-        event.target.style.backgroundColor = "color";
-        secondary_id_elem.style.backgroundColor = "color";
+var color = "#ee9";
+
+function addPairHighlighting(elem, depElem) {
+    elem.addEventListener("mouseenter", function(event) {
+        event.target.style.backgroundColor = color;
+        depElem.style.backgroundColor = color;
     }, false);
-    primary_id_elem.addEventListener("mouseleave", function(event) {
+
+    elem.addEventListener("mouseleave", function(event) {
         event.target.style.backgroundColor = "";
-        secondary_id_elem.style.backgroundColor = "";
-    }, false);
-    secondary_id_elem.addEventListener("mouseenter", function(event) {
-        event.target.style.backgroundColor = "color";
-        primary_id_elem.style.backgroundColor = "color";
-    }, false);
-    secondary_id_elem.addEventListener("mouseleave", function(event) {
-        event.target.style.backgroundColor = "";
-        primary_id_elem.style.backgroundColor = "";
+        depElem.style.backgroundColor = "";
     }, false);
 }
+
+function highlightIds(primaryId, secondaryId) {
+    var primaryElem = document.getElementById(primaryId);
+    var secondaryElem = document.getElementById(secondaryId);
+
+    if (primaryElem === null || secondaryElem === null) {
+        return;
+    }
+
+    addPairHighlighting(primaryElem, secondaryElem);
+    addPairHighlighting(secondaryElem, primaryElem);
+}
+
