@@ -393,7 +393,7 @@ fn generate_file_dump(elf: &ParsedElf) -> String {
             dump += "</span>";
         }
 
-        dump += if (i + 1) % 16 == 0 { "<br>\n" } else { " " };
+        dump += if (i + 1) % 16 == 0 { "\n" } else { " " };
     }
 
     dump

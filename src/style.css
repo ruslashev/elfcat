@@ -17,6 +17,8 @@
 .box {
   border: 1px solid;
   display: inline-block;
+  word-break: break-word;
+  width: 47ch;
 }
 .hover:hover {
   background-color: #ee9;
