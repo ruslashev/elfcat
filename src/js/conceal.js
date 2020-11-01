@@ -30,8 +30,10 @@ document.addEventListener("mouseover", function (e) {
             var tableId = id.replace(prefix, "info_");
             var target = document.getElementById(tableId);
 
-            target.style.display = "block";
-            prevTableId = target;
+            if (target !== null) {
+                target.style.display = "block";
+                prevTableId = target;
+            }
 
             break;
         }
