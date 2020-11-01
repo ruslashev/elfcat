@@ -59,9 +59,27 @@ function connect(sel1, sel2) {
         return;
     }
 
+    connections.push([elem1, elem2]);
+
     addSvgArrow(elem1, elem2);
 
     setJumpCallback(elem1, elem2);
     setJumpCallback(elem2, elem1);
+}
+
+var connections = [];
+
+function clearArrows() {
+    document.getElementById('arrows').innerHTML = '';
+}
+
+function redrawArrows() {
+    clearArrows();
+
+    for (var i = 0; i < connections.length; ++i) {
+        var conn = connections[i];
+
+        addSvgArrow(conn[0], conn[1]);
+    }
 }
 

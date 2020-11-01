@@ -11,6 +11,8 @@ function bytesCallback(ev) {
         elem.innerHTML = marker;
     }
 
+    redrawArrows();
+
     ev.preventDefault();
     return false;
 }
