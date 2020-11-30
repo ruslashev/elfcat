@@ -14,11 +14,17 @@
   display: none;
   border: 1px solid #000;
 }
-.box {
+#bytes {
   border: 1px solid;
   display: inline-block;
   word-break: break-word;
+  width: 47ch; /* 16 * (2 + 1) - 1*/
+}
+#vmap {
+  border: 1px solid;
+  display: inline-block;
   width: 47ch;
+  vertical-align: top;
 }
 .hover:hover {
   background-color: #ee9;

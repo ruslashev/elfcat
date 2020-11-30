@@ -398,10 +398,12 @@ fn generate_body(o: &mut String, elf: &ParsedElf) {
 
     generate_header(o, elf);
 
-    w!(o, 2, "<div class='box'>");
-
+    w!(o, 2, "<div id='bytes'>");
     wnonl!(o, 0, "{}", generate_file_dump(elf));
+    w!(o, 2, "</div>");
 
+    w!(o, 2, "<div id='vmap'>");
+    w!(o, 2, "under_construction.gif");
     w!(o, 2, "</div>");
 
     add_scripts(o, elf);
