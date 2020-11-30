@@ -79,10 +79,9 @@ function formatDesc(id) {
 
 function iterateParents(el) {
     var txt = "";
+    var keywords = [];
 
     do {
-        var keywords = [];
-
         if (el.id !== undefined) {
             keywords.push(el.id);
         }
@@ -94,20 +93,20 @@ function iterateParents(el) {
             }
         }
 
-        for (var i = 0; i < keywords.length; i++) {
-            var keyword = keywords[i];
-
-            if (isValid(keyword)) {
-                if (txt === "") {
-                    txt = formatDesc(keyword);
-                } else {
-                    txt = formatDesc(keyword) + separator + txt;
-                }
-            }
-        }
-
         el = el.parentNode;
     } while (el !== null && el.tagName !== "HTML")
+
+    for (var i = 0; i < keywords.length; ++i) {
+        var keyword = keywords[i];
+
+        if (isValid(keyword)) {
+            if (txt === "") {
+                txt = formatDesc(keyword);
+            } else {
+                txt = formatDesc(keyword) + separator + txt;
+            }
+        }
+    }
 
     return txt;
 }
