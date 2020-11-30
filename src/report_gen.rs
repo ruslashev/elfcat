@@ -315,6 +315,7 @@ fn add_arrows_script(o: &mut String, elf: &ParsedElf) {
     w!(o, 2, "</script>");
 }
 
+#[allow(dead_code)]
 fn add_collapsible_script(o: &mut String) {
     w!(o, 2, "<script type='text/javascript'>");
 
@@ -330,7 +331,8 @@ fn add_scripts(o: &mut String, elf: &ParsedElf) {
 
     add_conceal_script(o);
 
-    add_collapsible_script(o);
+    // disabled while working on section headers because it doesn't work for nested elements
+    // add_collapsible_script(o);
 
     add_arrows_script(o, elf);
 }
