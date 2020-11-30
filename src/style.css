@@ -88,9 +88,23 @@
 .segment {
   background-color: #f99;
 }
-
 .section {
   background-color: #f9f;
+}
+/* there are only sections inside segments due to code */
+.segment > .section {
+  background: repeating-linear-gradient(
+    -45deg,
+    #f99,
+    #f99 10px,
+    #f9f 10px,
+    #f9f 20px
+  );
+}
+/* another duplicate of .hover:hover with more specifity */
+.segment > .section.hover:hover {
+  background: initial;
+  background-color: #ee9;
 }
 
 svg {
