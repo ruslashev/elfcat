@@ -99,17 +99,17 @@ fn generate_svg_element(o: &mut String) {
     w!(o, 2, "</svg>");
 }
 
-fn generate_info_table(o: &mut String, elf: &ParsedElf) {
-    w!(o, 5, "<table>");
+fn generate_file_info_table(o: &mut String, elf: &ParsedElf) {
+    w!(o, 2, "<table>");
 
     for (id, desc, value) in elf.information.iter() {
-        wnonl!(o, 6, "<tr id='info_{}'> ", id);
+        wnonl!(o, 3, "<tr id='info_{}'> ", id);
         wnonl!(o, 0, "<td>{}:</td> ", desc);
         wnonl!(o, 0, "<td>{}</td> ", value);
         w!(o, 0, "</tr>");
     }
 
-    w!(o, 5, "</table>");
+    w!(o, 2, "</table>");
 }
 
 fn generate_phdr_info_table(o: &mut String, phdr: &ParsedPhdr, idx: usize) {
@@ -220,21 +220,17 @@ fn generate_segment_info_tables(o: &mut String, elf: &ParsedElf) {
     }
 }
 
-fn generate_header(o: &mut String, elf: &ParsedElf) {
-    w!(o, 2, "<table class='header'>");
+fn generate_sticky_info_table(o: &mut String, elf: &ParsedElf) {
+    w!(o, 2, "<table id='sticky_table' cellspacing='0'>");
     w!(o, 3, "<tr>");
-
-    w!(o, 4, "<td>");
-    generate_info_table(o, elf);
-    w!(o, 4, "</td>");
 
     w!(o, 4, "<td id='desc'></td>");
 
-    w!(o, 4, "<td>");
+    w!(o, 4, "<td id='struct_infotables'>");
     generate_phdr_info_tables(o, elf);
     w!(o, 4, "</td>");
 
-    w!(o, 4, "<td>");
+    w!(o, 4, "<td id='data_infotables'>");
     generate_segment_info_tables(o, elf);
     w!(o, 4, "</td>");
 
@@ -396,15 +392,17 @@ fn generate_body(o: &mut String, elf: &ParsedElf) {
 
     generate_svg_element(o);
 
-    generate_header(o, elf);
+    generate_file_info_table(o, elf);
 
     w!(o, 2, "<div id='bytes'>");
     wnonl!(o, 0, "{}", generate_file_dump(elf));
     w!(o, 2, "</div>");
 
     w!(o, 2, "<div id='vmap'>");
-    w!(o, 2, "under_construction.gif");
+    w!(o, 3, "under_construction.gif");
     w!(o, 2, "</div>");
+
+    generate_sticky_info_table(o, elf);
 
     add_scripts(o, elf);
 

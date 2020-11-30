@@ -2,13 +2,14 @@
   font-family: monospace;
   font-size: 0.8rem;
 }
-.header > * {
-  vertical-align: top;
-}
 #desc {
-  vertical-align: top;
-  padding-left: 2em;
   width: 250px;
+}
+#struct_infotables {
+  padding-right: 0px;
+}
+#data_infotables {
+  padding-left: 0px;
 }
 .conceal {
   display: none;
@@ -24,6 +25,15 @@
   border: 1px solid;
   display: inline-block;
   width: 47ch;
+  vertical-align: top;
+}
+#sticky_table {
+  display: inline-block;
+  vertical-align: top;
+  position: sticky;
+  top: 8px;
+}
+#sticky_table > * {
   vertical-align: top;
 }
 .hover:hover {
