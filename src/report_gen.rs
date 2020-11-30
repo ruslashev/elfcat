@@ -308,6 +308,16 @@ fn add_arrows_script(o: &mut String, elf: &ParsedElf) {
         );
     }
 
+    for i in 0..elf.shdrs.len() {
+        w!(
+            o,
+            3,
+            "connect('#bin_shdr{} > .sh_offset', '#bin_section{}');",
+            i,
+            i
+        );
+    }
+
     w!(o, 2, "</script>");
 }
 
