@@ -44,6 +44,7 @@ let descriptions = {
     sh_addralign: "Address alignment of the section (sh_addralign)",
     sh_entsize:   "Size of each entry if section has table of fixed-size entries (sh_entsize)",
     section:      "Section",
+    segment_and_section: "Segment and section",
 }
 let separator = "<br>&#x2193<br>";
 
@@ -95,6 +96,33 @@ function iterateParents(el) {
 
         el = el.parentNode;
     } while (el !== null && el.tagName !== "HTML")
+
+    // fix all occurences where segments and sections overlap.
+    // once again we are relying on programming by which sections are always inside segments.
+    // also, this is O(n^2) ugly.
+    var i = 1;
+    while (i < keywords.length) {
+        if (keywords[i] !== 'segment') {
+            ++i;
+            continue;
+        }
+
+        var have_section_before = false;
+        var j = 0;
+        for (; j < i; ++j) {
+            if (keywords[j] == 'section') {
+                have_section_before = true;
+                break;
+            }
+        }
+
+        if (have_section_before) {
+            keywords[i] = 'segment_and_section';
+            keywords.splice(j, 1);
+        } else {
+            ++i;
+        }
+    }
 
     for (var i = 0; i < keywords.length; ++i) {
         var keyword = keywords[i];
