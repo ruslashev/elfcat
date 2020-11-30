@@ -15,8 +15,11 @@ pub enum RangeType {
     FileHeader,
     HeaderField(&'static str),
     ProgramHeader(u32),
+    SectionHeader(u32),
     PhdrField(&'static str),
+    ShdrField(&'static str),
     Segment(u16),
+    Section(u16),
 }
 
 // Interval tree that allows querying point for all intervals that intersect it should be better.
@@ -40,6 +43,7 @@ pub struct ParsedElf {
     pub contents: Vec<u8>,
     pub ranges: Ranges,
     pub phdrs: Vec<ParsedPhdr>,
+    pub shdrs: Vec<ParsedShdr>,
 }
 
 pub struct ParsedPhdr {
@@ -53,6 +57,19 @@ pub struct ParsedPhdr {
     pub notes: Vec<Note>,
 }
 
+pub struct ParsedShdr {
+    pub name: usize,
+    pub stype: usize,
+    pub flags: usize,
+    pub addr: usize,
+    pub file_offset: usize,
+    pub file_size: usize,
+    pub link: usize,
+    pub info: usize,
+    pub addralign: usize,
+    pub entsize: usize,
+}
+
 pub struct Note {
     pub name: Vec<u8>,
     pub desc: Vec<u8>,
@@ -63,8 +80,11 @@ impl RangeType {
     fn needs_class(&self) -> bool {
         match self {
             RangeType::ProgramHeader(_) => true,
+            RangeType::SectionHeader(_) => true,
             RangeType::PhdrField(_) => true,
+            RangeType::ShdrField(_) => true,
             RangeType::Segment(_) => true,
+            RangeType::Section(_) => true,
             _ => false,
         }
     }
@@ -73,7 +93,9 @@ impl RangeType {
     fn needs_id(&self) -> bool {
         match self {
             RangeType::ProgramHeader(_) => true,
+            RangeType::SectionHeader(_) => true,
             RangeType::Segment(_) => true,
+            RangeType::Section(_) => true,
             _ => false,
         }
     }
@@ -83,8 +105,10 @@ impl RangeType {
             RangeType::Ident => String::from("ident"),
             RangeType::FileHeader => String::from("ehdr"),
             RangeType::ProgramHeader(idx) => format!("bin_phdr{}", idx),
+            RangeType::SectionHeader(idx) => format!("bin_shdr{}", idx),
             RangeType::HeaderField(class) => String::from(*class),
             RangeType::Segment(idx) => format!("bin_segment{}", idx),
+            RangeType::Section(idx) => format!("bin_section{}", idx),
             _ => String::new(),
         }
     }
@@ -92,8 +116,11 @@ impl RangeType {
     fn class(&self) -> String {
         match self {
             RangeType::ProgramHeader(_) => String::from("phdr"),
+            RangeType::SectionHeader(_) => String::from("shdr"),
             RangeType::PhdrField(field) => format!("{} phdr_hover", field),
+            RangeType::ShdrField(field) => format!("{} shdr_hover", field),
             RangeType::Segment(_) => String::from("segment"),
+            RangeType::Section(_) => String::from("section"),
             _ => String::new(),
         }
     }
@@ -112,6 +139,7 @@ impl RangeType {
                 _ => false,
             },
             RangeType::Segment(_) => true,
+            RangeType::Section(_) => true,
             _ => false,
         }
     }
@@ -194,6 +222,7 @@ impl ParsedElf {
             contents: vec![],
             ranges: Ranges::new(buf.len()),
             phdrs: vec![],
+            shdrs: vec![],
         };
 
         elf.push_ident_info(&ident)?;

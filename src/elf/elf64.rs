@@ -192,6 +192,8 @@ pub fn parse(buf: &[u8], ident: &ParsedIdent, elf: &mut ParsedElf) -> Result<(),
 
     parse_phdrs(buf, ident.endianness, &ehdr, elf)?;
 
+    parse_shdrs(buf, ident.endianness, &ehdr, elf)?;
+
     Ok(())
 }
 
@@ -318,4 +320,62 @@ fn parse_phdr(buf: &[u8], endianness: u8, phdr: &Elf64Phdr) -> ParsedPhdr {
         alignment: phdr.p_align as usize,
         notes,
     }
+}
+
+fn parse_shdrs(
+    buf: &[u8],
+    endianness: u8,
+    ehdr: &Elf64Ehdr,
+    elf: &mut ParsedElf,
+) -> Result<(), String> {
+    let mut start = ehdr.e_shoff as usize;
+    let shsize = size_of::<Elf64Shdr>();
+
+    for i in 0..ehdr.e_shnum {
+        let shdr = Elf64Shdr::from_bytes(&buf[start..start + shsize], endianness)?;
+        let parsed = parse_shdr(buf, endianness, &shdr);
+        let ranges = &mut elf.ranges;
+
+        if parsed.file_offset != 0 && parsed.file_size != 0 {
+            ranges.add_range(parsed.file_offset, parsed.file_size, RangeType::Section(i));
+        }
+
+        ranges.add_range(start, shsize, RangeType::SectionHeader(i as u32));
+
+        add_shdr_ranges(start, ranges);
+
+        elf.shdrs.push(parsed);
+
+        start += shsize;
+    }
+
+    Ok(())
+}
+
+fn parse_shdr(_buf: &[u8], _endianness: u8, shdr: &Elf64Shdr) -> ParsedShdr {
+    ParsedShdr {
+        name: shdr.sh_name as usize,
+        stype: shdr.sh_type as usize,
+        flags: shdr.sh_flags as usize,
+        addr: shdr.sh_addr as usize,
+        file_offset: shdr.sh_offset as usize,
+        file_size: shdr.sh_size as usize,
+        link: shdr.sh_link as usize,
+        info: shdr.sh_info as usize,
+        addralign: shdr.sh_addralign as usize,
+        entsize: shdr.sh_entsize as usize,
+    }
+}
+
+fn add_shdr_ranges(start: usize, ranges: &mut Ranges) {
+    ranges.add_range(start + 0, 4, RangeType::ShdrField("sh_name"));
+    ranges.add_range(start + 4, 4, RangeType::ShdrField("sh_type"));
+    ranges.add_range(start + 8, 8, RangeType::ShdrField("sh_flags"));
+    ranges.add_range(start + 16, 8, RangeType::ShdrField("sh_addr"));
+    ranges.add_range(start + 24, 8, RangeType::ShdrField("sh_offset"));
+    ranges.add_range(start + 32, 8, RangeType::ShdrField("sh_size"));
+    ranges.add_range(start + 40, 4, RangeType::ShdrField("sh_link"));
+    ranges.add_range(start + 44, 4, RangeType::ShdrField("sh_info"));
+    ranges.add_range(start + 48, 8, RangeType::ShdrField("sh_addralign"));
+    ranges.add_range(start + 56, 8, RangeType::ShdrField("sh_entsize"));
 }

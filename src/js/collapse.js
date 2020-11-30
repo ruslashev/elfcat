@@ -18,8 +18,7 @@ function bytesCallback(ev) {
 }
 
 function collapseBytes() {
-    var segments = document.querySelectorAll('.segment');
-    var elements = segments;
+    var elements = document.querySelectorAll('.segment, .section');
 
     for (var i = 0; i < elements.length; ++i) {
         var elem = elements[i];

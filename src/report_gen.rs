@@ -364,7 +364,7 @@ fn append_hex_byte(s: &mut String, byte: u8) {
 fn generate_file_dump(elf: &ParsedElf) -> String {
     let mut dump = String::new();
 
-    for (i, b) in elf.contents.iter().take(2000).enumerate() {
+    for (i, b) in elf.contents.iter().enumerate() {
         for range_type in &elf.ranges.data[i] {
             if *range_type != RangeType::End {
                 dump += format!("<span {}>", range_type.span_attributes()).as_str();

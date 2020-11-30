@@ -75,8 +75,22 @@
   background-color: #ef9;
 }
 
+.shdr {
+  background-color: #9be;
+}
+.shdr:hover > * {
+  background-color: #9de;
+}
+.shdr_hover:hover {
+  background-color: #9fe;
+}
+
 .segment {
   background-color: #f99;
+}
+
+.section {
+  background-color: #f9f;
 }
 
 svg {
