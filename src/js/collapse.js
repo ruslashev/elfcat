@@ -1,6 +1,6 @@
 var savedBytes = {};
 
-var marker = '[...]';
+var marker = '..';
 
 function bytesCallback(ev) {
     var elem = ev.target;
