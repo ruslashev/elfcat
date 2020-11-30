@@ -33,9 +33,9 @@ document.addEventListener("mouseover", function (e) {
             if (target !== null) {
                 target.style.display = "block";
                 prevTableId = target;
-            }
 
-            break;
+                break;
+            }
         }
     }
 }, false);
