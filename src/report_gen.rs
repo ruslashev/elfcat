@@ -228,11 +228,58 @@ fn generate_segment_info_table(o: &mut String, elf: &ParsedElf, phdr: &ParsedPhd
     }
 }
 
+fn generate_strtab_data(o: &mut String, section: &[u8]) {
+    let mut curr_start = 0;
+
+    w!(o, 6, "<tr>");
+    w!(o, 7, "<td></td>");
+    w!(o, 7, "<td>");
+    w!(o, 8, "<div>");
+
+    for (i, c) in section.iter().enumerate() {
+        if *c == 0 {
+            let end = if curr_start == 0 { 0 } else { i - 1 };
+
+            let maybe = std::str::from_utf8(&section[curr_start..=end]);
+
+            if maybe.is_ok() && section[curr_start] != 0 {
+                let string = maybe.unwrap();
+
+                w!(o, 9, "{}", string);
+            }
+
+            curr_start = i + 1;
+        }
+    }
+
+    w!(o, 8, "</div>");
+    w!(o, 7, "</td>");
+    w!(o, 6, "</tr>");
+}
+
+fn generate_section_info_table(o: &mut String, elf: &ParsedElf, shdr: &ParsedShdr) {
+    let section = &elf.contents[shdr.file_offset..shdr.file_offset + shdr.file_size];
+
+    match shdr.shtype {
+        SHT_STRTAB => {
+            generate_strtab_data(o, section);
+        }
+        _ => {}
+    }
+}
+
 // this is ugly
 fn has_segment_detail(ptype: u32) -> bool {
     match ptype {
         PT_INTERP => true,
         PT_NOTE => true,
+        _ => false,
+    }
+}
+
+fn has_section_detail(ptype: u32) -> bool {
+    match ptype {
+        SHT_STRTAB => true,
         _ => false,
     }
 }
@@ -244,6 +291,19 @@ fn generate_segment_info_tables(o: &mut String, elf: &ParsedElf) {
 
         if has_segment_detail(phdr.ptype) {
             generate_segment_info_table(o, elf, &phdr);
+        }
+
+        w!(o, 5, "</table>");
+    }
+}
+
+fn generate_section_info_tables(o: &mut String, elf: &ParsedElf) {
+    for (idx, shdr) in elf.shdrs.iter().enumerate() {
+        w!(o, 5, "<table class='conceal' id='info_section{}'>", idx);
+        wrow!(o, 6, "Section type", &shtype_to_string(shdr.shtype));
+
+        if has_section_detail(shdr.shtype) {
+            generate_section_info_table(o, elf, &shdr);
         }
 
         w!(o, 5, "</table>");
@@ -264,6 +324,8 @@ fn generate_sticky_info_table(o: &mut String, elf: &ParsedElf) {
 
     w!(o, 4, "<td id='data_infotables'>");
     generate_segment_info_tables(o, elf);
+
+    generate_section_info_tables(o, elf);
     w!(o, 4, "</td>");
 
     w!(o, 3, "</tr>");

@@ -14,6 +14,7 @@
 .conceal {
   display: none;
   border: 1px solid #000;
+  max-width: 600px;
 }
 #bytes {
   border: 1px solid;
