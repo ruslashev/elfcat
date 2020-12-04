@@ -239,12 +239,13 @@ fn has_segment_detail(ptype: u32) -> bool {
 
 fn generate_segment_info_tables(o: &mut String, elf: &ParsedElf) {
     for (idx, phdr) in elf.phdrs.iter().enumerate() {
-        if !has_segment_detail(phdr.ptype) {
-            continue;
+        w!(o, 5, "<table class='conceal' id='info_segment{}'>", idx);
+        wrow!(o, 6, "Segment type", &ptype_to_string(phdr.ptype));
+
+        if has_segment_detail(phdr.ptype) {
+            generate_segment_info_table(o, elf, &phdr);
         }
 
-        w!(o, 5, "<table class='conceal' id='info_segment{}'>", idx);
-        generate_segment_info_table(o, elf, &phdr);
         w!(o, 5, "</table>");
     }
 }
