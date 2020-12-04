@@ -46,6 +46,8 @@ pub struct ParsedElf<'a> {
     pub phdrs: Vec<ParsedPhdr>,
     pub shdrs: Vec<ParsedShdr>,
     pub strtab: StrTab<'a>,
+    pub shstrndx: u16,
+    pub shnstrtab: StrTab<'a>,
 }
 
 pub struct ParsedPhdr {
@@ -230,6 +232,8 @@ impl ParsedElf<'_> {
             phdrs: vec![],
             shdrs: vec![],
             strtab: StrTab::empty(),
+            shstrndx: 0,
+            shnstrtab: StrTab::empty(),
         };
 
         elf.push_ident_info(&ident)?;
@@ -242,7 +246,7 @@ impl ParsedElf<'_> {
 
         elf.add_ident_ranges();
 
-        elf.strtab.populate(&elf.shdrs, &elf.contents);
+        elf.parse_string_tables();
 
         Ok(elf)
     }
@@ -312,6 +316,33 @@ impl ParsedElf<'_> {
         ranges.add_range(8, 1, RangeType::HeaderField("abi_ver"));
         ranges.add_range(9, 7, RangeType::HeaderField("pad"));
     }
+
+    fn find_strtab_shdr(shdrs: &[ParsedShdr]) -> Option<&ParsedShdr> {
+        for shdr in shdrs {
+            if shdr.shtype == SHT_STRTAB {
+                return Some(shdr);
+            }
+        }
+
+        None
+    }
+
+    fn parse_string_tables(&mut self) {
+        let shdr = ParsedElf::find_strtab_shdr(&self.shdrs);
+
+        if let Some(shdr) = shdr {
+            let section = &self.contents[shdr.file_offset .. shdr.file_offset + shdr.file_size];
+
+            self.strtab.populate(&section);
+        }
+
+        if self.shstrndx != SHN_UNDEF {
+            let shdr = &self.shdrs[self.shstrndx as usize];
+            let section = &self.contents[shdr.file_offset .. shdr.file_offset + shdr.file_size];
+
+            self.shnstrtab.populate(&section);
+        }
+    }
 }
 
 impl Note {
@@ -376,28 +407,8 @@ impl<'a> StrTab<'a> {
         StrTab { strings: HashMap::new() }
     }
 
-    fn find_strtab_shdr(shdrs: &[ParsedShdr]) -> Option<&ParsedShdr> {
-        for shdr in shdrs {
-            if shdr.shtype == SHT_STRTAB {
-                return Some(shdr);
-            }
-        }
-
-        None
-    }
-
     // something could be better than references with lifetimes
-    fn populate(&mut self, shdrs: &[ParsedShdr], contents: &'a [u8]) {
-        let maybe = StrTab::find_strtab_shdr(shdrs);
-
-        if maybe.is_none() {
-            return;
-        }
-
-        let shdr = maybe.unwrap();
-
-        let section = &contents[shdr.file_offset .. shdr.file_offset + shdr.file_size];
-
+    fn populate(&mut self, section: &'a [u8]) {
         let mut curr_start = 0;
 
         for (i,c) in section.iter().enumerate() {

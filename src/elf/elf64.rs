@@ -188,6 +188,8 @@ pub fn parse(buf: &[u8], ident: &ParsedIdent, elf: &mut ParsedElf) -> Result<(),
 
     let ehdr = Elf64Ehdr::from_bytes(&buf[0..ehdr_size], ident.endianness)?;
 
+    elf.shstrndx = ehdr.e_shstrndx;
+
     parse_ehdr(&ehdr, elf);
 
     parse_phdrs(buf, ident.endianness, &ehdr, elf)?;

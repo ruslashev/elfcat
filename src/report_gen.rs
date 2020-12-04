@@ -140,7 +140,7 @@ fn generate_phdr_info_tables(o: &mut String, elf: &ParsedElf) {
 
 fn generate_shdr_info_table(o: &mut String, elf: &ParsedElf, shdr: &ParsedShdr, idx: usize) {
     let items = [
-        ("Name", &format!("{}", shdr.name)),
+        ("Name", elf.shnstrtab.get(shdr.name)),
         ("Type", &shtype_to_string(shdr.shtype)),
         ("Flags", &shflags_to_string(shdr.flags)),
         ("Vaddr in memory", &format!("{:#x}", shdr.addr)),

@@ -57,6 +57,8 @@ pub const PF_MASKPROC: u32 = 0xff00_0000;
 
 pub const NT_GNU_BUILD_ID: u32 = 0x3;
 
+pub const SHN_UNDEF: u16 = 0;
+
 pub const SHT_NULL: u32 = 0;
 pub const SHT_PROGBITS: u32 = 1;
 pub const SHT_SYMTAB: u32 = 2;
