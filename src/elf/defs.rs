@@ -57,6 +57,29 @@ pub const PF_MASKPROC: u32 = 0xff00_0000;
 
 pub const NT_GNU_BUILD_ID: u32 = 0x3;
 
+pub const SHT_NULL: u32 = 0;
+pub const SHT_PROGBITS: u32 = 1;
+pub const SHT_SYMTAB: u32 = 2;
+pub const SHT_STRTAB: u32 = 3;
+pub const SHT_RELA: u32 = 4;
+pub const SHT_HASH: u32 = 5;
+pub const SHT_DYNAMIC: u32 = 6;
+pub const SHT_NOTE: u32 = 7;
+pub const SHT_NOBITS: u32 = 8;
+pub const SHT_REL: u32 = 9;
+pub const SHT_SHLIB: u32 = 10;
+pub const SHT_DYNSYM: u32 = 11;
+pub const SHT_LOOS: u32 = 0x6000_0000;
+pub const SHT_HIOS: u32 = 0x6fff_ffff;
+pub const SHT_LOPROC: u32 = 0x7000_0000;
+pub const SHT_HIPROC: u32 = 0x7fff_ffff;
+
+pub const SHF_WRITE: u64 = 0b001;
+pub const SHF_ALLOC: u64 = 0b010;
+pub const SHF_EXECINSTR: u64 = 0b100;
+pub const SHF_MASKOS: u64 = 0x0f00_0000;
+pub const SHF_MASKPROC: u64 = 0xf000_0000;
+
 pub fn type_to_string(e_type: u16) -> String {
     match e_type {
         ELF_ET_NONE => String::from("None (NONE)"),
@@ -153,6 +176,50 @@ pub fn pflags_to_string(flags: u32) -> String {
 
     if flags & PF_X != 0 {
         s.push('X');
+    }
+
+    s
+}
+
+pub fn shtype_to_string(shtype: u32) -> String {
+    match shtype {
+        SHT_NULL => String::from("NULL"),
+        SHT_PROGBITS => String::from("PROGBITS"),
+        SHT_SYMTAB => String::from("SYMTAB"),
+        SHT_STRTAB => String::from("STRTAB"),
+        SHT_RELA => String::from("RELA"),
+        SHT_HASH => String::from("HASH"),
+        SHT_DYNAMIC => String::from("DYNAMIC"),
+        SHT_NOTE => String::from("NOTE"),
+        SHT_NOBITS => String::from("NOBITS"),
+        SHT_REL => String::from("REL"),
+        SHT_SHLIB => String::from("SHLIB"),
+        SHT_DYNSYM => String::from("DYNSYM"),
+        SHT_LOOS => String::from("LOOS"),
+        SHT_HIOS => String::from("HIOS"),
+        SHT_LOPROC => String::from("LOPROC"),
+        SHT_HIPROC => String::from("HIPROC"),
+        x => format!("Unknown: {}", x),
+    }
+}
+
+pub fn shflags_to_string(flags: u64) -> String {
+    let mut s = String::new();
+
+    if flags & SHF_WRITE != 0 {
+        s.push('W');
+    }
+
+    if flags & SHF_ALLOC != 0 {
+        s.push('A');
+    }
+
+    if flags & SHF_EXECINSTR != 0 {
+        s.push('X');
+    }
+
+    if s == "" {
+        s.push('0');
     }
 
     s

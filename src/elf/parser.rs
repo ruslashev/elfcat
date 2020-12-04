@@ -59,8 +59,8 @@ pub struct ParsedPhdr {
 
 pub struct ParsedShdr {
     pub name: usize,
-    pub stype: usize,
-    pub flags: usize,
+    pub shtype: u32,
+    pub flags: u64,
     pub addr: usize,
     pub file_offset: usize,
     pub file_size: usize,

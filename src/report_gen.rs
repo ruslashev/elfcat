@@ -1,5 +1,5 @@
 use crate::elf::defs::*;
-use crate::elf::parser::{Note, ParsedElf, ParsedPhdr, RangeType};
+use crate::elf::parser::{Note, ParsedElf, ParsedPhdr, ParsedShdr, RangeType};
 use std::fmt::Write;
 use std::path::Path;
 
@@ -138,6 +138,35 @@ fn generate_phdr_info_tables(o: &mut String, elf: &ParsedElf) {
     }
 }
 
+fn generate_shdr_info_table(o: &mut String, shdr: &ParsedShdr, idx: usize) {
+    let items = [
+        ("Name", &format!("{}", shdr.name)),
+        ("Type", &shtype_to_string(shdr.shtype)),
+        ("Flags", &shflags_to_string(shdr.flags)),
+        ("Vaddr in memory", &format!("{:#x}", shdr.addr)),
+        ("Offset in file", &format!("{}", shdr.file_offset)),
+        ("Size in file", &format!("{}", shdr.file_size)),
+        ("Linked section", &format!("{}", shdr.link)),
+        ("Extra info", &format!("{}", shdr.link)),
+        ("Alignment", &format!("{:#x}", shdr.addralign)),
+        ("Size of entries", &format!("{}", shdr.entsize)),
+    ];
+
+    w!(o, 5, "<table class='conceal' id='info_shdr{}'>", idx);
+
+    for (desc, value) in items.iter() {
+        wrow!(o, 6, desc, value);
+    }
+
+    w!(o, 5, "</table>");
+}
+
+fn generate_shdr_info_tables(o: &mut String, elf: &ParsedElf) {
+    for (idx, shdr) in elf.shdrs.iter().enumerate() {
+        generate_shdr_info_table(o, &shdr, idx);
+    }
+}
+
 fn format_string_byte(byte: u8) -> String {
     if byte.is_ascii_graphic() {
         format!("{}", char::from(byte))
@@ -228,6 +257,8 @@ fn generate_sticky_info_table(o: &mut String, elf: &ParsedElf) {
 
     w!(o, 4, "<td id='struct_infotables'>");
     generate_phdr_info_tables(o, elf);
+
+    generate_shdr_info_tables(o, elf);
     w!(o, 4, "</td>");
 
     w!(o, 4, "<td id='data_infotables'>");

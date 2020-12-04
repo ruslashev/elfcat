@@ -355,8 +355,8 @@ fn parse_shdrs(
 fn parse_shdr(_buf: &[u8], _endianness: u8, shdr: &Elf64Shdr) -> ParsedShdr {
     ParsedShdr {
         name: shdr.sh_name as usize,
-        stype: shdr.sh_type as usize,
-        flags: shdr.sh_flags as usize,
+        shtype: shdr.sh_type,
+        flags: shdr.sh_flags,
         addr: shdr.sh_addr as usize,
         file_offset: shdr.sh_offset as usize,
         file_size: shdr.sh_size as usize,
