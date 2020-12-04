@@ -138,7 +138,7 @@ fn generate_phdr_info_tables(o: &mut String, elf: &ParsedElf) {
     }
 }
 
-fn generate_shdr_info_table(o: &mut String, shdr: &ParsedShdr, idx: usize) {
+fn generate_shdr_info_table(o: &mut String, elf: &ParsedElf, shdr: &ParsedShdr, idx: usize) {
     let items = [
         ("Name", &format!("{}", shdr.name)),
         ("Type", &shtype_to_string(shdr.shtype)),
@@ -163,7 +163,7 @@ fn generate_shdr_info_table(o: &mut String, shdr: &ParsedShdr, idx: usize) {
 
 fn generate_shdr_info_tables(o: &mut String, elf: &ParsedElf) {
     for (idx, shdr) in elf.shdrs.iter().enumerate() {
-        generate_shdr_info_table(o, &shdr, idx);
+        generate_shdr_info_table(o, elf, &shdr, idx);
     }
 }
 

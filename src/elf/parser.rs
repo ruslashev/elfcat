@@ -2,6 +2,7 @@ use super::defs::*;
 use super::elf32;
 use super::elf64;
 use std::convert::TryInto;
+use std::collections::HashMap;
 
 pub type InfoTuple = (&'static str, &'static str, String);
 
@@ -44,6 +45,7 @@ pub struct ParsedElf<'a> {
     pub ranges: Ranges,
     pub phdrs: Vec<ParsedPhdr>,
     pub shdrs: Vec<ParsedShdr>,
+    pub strtab: StrTab<'a>,
 }
 
 pub struct ParsedPhdr {
@@ -74,6 +76,10 @@ pub struct Note {
     pub name: Vec<u8>,
     pub desc: Vec<u8>,
     pub ntype: u32,
+}
+
+pub struct StrTab<'a> {
+    strings: HashMap<usize, &'a str>,
 }
 
 impl RangeType {
@@ -223,6 +229,7 @@ impl ParsedElf<'_> {
             ranges: Ranges::new(buf.len()),
             phdrs: vec![],
             shdrs: vec![],
+            strtab: StrTab::empty(),
         };
 
         elf.push_ident_info(&ident)?;
@@ -234,6 +241,8 @@ impl ParsedElf<'_> {
         }
 
         elf.add_ident_ranges();
+
+        elf.strtab.populate(&elf.shdrs, &elf.contents);
 
         Ok(elf)
     }
@@ -359,4 +368,63 @@ pub fn parse_notes(segment: &[u8], segment_size: usize, endianness: u8) -> Vec<N
     }
 
     notes
+}
+
+impl<'a> StrTab<'a> {
+    // decently ugly
+    fn empty() -> StrTab<'static> {
+        StrTab { strings: HashMap::new() }
+    }
+
+    fn find_strtab_shdr(shdrs: &[ParsedShdr]) -> Option<&ParsedShdr> {
+        for shdr in shdrs {
+            if shdr.shtype == SHT_STRTAB {
+                return Some(shdr);
+            }
+        }
+
+        None
+    }
+
+    // something could be better than references with lifetimes
+    fn populate(&mut self, shdrs: &[ParsedShdr], contents: &'a [u8]) {
+        let maybe = StrTab::find_strtab_shdr(shdrs);
+
+        if maybe.is_none() {
+            return;
+        }
+
+        let shdr = maybe.unwrap();
+
+        let section = &contents[shdr.file_offset .. shdr.file_offset + shdr.file_size];
+
+        let mut curr_start = 0;
+
+        for (i,c) in section.iter().enumerate() {
+            if *c == 0 {
+                let end = if curr_start == 0 { 0 } else { i - 1 };
+
+                let maybe = std::str::from_utf8(&section[curr_start ..= end]);
+
+                if maybe.is_err() {
+                    continue;
+                }
+
+                let string = maybe.unwrap();
+
+                self.strings.insert(curr_start, string);
+
+                curr_start = i + 1;
+            }
+        }
+    }
+
+    pub fn get(&self, idx: usize) -> &str {
+        let maybe = self.strings.get(&idx);
+
+        match maybe {
+            None => "",
+            Some(s) => s,
+        }
+    }
 }
