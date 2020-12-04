@@ -6,7 +6,7 @@ use elf::parser::ParsedElf;
 fn main() {
     let filename = parse_arguments();
     let contents = std::fs::read(&filename).unwrap();
-    let elf = ParsedElf::from_bytes(&filename, contents).unwrap();
+    let elf = ParsedElf::from_bytes(&filename, &contents).unwrap();
     let report_filename = report_gen::construct_filename(&filename);
     let report = report_gen::generate_report(&elf);
 

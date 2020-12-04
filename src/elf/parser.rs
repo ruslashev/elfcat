@@ -37,10 +37,10 @@ pub struct ParsedIdent {
     pub abi_ver: u8,
 }
 
-pub struct ParsedElf {
+pub struct ParsedElf<'a> {
     pub filename: String,
     pub information: Vec<(&'static str, &'static str, String)>,
-    pub contents: Vec<u8>,
+    pub contents: &'a [u8],
     pub ranges: Ranges,
     pub phdrs: Vec<ParsedPhdr>,
     pub shdrs: Vec<ParsedShdr>,
@@ -204,8 +204,8 @@ impl ParsedIdent {
     }
 }
 
-impl ParsedElf {
-    pub fn from_bytes(filename: &str, buf: Vec<u8>) -> Result<ParsedElf, String> {
+impl ParsedElf<'_> {
+    pub fn from_bytes<'a>(filename: &str, buf: &'a [u8]) -> Result<ParsedElf<'a>, String> {
         if buf.len() < ELF_EI_NIDENT as usize {
             return Err(String::from("file is smaller than ELF header's e_ident"));
         }
@@ -219,7 +219,7 @@ impl ParsedElf {
         let mut elf = ParsedElf {
             filename: filename.to_string(),
             information: vec![],
-            contents: vec![],
+            contents: buf,
             ranges: Ranges::new(buf.len()),
             phdrs: vec![],
             shdrs: vec![],
@@ -234,8 +234,6 @@ impl ParsedElf {
         }
 
         elf.add_ident_ranges();
-
-        elf.contents = buf;
 
         Ok(elf)
     }
