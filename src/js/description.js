@@ -40,7 +40,7 @@ let descriptions = {
     sh_offset:    "Offset in file (sh_offset)",
     sh_size:      "Section size. Also size in file unless type is SHT_NOBITS (sh_size)",
     sh_link:      "Section index of an associated section (sh_link)",
-    sh_info:      "Extra info about section (sh_info)",
+    sh_info:      "Additional information about section (sh_info)",
     sh_addralign: "Address alignment of the section (sh_addralign)",
     sh_entsize:   "Size of each entry if section has table of fixed-size entries (sh_entsize)",
     section:      "Section",
