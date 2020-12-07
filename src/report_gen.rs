@@ -145,7 +145,7 @@ fn generate_shdr_info_table(o: &mut String, elf: &ParsedElf, shdr: &ParsedShdr, 
         ("Flags", &shflags_to_string(shdr.flags)),
         ("Vaddr in memory", &format!("{:#x}", shdr.addr)),
         ("Offset in file", &format!("{}", shdr.file_offset)),
-        ("Size in file", &format!("{}", shdr.file_size)),
+        ("Size in file", &format!("{}", shdr.size)),
         ("Linked section", &format!("{}", shdr.link)),
         ("Extra info", &format!("{}", shdr.link)),
         ("Alignment", &format!("{:#x}", shdr.addralign)),
@@ -258,7 +258,7 @@ fn generate_strtab_data(o: &mut String, section: &[u8]) {
 }
 
 fn generate_section_info_table(o: &mut String, elf: &ParsedElf, shdr: &ParsedShdr) {
-    let section = &elf.contents[shdr.file_offset..shdr.file_offset + shdr.file_size];
+    let section = &elf.contents[shdr.file_offset..shdr.file_offset + shdr.size];
 
     match shdr.shtype {
         SHT_STRTAB => {

@@ -338,8 +338,8 @@ fn parse_shdrs(
         let parsed = parse_shdr(buf, endianness, &shdr);
         let ranges = &mut elf.ranges;
 
-        if parsed.file_offset != 0 && parsed.file_size != 0 {
-            ranges.add_range(parsed.file_offset, parsed.file_size, RangeType::Section(i));
+        if parsed.file_offset != 0 && parsed.size != 0 {
+            ranges.add_range(parsed.file_offset, parsed.size, RangeType::Section(i));
         }
 
         ranges.add_range(start, shsize, RangeType::SectionHeader(i as u32));
@@ -361,7 +361,7 @@ fn parse_shdr(_buf: &[u8], _endianness: u8, shdr: &Elf64Shdr) -> ParsedShdr {
         flags: shdr.sh_flags,
         addr: shdr.sh_addr as usize,
         file_offset: shdr.sh_offset as usize,
-        file_size: shdr.sh_size as usize,
+        size: shdr.sh_size as usize,
         link: shdr.sh_link as usize,
         info: shdr.sh_info as usize,
         addralign: shdr.sh_addralign as usize,

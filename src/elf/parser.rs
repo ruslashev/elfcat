@@ -66,7 +66,7 @@ pub struct ParsedShdr {
     pub flags: u64,
     pub addr: usize,
     pub file_offset: usize,
-    pub file_size: usize,
+    pub size: usize,
     pub link: usize,
     pub info: usize,
     pub addralign: usize,
@@ -339,16 +339,16 @@ impl ParsedElf<'_> {
         let shdr = ParsedElf::find_strtab_shdr(&self.shdrs);
 
         if let Some(shdr) = shdr {
-            let section = &self.contents[shdr.file_offset..shdr.file_offset + shdr.file_size];
+            let section = &self.contents[shdr.file_offset..shdr.file_offset + shdr.size];
 
-            self.strtab.populate(&section, shdr.file_size);
+            self.strtab.populate(&section, shdr.size);
         }
 
         if self.shstrndx != SHN_UNDEF {
             let shdr = &self.shdrs[self.shstrndx as usize];
-            let section = &self.contents[shdr.file_offset..shdr.file_offset + shdr.file_size];
+            let section = &self.contents[shdr.file_offset..shdr.file_offset + shdr.size];
 
-            self.shnstrtab.populate(&section, shdr.file_size);
+            self.shnstrtab.populate(&section, shdr.size);
         }
     }
 }
