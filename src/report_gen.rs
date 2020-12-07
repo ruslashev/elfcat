@@ -487,11 +487,71 @@ fn generate_dump_for_byte(idx: usize, dump: &mut String, elf: &ParsedElf) {
     dump.push_str(if (idx + 1) % 16 == 0 { "\n" } else { " " });
 }
 
+// assumes balance == 1
+fn skip_bytes(idx: usize, len: usize, elf: &ParsedElf) -> Option<usize> {
+    if !(elf.ranges.data[idx].len() == 1 && elf.ranges.data[idx][0].skippable()) {
+        return None;
+    }
+
+    let mut new_idx = idx + 1;
+
+    while new_idx < len {
+        match elf.ranges.data[new_idx].len() {
+            0 => {
+                new_idx += 1;
+            }
+
+            1 => {
+                if elf.ranges.data[new_idx][0] == RangeType::End {
+                    return Some(new_idx);
+                }
+
+                return None;
+            }
+
+            _ => {
+                return None;
+            }
+        }
+    }
+
+    None
+}
+
 fn generate_file_dump(elf: &ParsedElf) -> String {
     let mut dump = String::new();
+    let mut i = 0;
+    let len = elf.contents.len();
+    let mut balance: i64 = 0;
 
-    for idx in 0..elf.contents.len() {
-        generate_dump_for_byte(idx, &mut dump, elf);
+    while i < len {
+        // we are iterating twice for one byte, which is not very smart
+        for r in &elf.ranges.data[i] {
+            if *r == RangeType::End {
+                balance -= 1;
+            } else {
+                balance += 1;
+            }
+        }
+
+        // account for one potential skippable range which would already start (incr. balance by 1)
+        if balance == 1 {
+            if let Some(new_idx) = skip_bytes(i, len, elf) {
+                dump += format!(
+                    "<span {}>..</span>",
+                    elf.ranges.data[i][0].span_attributes()
+                )
+                .as_str();
+
+                dump += if (i + 1) % 16 == 0 { "\n" } else { " " };
+
+                i = new_idx;
+                continue;
+            }
+        }
+
+        generate_dump_for_byte(i, &mut dump, elf);
+        i += 1;
     }
 
     dump
