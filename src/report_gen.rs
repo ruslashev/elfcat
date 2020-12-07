@@ -465,27 +465,33 @@ fn append_hex_byte(s: &mut String, byte: u8) {
     }
 }
 
+fn generate_dump_for_byte(idx: usize, dump: &mut String, elf: &ParsedElf) {
+    let byte = elf.contents[idx];
+
+    for range_type in &elf.ranges.data[idx] {
+        if *range_type != RangeType::End {
+            dump.push_str(format!("<span {}>", range_type.span_attributes()).as_str());
+        }
+    }
+
+    if idx < 4 {
+        dump.push_str(&format_magic(byte))
+    } else {
+        append_hex_byte(dump, byte);
+    }
+
+    for _ in 0..elf.ranges.lookup_range_ends(idx) {
+        dump.push_str("</span>");
+    }
+
+    dump.push_str(if (idx + 1) % 16 == 0 { "\n" } else { " " });
+}
+
 fn generate_file_dump(elf: &ParsedElf) -> String {
     let mut dump = String::new();
 
-    for (i, b) in elf.contents.iter().enumerate() {
-        for range_type in &elf.ranges.data[i] {
-            if *range_type != RangeType::End {
-                dump += format!("<span {}>", range_type.span_attributes()).as_str();
-            }
-        }
-
-        if i < 4 {
-            dump += format_magic(*b).as_str();
-        } else {
-            append_hex_byte(&mut dump, *b);
-        }
-
-        for _ in 0..elf.ranges.lookup_range_ends(i) {
-            dump += "</span>";
-        }
-
-        dump += if (i + 1) % 16 == 0 { "\n" } else { " " };
+    for idx in 0..elf.contents.len() {
+        generate_dump_for_byte(idx, &mut dump, elf);
     }
 
     dump
