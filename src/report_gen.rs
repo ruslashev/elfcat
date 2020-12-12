@@ -542,7 +542,8 @@ fn generate_file_dump(elf: &ParsedElf) -> String {
         }
 
         // account for one potential skippable range which would already start (incr. balance by 1)
-        if balance == 1 {
+        // disable while working on offsets
+        if false && balance == 1 {
             if let Some(new_idx) = skip_bytes(i, len, elf) {
                 dump += format!(
                     "<span {}>..</span>",
@@ -570,6 +571,12 @@ fn generate_body(o: &mut String, elf: &ParsedElf) {
     generate_svg_element(o);
 
     generate_file_info_table(o, elf);
+
+    w!(o, 2, "<div id='offsets'>");
+    for off in (0..elf.contents.len()).step_by(16) {
+        w!(o, 3, "{:x}</br>", off);
+    }
+    w!(o, 2, "</div>");
 
     w!(o, 2, "<div id='bytes'>");
     wnonl!(o, 0, "{}", generate_file_dump(elf));

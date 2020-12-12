@@ -16,6 +16,10 @@
   border: 1px solid #000;
   max-width: 600px;
 }
+#offsets {
+  display: inline-block;
+  text-align: right;
+}
 #bytes {
   border: 1px solid;
   display: inline-block;
