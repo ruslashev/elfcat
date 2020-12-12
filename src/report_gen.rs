@@ -182,7 +182,11 @@ fn format_string_slice(slice: &[u8]) -> String {
 }
 
 fn generate_note_data(o: &mut String, note: &Note) {
-    let name = format_string_slice(&note.name[0..note.name.len() - 1]);
+    let name = if note.name.len() == 0 {
+        String::new()
+    } else {
+        format_string_slice(&note.name[0..note.name.len() - 1])
+    };
 
     wrow!(o, 6, "Name", name);
 

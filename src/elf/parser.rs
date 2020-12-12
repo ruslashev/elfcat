@@ -358,8 +358,8 @@ impl Note {
         let (namesz, descsz, ntype) = Note::read_header(buf, endianness).ok()?;
         let (namesz, descsz) = (namesz as usize, descsz as usize);
 
-        let name = buf[12..12 + namesz].to_vec();
-        let desc = buf[12 + namesz..12 + namesz + descsz].to_vec();
+        let name = buf.get(12..12 + namesz)?.to_vec();
+        let desc = buf.get(12 + namesz..12 + namesz + descsz)?.to_vec();
 
         let mut len: usize = 12 + namesz + descsz;
 
