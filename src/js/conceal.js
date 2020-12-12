@@ -17,10 +17,6 @@ document.addEventListener("mouseover", function (e) {
     var target = event.target || event.srcElement;
     var prefix = 'bin_';
 
-    if (prevTableId) {
-        prevTableId.style.display = "none";
-    }
-
     parents = listOfParents(target);
 
     for (var i = 0; i < parents.length; i++) {
@@ -31,6 +27,10 @@ document.addEventListener("mouseover", function (e) {
             var target = document.getElementById(tableId);
 
             if (target !== null) {
+                if (prevTableId) {
+                    prevTableId.style.display = "none";
+                }
+
                 target.style.display = "block";
                 prevTableId = target;
 
