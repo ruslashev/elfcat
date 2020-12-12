@@ -288,6 +288,8 @@ fn generate_segment_info_tables(o: &mut String, elf: &ParsedElf) {
     for (idx, phdr) in elf.phdrs.iter().enumerate() {
         w!(o, 5, "<table class='conceal' id='info_segment{}'>", idx);
         wrow!(o, 6, "Segment type", &ptype_to_string(phdr.ptype));
+        wrow!(o, 6, "Size in file", phdr.file_size);
+        wrow!(o, 6, "Size in memory", phdr.memsz);
 
         if has_segment_detail(phdr.ptype) {
             generate_segment_info_table(o, elf, &phdr);
@@ -301,6 +303,7 @@ fn generate_section_info_tables(o: &mut String, elf: &ParsedElf) {
     for (idx, shdr) in elf.shdrs.iter().enumerate() {
         w!(o, 5, "<table class='conceal' id='info_section{}'>", idx);
         wrow!(o, 6, "Section type", &shtype_to_string(shdr.shtype));
+        wrow!(o, 6, "Size", shdr.size);
 
         if has_section_detail(shdr.shtype) {
             generate_section_info_table(o, elf, &shdr);
