@@ -112,6 +112,11 @@
   background-color: #ee9;
 }
 
+.segment > .segment_subrange.hover:hover {
+  background: initial;
+  background-color: #f59;
+}
+
 svg {
   position: absolute;
   left: 0px;

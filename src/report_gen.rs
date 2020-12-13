@@ -299,6 +299,7 @@ fn generate_segment_info_tables(o: &mut String, elf: &ParsedElf) {
         wrow!(o, 6, "Size in memory", phdr.memsz);
 
         if has_segment_detail(phdr.ptype) {
+            w!(o, 6, "<tr><td><br></td></tr>");
             generate_segment_info_table(o, elf, &phdr);
         }
 
@@ -313,6 +314,7 @@ fn generate_section_info_tables(o: &mut String, elf: &ParsedElf) {
         wrow!(o, 6, "Size", shdr.size);
 
         if has_section_detail(shdr.shtype) {
+            w!(o, 6, "<tr><td><br></td></tr>");
             generate_section_info_table(o, elf, &shdr);
         }
 

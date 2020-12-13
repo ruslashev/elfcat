@@ -20,6 +20,7 @@ pub enum RangeType {
     ShdrField(&'static str),
     Segment(u16),
     Section(u16),
+    SegmentSubrange,
 }
 
 // Interval tree that allows querying point for all intervals that intersect it should be better.
@@ -85,6 +86,7 @@ pub struct StrTab<'a> {
 }
 
 impl RangeType {
+    // this is a bit of a clusterfuck
     fn needs_class(&self) -> bool {
         match self {
             RangeType::ProgramHeader(_) => true,
@@ -93,6 +95,7 @@ impl RangeType {
             RangeType::ShdrField(_) => true,
             RangeType::Segment(_) => true,
             RangeType::Section(_) => true,
+            RangeType::SegmentSubrange => true,
             _ => false,
         }
     }
@@ -129,6 +132,7 @@ impl RangeType {
             RangeType::ShdrField(field) => format!("{} shdr_hover", field),
             RangeType::Segment(_) => String::from("segment"),
             RangeType::Section(_) => String::from("section"),
+            RangeType::SegmentSubrange => String::from("segment_subrange"),
             _ => String::new(),
         }
     }
@@ -148,6 +152,7 @@ impl RangeType {
             },
             RangeType::Segment(_) => true,
             RangeType::Section(_) => true,
+            RangeType::SegmentSubrange => true,
             _ => false,
         }
     }
@@ -376,20 +381,24 @@ impl ParsedElf<'_> {
     }
 
     fn parse_notes(&mut self, endianness: u8) {
+        let mut areas = vec![];
+
         for phdr in &self.phdrs {
             if phdr.ptype == PT_NOTE {
-                let segment = &self.contents[phdr.file_offset..phdr.file_offset + phdr.file_size];
-                let mut notes = ParsedElf::parse_note_area(segment, phdr.file_size, endianness);
-                self.notes.append(&mut notes);
+                areas.push((phdr.file_offset, phdr.file_size));
             }
+        }
+
+        for (start, len) in areas {
+            self.parse_note_area(start, len, endianness);
         }
     }
 
     // this is pretty ugly in terms of raw addressing, unwieldly offsets, etc.
     // area here stands for segment or section because notes may come from either of them.
-    fn parse_note_area(area: &[u8], area_size: usize, endianness: u8) -> Vec<Note> {
+    fn parse_note_area(&mut self, area_start: usize, area_size: usize, endianness: u8) {
+        let area = &self.contents[area_start..area_start + area_size];
         let mut start = 0;
-        let mut notes = vec![];
 
         loop {
             if start >= area_size {
@@ -399,13 +408,17 @@ impl ParsedElf<'_> {
             match Note::from_bytes(&area[start..area_size], endianness) {
                 None => break,
                 Some((note, len_taken)) => {
-                    notes.push(note);
+                    // not an ideal look because this can also be a SectionSubrange
+                    self.ranges.add_range(
+                        area_start + start,
+                        len_taken,
+                        RangeType::SegmentSubrange,
+                    );
+                    self.notes.push(note);
                     start += len_taken;
                 }
             }
         }
-
-        notes
     }
 }
 
