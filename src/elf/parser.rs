@@ -244,6 +244,8 @@ impl ParsedElf<'_> {
             shnstrtab: StrTab::empty(),
         };
 
+        elf.push_file_info(filename, buf.len());
+
         elf.push_ident_info(&ident)?;
 
         if ident.class == ELF_CLASS32 {
@@ -257,6 +259,24 @@ impl ParsedElf<'_> {
         elf.parse_string_tables();
 
         Ok(elf)
+    }
+
+    fn push_file_info(&mut self, file_name: &str, file_size: usize) {
+        self.information
+            .push(("file_name", "File name", file_name.to_string()));
+
+        let file_size_str = if file_size < 1024 {
+            format!("{} B", file_size)
+        } else {
+            format!(
+                "{} ({} B)",
+                crate::utils::human_format_bytes(file_size as u64),
+                file_size
+            )
+        };
+
+        self.information
+            .push(("file_size", "File size", file_size_str));
     }
 
     fn push_ident_info(&mut self, ident: &ParsedIdent) -> Result<(), String> {

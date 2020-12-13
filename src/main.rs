@@ -1,5 +1,6 @@
 mod elf;
 mod report_gen;
+mod utils;
 
 use elf::parser::ParsedElf;
 
