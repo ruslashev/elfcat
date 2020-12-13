@@ -570,6 +570,29 @@ fn generate_file_dump(elf: &ParsedElf) -> String {
     dump
 }
 
+fn generate_ascii_dump(o: &mut String, elf: &ParsedElf) {
+    for (i, b) in elf.contents.iter().enumerate() {
+        if b.is_ascii_graphic() {
+            let ch = *b as char;
+
+            match crate::utils::html_escape(ch) {
+                Some(escaped) => {
+                    wnonl!(o, 0, "{}", escaped);
+                }
+                None => {
+                    wnonl!(o, 0, "{}", ch);
+                }
+            }
+        } else {
+            wnonl!(o, 0, ".");
+        }
+
+        if (i + 1) % 16 == 0 {
+            w!(o, 0, "");
+        }
+    }
+}
+
 fn generate_body(o: &mut String, elf: &ParsedElf) {
     w!(o, 1, "<body>");
 
@@ -585,6 +608,10 @@ fn generate_body(o: &mut String, elf: &ParsedElf) {
 
     w!(o, 2, "<div id='bytes'>");
     wnonl!(o, 0, "{}", generate_file_dump(elf));
+    w!(o, 2, "</div>");
+
+    w!(o, 2, "<div id='ascii'>");
+    generate_ascii_dump(o, elf);
     w!(o, 2, "</div>");
 
     w!(o, 2, "<div id='vmap'>");

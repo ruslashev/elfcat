@@ -26,6 +26,11 @@
   word-break: break-word;
   width: 47ch; /* 16 * (2 + 1) - 1*/
 }
+#ascii {
+  border: 1px solid;
+  display: inline-block;
+  width: 16ch;
+}
 #vmap {
   border: 1px solid;
   display: inline-block;

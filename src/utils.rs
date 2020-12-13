@@ -14,3 +14,13 @@ pub fn human_format_bytes(bytes: u64) -> String {
         prefixes[(exponent - 1) as usize]
     )
 }
+
+pub fn html_escape(ch: char) -> Option<&'static str> {
+    match ch {
+        '&' => Some("&amp;"),
+        '<' => Some("&lt;"),
+        '>' => Some("&gt;"),
+        '"' => Some("&quot;"),
+        _ => None,
+    }
+}
