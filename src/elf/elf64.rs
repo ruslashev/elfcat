@@ -271,7 +271,7 @@ fn parse_phdrs(
 
     for i in 0..ehdr.e_phnum {
         let phdr = Elf64Phdr::from_bytes(&buf[start..start + phsize], endianness)?;
-        let parsed = parse_phdr(buf, endianness, &phdr);
+        let parsed = parse_phdr(&phdr);
         let ranges = &mut elf.ranges;
 
         if parsed.file_offset != 0 && parsed.file_size != 0 {
@@ -301,16 +301,10 @@ fn add_phdr_ranges(start: usize, ranges: &mut Ranges) {
     ranges.add_range(start + 48, 8, RangeType::PhdrField("p_align"));
 }
 
-fn parse_phdr(buf: &[u8], endianness: u8, phdr: &Elf64Phdr) -> ParsedPhdr {
+fn parse_phdr(phdr: &Elf64Phdr) -> ParsedPhdr {
     let ptype = phdr.p_type;
     let file_offset = phdr.p_offset as usize;
     let file_size = phdr.p_filesz as usize;
-    let notes = if ptype == PT_NOTE {
-        let segment = &buf[file_offset..file_offset + file_size];
-        parse_notes(segment, file_size, endianness)
-    } else {
-        vec![]
-    };
 
     ParsedPhdr {
         ptype,
@@ -320,7 +314,6 @@ fn parse_phdr(buf: &[u8], endianness: u8, phdr: &Elf64Phdr) -> ParsedPhdr {
         vaddr: phdr.p_vaddr as usize,
         memsz: phdr.p_memsz as usize,
         alignment: phdr.p_align as usize,
-        notes,
     }
 }
 

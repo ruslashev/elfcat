@@ -47,6 +47,7 @@ pub struct ParsedElf<'a> {
     pub strtab: StrTab<'a>,
     pub shstrndx: u16,
     pub shnstrtab: StrTab<'a>,
+    pub notes: Vec<Note>,
 }
 
 pub struct ParsedPhdr {
@@ -57,7 +58,6 @@ pub struct ParsedPhdr {
     pub vaddr: usize,
     pub memsz: usize,
     pub alignment: usize,
-    pub notes: Vec<Note>,
 }
 
 pub struct ParsedShdr {
@@ -242,6 +242,7 @@ impl ParsedElf<'_> {
             strtab: StrTab::empty(),
             shstrndx: 0,
             shnstrtab: StrTab::empty(),
+            notes: vec![],
         };
 
         elf.push_file_info(filename, buf.len());
@@ -257,6 +258,8 @@ impl ParsedElf<'_> {
         elf.add_ident_ranges();
 
         elf.parse_string_tables();
+
+        elf.parse_notes(ident.endianness);
 
         Ok(elf)
     }
@@ -371,6 +374,39 @@ impl ParsedElf<'_> {
             self.shnstrtab.populate(&section, shdr.size);
         }
     }
+
+    fn parse_notes(&mut self, endianness: u8) {
+        for phdr in &self.phdrs {
+            if phdr.ptype == PT_NOTE {
+                let segment = &self.contents[phdr.file_offset..phdr.file_offset + phdr.file_size];
+                let mut notes = ParsedElf::parse_note_area(segment, phdr.file_size, endianness);
+                self.notes.append(&mut notes);
+            }
+        }
+    }
+
+    // this is pretty ugly in terms of raw addressing, unwieldly offsets, etc.
+    // area here stands for segment or section because notes may come from either of them.
+    fn parse_note_area(area: &[u8], area_size: usize, endianness: u8) -> Vec<Note> {
+        let mut start = 0;
+        let mut notes = vec![];
+
+        loop {
+            if start >= area_size {
+                break;
+            }
+
+            match Note::from_bytes(&area[start..area_size], endianness) {
+                None => break,
+                Some((note, len_taken)) => {
+                    notes.push(note);
+                    start += len_taken;
+                }
+            }
+        }
+
+        notes
+    }
 }
 
 impl Note {
@@ -405,28 +441,6 @@ impl Note {
             )
         })
     }
-}
-
-// this is pretty ugly
-pub fn parse_notes(segment: &[u8], segment_size: usize, endianness: u8) -> Vec<Note> {
-    let mut start = 0;
-    let mut notes = vec![];
-
-    loop {
-        if start >= segment_size {
-            break;
-        }
-
-        match Note::from_bytes(&segment[start..segment_size], endianness) {
-            None => break,
-            Some((note, len_taken)) => {
-                notes.push(note);
-                start += len_taken;
-            }
-        }
-    }
-
-    notes
 }
 
 impl<'a> StrTab<'a> {

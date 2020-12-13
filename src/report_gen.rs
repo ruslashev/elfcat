@@ -218,12 +218,15 @@ fn generate_segment_info_table(o: &mut String, elf: &ParsedElf, phdr: &ParsedPhd
             wrow!(o, 6, "Interpreter", interp_str);
         }
         PT_NOTE => {
-            for i in 0..phdr.notes.len() {
-                let note = &phdr.notes[i];
+            // this is really bad and made out of desperation.
+            // notes stored in elf.notes don't have to have 1-to-1
+            // correspondence with phdrs, yet here we are.
+            for i in 0..elf.notes.len() {
+                let note = &elf.notes[i];
 
                 generate_note_data(o, note);
 
-                if i != phdr.notes.len() - 1 {
+                if i != elf.notes.len() - 1 {
                     w!(o, 6, "<tr> <td><br></td> </tr>");
                 }
             }
