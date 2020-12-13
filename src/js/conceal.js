@@ -4,7 +4,10 @@ function listOfParents(el) {
     while (el.tagName !== "HTML") {
         el = el.parentNode;
 
-        list.push(el.id);
+        // use unshift() instead of push() because we are stupid and have
+        // an assumption that section spans are inside segment spans
+        // so that break; in loop below doesn't have to go away.
+        list.unshift(el.id);
     }
 
     return list;
