@@ -36,6 +36,8 @@
   display: inline-block;
   width: 47ch;
   vertical-align: top;
+  position: sticky;
+  top: 8px;
 }
 #sticky_table {
   display: inline-block;
