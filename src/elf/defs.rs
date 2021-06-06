@@ -228,7 +228,7 @@ pub fn shflags_to_string(flags: u64) -> String {
         s.push('X');
     }
 
-    if s == "" {
+    if s.is_empty() {
         s.push('0');
     }
 

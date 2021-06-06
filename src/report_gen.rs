@@ -25,7 +25,7 @@ pub fn construct_filename(filename: &str) -> String {
 }
 
 fn indent(level: usize, line: &str) -> String {
-    if line == "" {
+    if line.is_empty() {
         String::new()
     } else {
         INDENT.repeat(level) + line
@@ -182,7 +182,7 @@ fn format_string_slice(slice: &[u8]) -> String {
 }
 
 fn generate_note_data(o: &mut String, note: &Note) {
-    let name = if note.name.len() == 0 {
+    let name = if note.name.is_empty() {
         String::new()
     } else {
         format_string_slice(&note.name[0..note.name.len() - 1])
