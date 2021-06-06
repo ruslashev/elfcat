@@ -1,6 +1,7 @@
 #![cfg_attr(debug_assertions, allow(dead_code))]
 
 use super::defs::*;
+use super::elfxx::ElfHeader;
 use super::parser::*;
 use std::convert::TryInto;
 use std::mem::size_of;
@@ -58,14 +59,9 @@ struct Elf64Shdr {
 }
 
 // All this just to avoid unsafe. This should be improved.
-impl Elf64Ehdr {
-    fn from_bytes(buf: &[u8], endianness: u8) -> Result<Elf64Ehdr, String> {
-        if endianness == ELF_DATA2LSB {
-            Elf64Ehdr::from_le_bytes(buf)
-        } else {
-            Elf64Ehdr::from_be_bytes(buf)
-        }
-        .map_err(|a| format!("failed to read file header: {}", a))
+impl ElfHeader for Elf64Ehdr {
+    fn describe() -> String {
+        String::from("file header")
     }
     fn from_le_bytes(buf: &[u8]) -> Result<Elf64Ehdr, ReadErr> {
         Ok(Elf64Ehdr {
@@ -105,14 +101,9 @@ impl Elf64Ehdr {
     }
 }
 
-impl Elf64Phdr {
-    fn from_bytes(buf: &[u8], endianness: u8) -> Result<Elf64Phdr, String> {
-        if endianness == ELF_DATA2LSB {
-            Elf64Phdr::from_le_bytes(buf)
-        } else {
-            Elf64Phdr::from_be_bytes(buf)
-        }
-        .map_err(|a| format!("failed to read program header: {}", a))
+impl ElfHeader for Elf64Phdr {
+    fn describe() -> String {
+        String::from("program header")
     }
     fn from_le_bytes(buf: &[u8]) -> Result<Elf64Phdr, ReadErr> {
         Ok(Elf64Phdr {
@@ -140,14 +131,9 @@ impl Elf64Phdr {
     }
 }
 
-impl Elf64Shdr {
-    fn from_bytes(buf: &[u8], endianness: u8) -> Result<Elf64Shdr, String> {
-        if endianness == ELF_DATA2LSB {
-            Elf64Shdr::from_le_bytes(buf)
-        } else {
-            Elf64Shdr::from_be_bytes(buf)
-        }
-        .map_err(|a| format!("failed to read section header: {}", a))
+impl ElfHeader for Elf64Shdr {
+    fn describe() -> String {
+        String::from("section header")
     }
     fn from_le_bytes(buf: &[u8]) -> Result<Elf64Shdr, ReadErr> {
         Ok(Elf64Shdr {
