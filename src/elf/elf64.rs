@@ -1,5 +1,3 @@
-#![cfg_attr(debug_assertions, allow(dead_code))]
-
 use super::elfxx::*;
 use super::parser::*;
 use std::convert::TryInto;
@@ -8,9 +6,7 @@ type Elf64Addr = u64;
 type Elf64Off = u64;
 type Elf64Half = u16;
 type Elf64Word = u32;
-type Elf64Sword = i32;
 type Elf64Xword = u64;
-type Elf64Sxword = i64;
 
 pub struct Elf64Ehdr {
     e_ident: [u8; 16],

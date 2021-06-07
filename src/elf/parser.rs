@@ -1,5 +1,5 @@
 use super::defs::*;
-use super::elf32;
+use super::elf32::Elf32;
 use super::elf64::Elf64;
 use super::elfxx::ElfXX;
 use std::convert::TryInto;
@@ -256,7 +256,7 @@ impl ParsedElf<'_> {
         elf.push_ident_info(&ident)?;
 
         if ident.class == ELF_CLASS32 {
-            elf32::parse(&buf, &ident, &mut elf)?;
+            Elf32::parse(&buf, &ident, &mut elf)?;
         } else {
             Elf64::parse(&buf, &ident, &mut elf)?;
         }
