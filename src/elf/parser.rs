@@ -1,6 +1,7 @@
 use super::defs::*;
 use super::elf32;
-use super::elf64;
+use super::elf64::Elf64;
+use super::elfxx::ElfXX;
 use std::convert::TryInto;
 
 pub type InfoTuple = (&'static str, &'static str, String);
@@ -257,7 +258,7 @@ impl ParsedElf<'_> {
         if ident.class == ELF_CLASS32 {
             elf32::parse(&buf, &ident, &mut elf)?;
         } else {
-            elf64::parse(&buf, &ident, &mut elf)?;
+            Elf64::parse(&buf, &ident, &mut elf)?;
         }
 
         elf.add_ident_ranges();

@@ -1,6 +1,5 @@
 #![cfg_attr(debug_assertions, allow(dead_code))]
 
-use super::defs::*;
 use super::elfxx::*;
 use super::parser::*;
 use std::convert::TryInto;
@@ -13,7 +12,7 @@ type Elf64Sword = i32;
 type Elf64Xword = u64;
 type Elf64Sxword = i64;
 
-struct Elf64Ehdr {
+pub struct Elf64Ehdr {
     e_ident: [u8; 16],
     e_type: Elf64Half,
     e_machine: Elf64Half,
@@ -30,7 +29,7 @@ struct Elf64Ehdr {
     e_shstrndx: Elf64Half,
 }
 
-struct Elf64Phdr {
+pub struct Elf64Phdr {
     p_type: Elf64Word,
     p_flags: Elf64Word,
     p_offset: Elf64Off,
@@ -41,7 +40,7 @@ struct Elf64Phdr {
     p_align: Elf64Xword,
 }
 
-struct Elf64Shdr {
+pub struct Elf64Shdr {
     sh_name: Elf64Word,
     sh_type: Elf64Word,
     sh_flags: Elf64Xword,
@@ -54,7 +53,7 @@ struct Elf64Shdr {
     sh_entsize: Elf64Xword,
 }
 
-struct Elf64;
+pub struct Elf64;
 
 // All this just to avoid unsafe. This should be improved.
 impl ElfHeader for Elf64Ehdr {
@@ -207,7 +206,9 @@ impl ElfXXShdr<Elf64Addr, Elf64Word, Elf64Off, Elf64Xword> for Elf64Shdr {
     fn sh_entsize(&self)   -> Elf64Xword { self.sh_entsize   }
 }
 
-impl ElfXX<Elf64Ehdr,Elf64Phdr,Elf64Shdr,Elf64Addr,Elf64Half,Elf64Word,Elf64Off,Elf64Xword> for Elf64 {
+impl ElfXX<Elf64Ehdr, Elf64Phdr, Elf64Shdr, Elf64Addr, Elf64Half, Elf64Word, Elf64Off, Elf64Xword>
+    for Elf64
+{
     fn add_ehdr_ranges(ehdr: &Elf64Ehdr, ranges: &mut Ranges) {
         ranges.add_range(0, ehdr.e_ehsize as usize, RangeType::FileHeader);
         ranges.add_range(16, 2, RangeType::HeaderField("e_type"));
@@ -249,4 +250,3 @@ impl ElfXX<Elf64Ehdr,Elf64Phdr,Elf64Shdr,Elf64Addr,Elf64Half,Elf64Word,Elf64Off,
         ranges.add_range(start + 56, 8, RangeType::ShdrField("sh_entsize"));
     }
 }
-
