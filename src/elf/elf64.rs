@@ -1,7 +1,7 @@
 #![cfg_attr(debug_assertions, allow(dead_code))]
 
 use super::defs::*;
-use super::elfxx::ElfHeader;
+use super::elfxx::*;
 use super::parser::*;
 use std::convert::TryInto;
 use std::mem::size_of;
@@ -14,7 +14,6 @@ type Elf64Sword = i32;
 type Elf64Xword = u64;
 type Elf64Sxword = i64;
 
-#[allow(dead_code)] // REMOVEME
 struct Elf64Ehdr {
     e_ident: [u8; 16],
     e_type: Elf64Half,
@@ -32,7 +31,6 @@ struct Elf64Ehdr {
     e_shstrndx: Elf64Half,
 }
 
-#[allow(dead_code)]
 struct Elf64Phdr {
     p_type: Elf64Word,
     p_flags: Elf64Word,
@@ -44,7 +42,6 @@ struct Elf64Phdr {
     p_align: Elf64Xword,
 }
 
-#[allow(dead_code)]
 struct Elf64Shdr {
     sh_name: Elf64Word,
     sh_type: Elf64Word,
@@ -163,6 +160,50 @@ impl ElfHeader for Elf64Shdr {
             sh_entsize: Elf64Xword::from_be_bytes(buf[56..64].try_into()?),
         })
     }
+}
+
+#[rustfmt::skip]
+impl ElfXXEhdr<Elf64Addr, Elf64Half, Elf64Word, Elf64Off> for Elf64Ehdr {
+    fn e_ident(&self)     -> [u8; 16]  { self.e_ident     }
+    fn e_type(&self)      -> Elf64Half { self.e_type      }
+    fn e_machine(&self)   -> Elf64Half { self.e_machine   }
+    fn e_version(&self)   -> Elf64Word { self.e_version   }
+    fn e_entry(&self)     -> Elf64Addr { self.e_entry     }
+    fn e_phoff(&self)     -> Elf64Off  { self.e_phoff     }
+    fn e_shoff(&self)     -> Elf64Off  { self.e_shoff     }
+    fn e_flags(&self)     -> Elf64Word { self.e_flags     }
+    fn e_ehsize(&self)    -> Elf64Half { self.e_ehsize    }
+    fn e_phentsize(&self) -> Elf64Half { self.e_phentsize }
+    fn e_phnum(&self)     -> Elf64Half { self.e_phnum     }
+    fn e_shentsize(&self) -> Elf64Half { self.e_shentsize }
+    fn e_shnum(&self)     -> Elf64Half { self.e_shnum     }
+    fn e_shstrndx(&self)  -> Elf64Half { self.e_shstrndx  }
+}
+
+#[rustfmt::skip]
+impl ElfXXPhdr<Elf64Addr, Elf64Word, Elf64Off, Elf64Xword> for Elf64Phdr {
+    fn p_type(&self)   -> Elf64Word  { self.p_type   }
+    fn p_flags(&self)  -> Elf64Word  { self.p_flags  }
+    fn p_offset(&self) -> Elf64Off   { self.p_offset }
+    fn p_vaddr(&self)  -> Elf64Addr  { self.p_vaddr  }
+    fn p_paddr(&self)  -> Elf64Addr  { self.p_paddr  }
+    fn p_filesz(&self) -> Elf64Xword { self.p_filesz }
+    fn p_memsz(&self)  -> Elf64Xword { self.p_memsz  }
+    fn p_align(&self)  -> Elf64Xword { self.p_align  }
+}
+
+#[rustfmt::skip]
+impl ElfXXShdr<Elf64Addr, Elf64Word, Elf64Off, Elf64Xword> for Elf64Shdr {
+    fn sh_name(&self)      -> Elf64Word  { self.sh_name      }
+    fn sh_type(&self)      -> Elf64Word  { self.sh_type      }
+    fn sh_flags(&self)     -> Elf64Xword { self.sh_flags     }
+    fn sh_addr(&self)      -> Elf64Addr  { self.sh_addr      }
+    fn sh_offset(&self)    -> Elf64Off   { self.sh_offset    }
+    fn sh_size(&self)      -> Elf64Xword { self.sh_size      }
+    fn sh_link(&self)      -> Elf64Word  { self.sh_link      }
+    fn sh_info(&self)      -> Elf64Word  { self.sh_info      }
+    fn sh_addralign(&self) -> Elf64Xword { self.sh_addralign }
+    fn sh_entsize(&self)   -> Elf64Xword { self.sh_entsize   }
 }
 
 pub fn parse(buf: &[u8], ident: &ParsedIdent, elf: &mut ParsedElf) -> Result<(), String> {
