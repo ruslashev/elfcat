@@ -4,6 +4,6 @@ version = "0.1.0"
 authors = ["Ruslan Akbashev <ruslashev@gmail.com>"]
 edition = "2018"
 repository = "https://github.com/ruslashev/elfcat"
-license = "Unlicense"
+license = "Zlib"
 
 [dependencies]
