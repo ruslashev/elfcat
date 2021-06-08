@@ -222,7 +222,7 @@ where
             let parsed = Self::parse_shdr(buf, endianness, &shdr)?;
             let ranges = &mut elf.ranges;
 
-            if parsed.file_offset != 0 && parsed.size != 0 {
+            if parsed.file_offset != 0 && parsed.size != 0 && parsed.shtype != SHT_NOBITS {
                 ranges.add_range(parsed.file_offset, parsed.size, RangeType::Section(i));
             }
 
