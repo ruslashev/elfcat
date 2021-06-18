@@ -41,6 +41,7 @@ pub struct ParsedIdent {
 
 pub struct ParsedElf<'a> {
     pub filename: String,
+    pub file_size: usize,
     pub information: Vec<(&'static str, &'static str, String)>,
     pub contents: &'a [u8],
     pub ranges: Ranges,
@@ -240,6 +241,7 @@ impl ParsedElf<'_> {
 
         let mut elf = ParsedElf {
             filename: filename.to_string(),
+            file_size: buf.len(),
             information: vec![],
             contents: buf,
             ranges: Ranges::new(buf.len()),
@@ -251,7 +253,7 @@ impl ParsedElf<'_> {
             notes: vec![],
         };
 
-        elf.push_file_info(filename, buf.len());
+        elf.push_file_info();
 
         elf.push_ident_info(&ident)?;
 
@@ -270,17 +272,17 @@ impl ParsedElf<'_> {
         Ok(elf)
     }
 
-    fn push_file_info(&mut self, file_name: &str, file_size: usize) {
+    fn push_file_info(&mut self) {
         self.information
-            .push(("file_name", "File name", file_name.to_string()));
+            .push(("file_name", "File name", self.filename.to_string()));
 
-        let file_size_str = if file_size < 1024 {
-            format!("{} B", file_size)
+        let file_size_str = if self.file_size < 1024 {
+            format!("{} B", self.file_size)
         } else {
             format!(
                 "{} ({} B)",
-                crate::utils::human_format_bytes(file_size as u64),
-                file_size
+                crate::utils::human_format_bytes(self.file_size as u64),
+                self.file_size
             )
         };
 

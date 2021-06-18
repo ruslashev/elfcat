@@ -396,6 +396,18 @@ fn add_conceal_script(o: &mut String) {
     w!(o, 2, "</script>");
 }
 
+fn add_offsets_script(o: &mut String, elf: &ParsedElf) {
+    w!(o, 2, "<script type='text/javascript'>");
+
+    w!(o, 3, "let fileLen = {}", elf.file_size);
+
+    wnonl!(o, 0, "{}", include_str!("js/offsets.js").indent_lines(3));
+
+    w!(o, 3, "populateOffsets(16)");
+
+    w!(o, 2, "</script>");
+}
+
 fn add_arrows_script(o: &mut String, elf: &ParsedElf) {
     w!(o, 2, "<script type='text/javascript'>");
 
@@ -445,6 +457,8 @@ fn add_scripts(o: &mut String, elf: &ParsedElf) {
 
     // disabled while working on section headers because it doesn't work for nested elements
     // add_collapsible_script(o);
+
+    add_offsets_script(o, elf);
 
     add_arrows_script(o, elf);
 }
@@ -600,11 +614,7 @@ fn generate_body(o: &mut String, elf: &ParsedElf) {
 
     generate_file_info_table(o, elf);
 
-    w!(o, 2, "<div id='offsets'>");
-    for off in (0..elf.contents.len()).step_by(16) {
-        w!(o, 3, "{:x}</br>", off);
-    }
-    w!(o, 2, "</div>");
+    w!(o, 2, "<div id='offsets'></div>");
 
     w!(o, 2, "<div id='bytes'>");
     wnonl!(o, 0, "{}", generate_file_dump(elf));
