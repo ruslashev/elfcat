@@ -636,10 +636,6 @@ fn generate_body(o: &mut String, elf: &ParsedElf) {
     generate_ascii_dump(o, elf);
     w!(o, 2, "</div>");
 
-    w!(o, 2, "<div id='vmap'>");
-    w!(o, 3, "under_construction.gif");
-    w!(o, 2, "</div>");
-
     generate_sticky_info_table(o, elf);
 
     add_scripts(o, elf);
