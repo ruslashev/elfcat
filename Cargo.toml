@@ -1,9 +1,8 @@
 [package]
 name = "elfcat"
 version = "0.1.0"
+description = "ELF visualizer. Generates HTML files from ELF binaries."
 authors = ["Ruslan Akbashev <ruslashev@gmail.com>"]
 edition = "2018"
 repository = "https://github.com/ruslashev/elfcat"
 license = "Zlib"
-
-[dependencies]
