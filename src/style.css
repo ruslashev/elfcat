@@ -2,6 +2,22 @@
   font-family: monospace;
   font-size: 0.8rem;
 }
+#headertable {
+  width: 100%;
+}
+#rightmenu {
+  vertical-align: top;
+  text-align: right;
+}
+#rightmenu > * {
+  margin-top: 0px;
+}
+#credits {
+  color: #ddd;
+}
+#credits:hover {
+  color: #000;
+}
 #desc {
   width: 250px;
 }

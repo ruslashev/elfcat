@@ -100,16 +100,16 @@ fn generate_svg_element(o: &mut String) {
 }
 
 fn generate_file_info_table(o: &mut String, elf: &ParsedElf) {
-    w!(o, 2, "<table>");
+    w!(o, 4, "<table>");
 
     for (id, desc, value) in elf.information.iter() {
-        wnonl!(o, 3, "<tr id='info_{}'> ", id);
+        wnonl!(o, 5, "<tr id='info_{}'> ", id);
         wnonl!(o, 0, "<td>{}:</td> ", desc);
         wnonl!(o, 0, "<td>{}</td> ", value);
         w!(o, 0, "</tr>");
     }
 
-    w!(o, 2, "</table>");
+    w!(o, 4, "</table>");
 }
 
 fn generate_phdr_info_table(o: &mut String, phdr: &ParsedPhdr, idx: usize) {
@@ -612,7 +612,19 @@ fn generate_body(o: &mut String, elf: &ParsedElf) {
 
     generate_svg_element(o);
 
+    w!(o, 2, "<table id='headertable'>");
+    w!(o, 3, "<td>");
     generate_file_info_table(o, elf);
+    w!(o, 3, "</td>");
+    w!(o, 3, "<td id='rightmenu'>");
+    w!(
+        o,
+        4,
+        "<p id='credits'>generated with elfcat {}</p>",
+        env!("CARGO_PKG_VERSION")
+    );
+    w!(o, 3, "</td>");
+    w!(o, 2, "</table>");
 
     w!(o, 2, "<div id='offsets'></div>");
 
