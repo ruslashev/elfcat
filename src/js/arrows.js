@@ -83,3 +83,7 @@ function redrawArrows() {
     }
 }
 
+window.onresize = function() {
+    redrawArrows();
+}
+

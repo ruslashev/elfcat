@@ -70,6 +70,7 @@ fn generate_head(o: &mut String, elf: &ParsedElf) {
 
     w!(o, 1, "<head>");
     w!(o, 2, "<meta charset='utf-8'>");
+    w!(o, 2, "<meta name='viewport' content='width=900, initial-scale=1'>");
     w!(o, 2, "<title>{}</title>", basename(&elf.filename));
     w!(o, 2, "<style>");
     wnonl!(o, 0, "{}", stylesheet);
