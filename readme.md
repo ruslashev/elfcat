@@ -5,9 +5,9 @@ elfcat - ELF visualizer. Generates HTML files from ELF binaries.
        $ cargo install elfcat
        $ elfcat path/to/file
 
-2. How does it look like?
+2. What does it look like?
 
-   This is how the following small example ELF file looks like:
+   This is what the following small example ELF file looks like:
 
    http://ruslashev.github.io/elfcat/hello_world.html
 
