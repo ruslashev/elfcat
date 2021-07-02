@@ -117,11 +117,7 @@ where
     fn push_ehdr_info(ehdr: &EhdrT, information: &mut Vec<InfoTuple>) {
         information.push(("e_type", "Type", type_to_string(ehdr.e_type().into())));
 
-        information.push((
-            "e_machine",
-            "Architecture",
-            machine_to_string(ehdr.e_machine().into()),
-        ));
+        information.push(("e_machine", "Architecture", machine_to_string(ehdr.e_machine().into())));
 
         information.push(("e_entry", "Entrypoint", format!("0x{:x}", ehdr.e_entry())));
 

@@ -394,12 +394,7 @@ fn add_highlight_script(o: &mut String) {
 fn add_description_script(o: &mut String) {
     w!(o, 2, "<script type='text/javascript'>");
 
-    wnonl!(
-        o,
-        0,
-        "{}",
-        include_str!("js/description.js").indent_lines(3)
-    );
+    wnonl!(o, 0, "{}", include_str!("js/description.js").indent_lines(3));
 
     w!(o, 2, "</script>");
 }
@@ -433,23 +428,11 @@ fn add_arrows_script(o: &mut String, elf: &ParsedElf) {
     w!(o, 3, "connect('#e_shoff', '#bin_shdr0');");
 
     for i in 0..elf.phdrs.len() {
-        w!(
-            o,
-            3,
-            "connect('#bin_phdr{} > .p_offset', '#bin_segment{}');",
-            i,
-            i
-        );
+        w!(o, 3, "connect('#bin_phdr{} > .p_offset', '#bin_segment{}');", i, i);
     }
 
     for i in 0..elf.shdrs.len() {
-        w!(
-            o,
-            3,
-            "connect('#bin_shdr{} > .sh_offset', '#bin_section{}');",
-            i,
-            i
-        );
+        w!(o, 3, "connect('#bin_shdr{} > .sh_offset', '#bin_section{}');", i, i);
     }
 
     w!(o, 2, "</script>");
@@ -590,11 +573,8 @@ fn generate_file_dump(elf: &ParsedElf) -> String {
         // disable while working on offsets
         if false && balance == 1 {
             if let Some(new_idx) = skip_bytes(i, len, elf) {
-                dump += format!(
-                    "<span {}>..</span>",
-                    elf.ranges.data[i][0].span_attributes()
-                )
-                .as_str();
+                dump +=
+                    format!("<span {}>..</span>", elf.ranges.data[i][0].span_attributes()).as_str();
 
                 dump += if (i + 1) % 16 == 0 { "\n" } else { " " };
 
