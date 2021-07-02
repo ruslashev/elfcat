@@ -82,10 +82,11 @@ where
     ShdrT: ElfHeader + ElfXXShdr<ElfXXAddr, ElfXXWord, ElfXXOff, ElfXXXword>,
     u32: From<ElfXXWord>,
     u64: From<ElfXXXword>,
-    ElfXXAddr: std::convert::TryInto<usize> + std::fmt::LowerHex,
-    ElfXXHalf: std::convert::Into<u16> + std::fmt::Display,
+    // This is a bit of a mess
+    ElfXXAddr: std::convert::TryInto<usize> + std::fmt::Display + std::fmt::LowerHex,
+    ElfXXHalf: std::convert::Into<u16> + std::fmt::Display + std::fmt::LowerHex,
     ElfXXWord: std::convert::TryInto<usize> + std::fmt::LowerHex,
-    ElfXXOff: std::convert::TryInto<usize> + std::fmt::Display,
+    ElfXXOff: std::convert::TryInto<usize> + std::fmt::Display + std::fmt::LowerHex,
     ElfXXXword: std::convert::TryInto<usize>,
 {
     fn parse(buf: &[u8], ident: &ParsedIdent, elf: &mut ParsedElf) -> Result<(), String> {
@@ -119,17 +120,24 @@ where
 
         information.push(("e_machine", "Architecture", machine_to_string(ehdr.e_machine().into())));
 
-        information.push(("e_entry", "Entrypoint", format!("0x{:x}", ehdr.e_entry())));
+        information.push((
+            "e_entry",
+            "Entrypoint",
+            format!("<span class='number' title='{}'>{:#x}</span>", ehdr.e_entry(), ehdr.e_entry()),
+        ));
 
         information.push((
             "ph",
             "Program headers",
             format!(
-                "<span id='info_e_phnum'>{}</span> * \
-                 <span id='info_e_phentsize'>{}</span> @ \
-                 <span id='info_e_phoff'>{}</span>",
+                "<span class='number' title='{:#x}' id='info_e_phnum'>{}</span> * \
+                 <span class='number' title='{:#x}' id='info_e_phentsize'>{}</span> @ \
+                 <span class='number' title='{:#x}' id='info_e_phoff'>{}</span>",
+                ehdr.e_phnum(),
                 ehdr.e_phnum(),
                 ehdr.e_phentsize(),
+                ehdr.e_phentsize(),
+                ehdr.e_phoff(),
                 ehdr.e_phoff()
             ),
         ));
@@ -138,17 +146,20 @@ where
             "sh",
             "Section headers",
             format!(
-                "<span id='info_e_shnum'>{}</span> * \
-                 <span id='info_e_shentsize'>{}</span> @ \
-                 <span id='info_e_shoff'>{}</span>",
+                "<span class='number' title='{:#x}' id='info_e_shnum'>{}</span> * \
+                 <span class='number' title='{:#x}' id='info_e_shentsize'>{}</span> @ \
+                 <span class='number' title='{:#x}' id='info_e_shoff'>{}</span>",
+                ehdr.e_shnum(),
                 ehdr.e_shnum(),
                 ehdr.e_shentsize(),
+                ehdr.e_shentsize(),
+                ehdr.e_shoff(),
                 ehdr.e_shoff()
             ),
         ));
 
         if u32::from(ehdr.e_flags()) != 0 {
-            information.push(("e_flags", "Flags", format!("0x{:x}", ehdr.e_flags())));
+            information.push(("e_flags", "Flags", format!("{:#x}", ehdr.e_flags())));
         }
     }
 

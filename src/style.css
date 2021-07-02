@@ -53,6 +53,9 @@ html {
 .textbutton:hover::after {
   color: #222;
 }
+.number {
+  text-decoration: underline dotted #888;
+}
 #desc {
   width: 250px;
 }

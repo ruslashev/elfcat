@@ -42,6 +42,18 @@ impl Indentable for str {
     }
 }
 
+macro_rules! hex_dualfmt {
+    ($id:expr) => {
+        format!("<span class='number' title='{}'>{:#x}</span>", $id, $id)
+    };
+}
+
+macro_rules! dec_dualfmt {
+    ($id:expr) => {
+        format!("<span class='number' title='{:#x}'>{}</span>", $id, $id)
+    };
+}
+
 macro_rules! wrow {
     ($dst:expr, $indent_level:expr, $lhs:expr, $rhs:expr) => {
         wnonl!($dst, $indent_level, "<tr> ");
@@ -132,11 +144,11 @@ fn generate_phdr_info_table(o: &mut String, phdr: &ParsedPhdr, idx: usize) {
     let items = [
         ("Type", &ptype_to_string(phdr.ptype)),
         ("Flags", &phdr.flags),
-        ("Offset in file", &format!("{}", phdr.file_offset)),
-        ("Size in file", &format!("{}", phdr.file_size)),
-        ("Vaddr in memory", &format!("{:#x}", phdr.vaddr)),
-        ("Size in memory", &format!("{:#x}", phdr.memsz)),
-        ("Alignment", &format!("{:#x}", phdr.alignment)),
+        ("Offset in file", &hex_dualfmt!(phdr.file_offset)),
+        ("Size in file", &dec_dualfmt!(phdr.file_size)),
+        ("Vaddr in memory", &hex_dualfmt!(phdr.vaddr)),
+        ("Size in memory", &hex_dualfmt!(phdr.memsz)),
+        ("Alignment", &hex_dualfmt!(phdr.alignment)),
     ];
 
     w!(o, 5, "<table class='conceal' id='info_phdr{}'>", idx);
@@ -159,13 +171,13 @@ fn generate_shdr_info_table(o: &mut String, elf: &ParsedElf, shdr: &ParsedShdr, 
         ("Name", elf.shnstrtab.get(shdr.name)),
         ("Type", &shtype_to_string(shdr.shtype)),
         ("Flags", &shflags_to_string(shdr.flags)),
-        ("Vaddr in memory", &format!("{:#x}", shdr.addr)),
-        ("Offset in file", &format!("{}", shdr.file_offset)),
-        ("Size in file", &format!("{}", shdr.size)),
+        ("Vaddr in memory", &hex_dualfmt!(shdr.addr)),
+        ("Offset in file", &hex_dualfmt!(shdr.file_offset)),
+        ("Size in file", &dec_dualfmt!(shdr.size)),
         ("Linked section", &format!("{}", shdr.link)),
-        ("Extra info", &format!("{}", shdr.link)),
-        ("Alignment", &format!("{:#x}", shdr.addralign)),
-        ("Size of entries", &format!("{}", shdr.entsize)),
+        ("Extra info", &dec_dualfmt!(shdr.link)),
+        ("Alignment", &hex_dualfmt!(shdr.addralign)),
+        ("Size of entries", &dec_dualfmt!(shdr.entsize)),
     ];
 
     w!(o, 5, "<table class='conceal' id='info_shdr{}'>", idx);
@@ -311,8 +323,8 @@ fn generate_segment_info_tables(o: &mut String, elf: &ParsedElf) {
     for (idx, phdr) in elf.phdrs.iter().enumerate() {
         w!(o, 5, "<table class='conceal' id='info_segment{}'>", idx);
         wrow!(o, 6, "Segment type", &ptype_to_string(phdr.ptype));
-        wrow!(o, 6, "Size in file", phdr.file_size);
-        wrow!(o, 6, "Size in memory", phdr.memsz);
+        wrow!(o, 6, "Size in file", dec_dualfmt!(phdr.file_size));
+        wrow!(o, 6, "Size in memory", dec_dualfmt!(phdr.memsz));
 
         if has_segment_detail(phdr.ptype) {
             w!(o, 6, "<tr><td><br></td></tr>");
@@ -327,7 +339,7 @@ fn generate_section_info_tables(o: &mut String, elf: &ParsedElf) {
     for (idx, shdr) in elf.shdrs.iter().enumerate() {
         w!(o, 5, "<table class='conceal' id='info_section{}'>", idx);
         wrow!(o, 6, "Section type", &shtype_to_string(shdr.shtype));
-        wrow!(o, 6, "Size", shdr.size);
+        wrow!(o, 6, "Size", dec_dualfmt!(shdr.size));
 
         if has_section_detail(shdr.shtype) {
             w!(o, 6, "<tr><td><br></td></tr>");
