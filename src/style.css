@@ -22,6 +22,7 @@ html {
   width: 8em;
 }
 .right_hidden {
+  text-align: left;
   display: none;
 }
 .textbutton {
@@ -50,6 +51,9 @@ html {
 }
 .textbutton:hover::after {
   color: #222;
+}
+label, input {
+  vertical-align: middle;
 }
 .number {
   text-decoration: underline dotted #888;
