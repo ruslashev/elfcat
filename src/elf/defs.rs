@@ -1,4 +1,4 @@
-#![cfg_attr(debug_assertions, allow(dead_code))]
+#![allow(dead_code)]
 
 pub const ELF_EI_MAG0: u8 = 0;
 pub const ELF_EI_MAG1: u8 = 1;
