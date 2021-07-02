@@ -7,9 +7,7 @@ html {
 #rightmenu {
   vertical-align: top;
   text-align: right;
-}
-#rightmenu > * {
-  margin-top: 0px;
+  float: right;
 }
 #credits {
   color: #ddd;

@@ -114,30 +114,30 @@ fn generate_svg_element(o: &mut String) {
 }
 
 fn generate_file_info_table(o: &mut String, elf: &ParsedElf) {
-    w!(o, 4, "<table>");
+    w!(o, 2, "<table>");
 
     for (id, desc, value) in elf.information.iter() {
-        wnonl!(o, 5, "<tr id='info_{}'> ", id);
+        wnonl!(o, 3, "<tr id='info_{}'> ", id);
         wnonl!(o, 0, "<td>{}:</td> ", desc);
         wnonl!(o, 0, "<td>{}</td> ", value);
         w!(o, 0, "</tr>");
     }
 
-    w!(o, 4, "</table>");
+    w!(o, 2, "</table>");
 }
 
 fn generate_right_menu(o: &mut String) {
     let credits = format!("generated with elfcat {}", env!("CARGO_PKG_VERSION"));
     let url = "https://github.com/ruslashev/elfcat";
 
-    w!(o, 4, "<a id='credits' href='{}'>{}</a>", url, credits);
+    w!(o, 3, "<a id='credits' href='{}'>{}</a>", url, credits);
 
-    w!(o, 4, "<button class='textbutton' id='settings_toggle'>Settings</button>");
+    w!(o, 3, "<button class='textbutton' id='settings_toggle'>Settings</button>");
 
-    w!(o, 4, "<div class='right_hidden' id='settings'>");
-    w!(o, 5, "<label for='arrow_opacity_range'>Arrow opacity:</label>");
-    w!(o, 5, "<input type='range' id='arrow_opacity_range' min='0' max='100' value='100'>");
-    w!(o, 4, "</div>");
+    w!(o, 3, "<div class='right_hidden' id='settings'>");
+    w!(o, 4, "<label for='arrow_opacity_range'>Arrow opacity:</label>");
+    w!(o, 4, "<input type='range' id='arrow_opacity_range' min='0' max='100' value='100'>");
+    w!(o, 3, "</div>");
 }
 
 fn generate_phdr_info_table(o: &mut String, phdr: &ParsedPhdr, idx: usize) {
@@ -630,14 +630,11 @@ fn generate_body(o: &mut String, elf: &ParsedElf) {
 
     generate_svg_element(o);
 
-    w!(o, 2, "<table id='headertable'>");
-    w!(o, 3, "<td>");
-    generate_file_info_table(o, elf);
-    w!(o, 3, "</td>");
-    w!(o, 3, "<td id='rightmenu'>");
+    w!(o, 2, "<div id='rightmenu'>");
     generate_right_menu(o);
-    w!(o, 3, "</td>");
-    w!(o, 2, "</table>");
+    w!(o, 2, "</div>");
+
+    generate_file_info_table(o, elf);
 
     w!(o, 2, "<div id='offsets'></div>");
 
