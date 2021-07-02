@@ -119,6 +119,13 @@ fn generate_right_menu(o: &mut String) {
     let url = "https://github.com/ruslashev/elfcat";
 
     w!(o, 4, "<a id='credits' href='{}'>{}</a>", url, credits);
+
+    w!(o, 4, "<button class='textbutton' id='settings_toggle'>Settings</button>");
+
+    w!(o, 4, "<div class='right_hidden' id='settings'>");
+    w!(o, 5, "<label for='arrow_opacity_range'>Arrow opacity:</label>");
+    w!(o, 5, "<input type='range' id='arrow_opacity_range' min='0' max='100' value='100'>");
+    w!(o, 4, "</div>");
 }
 
 fn generate_phdr_info_table(o: &mut String, phdr: &ParsedPhdr, idx: usize) {
@@ -457,6 +464,14 @@ fn add_collapsible_script(o: &mut String) {
     w!(o, 2, "</script>");
 }
 
+fn add_settings_script(o: &mut String) {
+    w!(o, 2, "<script type='text/javascript'>");
+
+    wnonl!(o, 0, "{}", include_str!("js/settings.js").indent_lines(3));
+
+    w!(o, 2, "</script>");
+}
+
 fn add_scripts(o: &mut String, elf: &ParsedElf) {
     add_highlight_script(o);
 
@@ -470,6 +485,8 @@ fn add_scripts(o: &mut String, elf: &ParsedElf) {
     add_offsets_script(o, elf);
 
     add_arrows_script(o, elf);
+
+    add_settings_script(o);
 }
 
 fn format_magic(byte: u8) -> String {

@@ -14,11 +14,44 @@ html {
 #credits {
   color: #ddd;
   text-decoration: none;
-  margin-bottom: 1em;
+  margin-bottom: 0.5em;
   display: block;
 }
 #credits:hover {
   color: #000;
+}
+#arrow_opacity_range {
+  width: 8em;
+}
+.right_hidden {
+  display: none;
+}
+.textbutton {
+  color: #222;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  margin-bottom: 0.5em;
+}
+.textbutton::before {
+  content: "[";
+}
+.textbutton::after {
+  content: "]";
+}
+.textbutton:hover {
+  color: #922;
+}
+.textbutton:active {
+  color: #d11;
+}
+.textbutton:hover::before {
+  color: #222;
+}
+.textbutton:hover::after {
+  color: #222;
 }
 #desc {
   width: 250px;
