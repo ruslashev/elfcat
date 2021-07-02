@@ -113,6 +113,13 @@ fn generate_file_info_table(o: &mut String, elf: &ParsedElf) {
     w!(o, 4, "</table>");
 }
 
+fn generate_right_menu(o: &mut String) {
+    let credits = format!("generated with elfcat {}", env!("CARGO_PKG_VERSION"));
+    let url = "https://github.com/ruslashev/elfcat";
+
+    w!(o, 4, "<a id='credits' href='{}'>{}</a>", url, credits);
+}
+
 fn generate_phdr_info_table(o: &mut String, phdr: &ParsedPhdr, idx: usize) {
     let items = [
         ("Type", &ptype_to_string(phdr.ptype)),
@@ -618,12 +625,7 @@ fn generate_body(o: &mut String, elf: &ParsedElf) {
     generate_file_info_table(o, elf);
     w!(o, 3, "</td>");
     w!(o, 3, "<td id='rightmenu'>");
-    w!(
-        o,
-        4,
-        "<p id='credits'>generated with elfcat {}</p>",
-        env!("CARGO_PKG_VERSION")
-    );
+    generate_right_menu(o);
     w!(o, 3, "</td>");
     w!(o, 2, "</table>");
 

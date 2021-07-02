@@ -13,6 +13,9 @@ html {
 }
 #credits {
   color: #ddd;
+  text-decoration: none;
+  margin-bottom: 1em;
+  display: block;
 }
 #credits:hover {
   color: #000;
