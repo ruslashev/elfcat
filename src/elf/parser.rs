@@ -91,6 +91,8 @@ impl RangeType {
     // this is a bit of a clusterfuck
     fn needs_class(&self) -> bool {
         match self {
+            RangeType::Ident => true,
+            RangeType::FileHeader => true,
             RangeType::ProgramHeader(_) => true,
             RangeType::SectionHeader(_) => true,
             RangeType::PhdrField(_) => true,
@@ -115,8 +117,6 @@ impl RangeType {
 
     fn id(&self) -> String {
         match self {
-            RangeType::Ident => String::from("ident"),
-            RangeType::FileHeader => String::from("ehdr"),
             RangeType::ProgramHeader(idx) => format!("bin_phdr{}", idx),
             RangeType::SectionHeader(idx) => format!("bin_shdr{}", idx),
             RangeType::HeaderField(class) => String::from(*class),
@@ -128,6 +128,8 @@ impl RangeType {
 
     fn class(&self) -> String {
         match self {
+            RangeType::Ident => String::from("ident"),
+            RangeType::FileHeader => String::from("ehdr"),
             RangeType::ProgramHeader(_) => String::from("phdr"),
             RangeType::SectionHeader(_) => String::from("shdr"),
             RangeType::PhdrField(field) => format!("{} phdr_hover", field),
