@@ -55,6 +55,35 @@ html {
 label, input {
   vertical-align: middle;
 }
+.legend_rect {
+  float: left;
+  margin-right: 0.4em;
+  width: 3em;
+  height: 1.5em;
+  border: 1px solid rgba(0, 0, 0, .2);
+}
+ul {
+  list-style: none;
+  padding: 0em;
+}
+#help > p {
+  margin-top: 0em;
+  margin-bottom: 0.5em;
+  width: 29em;
+}
+#help > ul {
+  margin-top: 0em;
+}
+#help > p + p {
+  margin-top: 1em;
+}
+li {
+  clear: left;
+  height: 2em;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
 .number {
   text-decoration: underline dotted #888;
 }
@@ -162,7 +191,7 @@ label, input {
   background-color: #f9f;
 }
 /* there are only sections inside segments due to code */
-.segment > .section {
+.segment > .section, .segm_sect_legend {
   background: repeating-linear-gradient(
     -45deg,
     #f99,

@@ -126,6 +126,32 @@ fn generate_file_info_table(o: &mut String, elf: &ParsedElf) {
     w!(o, 2, "</table>");
 }
 
+fn generate_help(o: &mut String) {
+    let legend_items = [
+        ("ident", "ELF Identification"),
+        ("ehdr", "ELF Header"),
+        ("phdr", "Program Header"),
+        ("shdr", "Section Header"),
+        ("segment", "Segment"),
+        ("section", "Section"),
+        ("segm_sect_legend", "Segment &amp; Section overlap"),
+    ];
+    let help_text = "The leftmost column shows offsets within the file. \
+                     The middle column is the file dump. It has ELF structs, sections and segments \
+                     highlighted. Some fields that reference areas in the file are clickable and \
+                     connected with arrows. The rightmost column shows printable ASCII characters \
+                     corresponding to the file bytes.";
+
+    w!(o, 4, "<p>{}</p>", help_text);
+
+    w!(o, 4, "<p>Legend</p>");
+    w!(o, 4, "<ul>");
+    for (class, desc) in legend_items {
+        w!(o, 5, "<li><span class='legend_rect {}'></span>{}</li>", class, desc);
+    }
+    w!(o, 4, "</ul>");
+}
+
 fn generate_right_menu(o: &mut String) {
     let credits = format!("generated with elfcat {}", env!("CARGO_PKG_VERSION"));
     let url = "https://github.com/ruslashev/elfcat";
@@ -134,9 +160,15 @@ fn generate_right_menu(o: &mut String) {
 
     w!(o, 3, "<button class='textbutton' id='settings_toggle'>Settings</button>");
 
+    w!(o, 3, "<button class='textbutton' id='help_toggle'>Help</button>");
+
     w!(o, 3, "<div class='right_hidden' id='settings'>");
     w!(o, 4, "<label for='arrow_opacity_range'>Arrow opacity:</label>");
     w!(o, 4, "<input type='range' id='arrow_opacity_range' min='0' max='100' value='100'>");
+    w!(o, 3, "</div>");
+
+    w!(o, 3, "<div class='right_hidden' id='help'>");
+    generate_help(o);
     w!(o, 3, "</div>");
 }
 

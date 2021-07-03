@@ -144,5 +144,7 @@ document.addEventListener("mouseover", function (e) {
 
     var target = event.target || event.srcElement;
 
-    document.getElementById('desc').innerHTML = iterateParents(target);
+    if (!target.classList.contains('legend_rect')) {
+        document.getElementById('desc').innerHTML = iterateParents(target);
+    }
 }, false);

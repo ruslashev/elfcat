@@ -1,4 +1,5 @@
 const settings = document.getElementById('settings');
+const help = document.getElementById('help');
 const arrows = document.getElementById('arrows');
 const arrow_input = document.getElementById('arrow_opacity_range');
 
@@ -12,6 +13,14 @@ function toggleVisibility(elem) {
 
 document.getElementById('settings_toggle').onclick = function() {
     toggleVisibility(settings);
+
+    help.style.display = "none";
+}
+
+document.getElementById('help_toggle').onclick = function() {
+    toggleVisibility(help);
+
+    settings.style.display = "none";
 }
 
 function setArrowOpacity(e) {
