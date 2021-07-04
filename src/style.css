@@ -64,15 +64,15 @@ label, input {
 }
 ul {
   list-style: none;
-  padding: 0em;
+  padding: 0;
 }
 #help > p {
-  margin-top: 0em;
+  margin-top: 0;
   margin-bottom: 0.5em;
   width: 29em;
 }
 #help > ul {
-  margin-top: 0em;
+  margin-top: 0;
 }
 #help > p + p {
   margin-top: 1em;
@@ -91,10 +91,10 @@ li {
   width: 250px;
 }
 #struct_infotables {
-  padding-right: 0px;
+  padding-right: 0;
 }
 #data_infotables {
-  padding-left: 0px;
+  padding-left: 0;
 }
 .conceal {
   display: none;
@@ -213,8 +213,8 @@ li {
 
 svg {
   position: absolute;
-  left: 0px;
-  right: 0px;
+  left: 0;
+  right: 0;
   pointer-events: none;
   overflow: visible;
 }
