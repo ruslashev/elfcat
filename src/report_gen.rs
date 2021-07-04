@@ -184,7 +184,7 @@ fn generate_phdr_info_table(o: &mut String, phdr: &ParsedPhdr, idx: usize) {
         ("Alignment", &hex_dualfmt!(phdr.alignment)),
     ];
 
-    w!(o, 5, "<table class='conceal' id='info_phdr{}'>", idx);
+    w!(o, 5, "<table class='conceal valign_top' id='info_phdr{}'>", idx);
 
     for (desc, value) in items.iter() {
         wrow!(o, 6, desc, value);
@@ -213,7 +213,7 @@ fn generate_shdr_info_table(o: &mut String, elf: &ParsedElf, shdr: &ParsedShdr, 
         ("Size of entries", &dec_dualfmt!(shdr.entsize)),
     ];
 
-    w!(o, 5, "<table class='conceal' id='info_shdr{}'>", idx);
+    w!(o, 5, "<table class='conceal valign_top' id='info_shdr{}'>", idx);
 
     for (desc, value) in items.iter() {
         wrow!(o, 6, desc, value);
@@ -354,7 +354,7 @@ fn has_section_detail(ptype: u32) -> bool {
 
 fn generate_segment_info_tables(o: &mut String, elf: &ParsedElf) {
     for (idx, phdr) in elf.phdrs.iter().enumerate() {
-        w!(o, 5, "<table class='conceal' id='info_segment{}'>", idx);
+        w!(o, 5, "<table class='conceal valign_top' id='info_segment{}'>", idx);
         wrow!(o, 6, "Segment type", &ptype_to_string(phdr.ptype));
         wrow!(o, 6, "Size in file", dec_dualfmt!(phdr.file_size));
         wrow!(o, 6, "Size in memory", dec_dualfmt!(phdr.memsz));
@@ -370,7 +370,7 @@ fn generate_segment_info_tables(o: &mut String, elf: &ParsedElf) {
 
 fn generate_section_info_tables(o: &mut String, elf: &ParsedElf) {
     for (idx, shdr) in elf.shdrs.iter().enumerate() {
-        w!(o, 5, "<table class='conceal' id='info_section{}'>", idx);
+        w!(o, 5, "<table class='conceal valign_top' id='info_section{}'>", idx);
         wrow!(o, 6, "Section type", &shtype_to_string(shdr.shtype));
         wrow!(o, 6, "Size", dec_dualfmt!(shdr.size));
 

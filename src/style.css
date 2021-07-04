@@ -132,7 +132,7 @@ li {
   position: sticky;
   top: 8px;
 }
-#sticky_table > * {
+#desc, .valign_top {
   vertical-align: top;
 }
 .hover:hover {
@@ -142,14 +142,13 @@ li {
 .ident {
   background-color: #e99;
 }
-/* highlight children */
-.ident:hover > * {
+/* highlight fields */
+.ident:hover > span {
   background-color: #ebb;
 }
-/* duplicate of .hover:hover with more specifity.
- * used for elements like #magic, for whom
- * rule .ident:hover > * would override .hover:hover rule */
-.ident:hover > *.hover:hover {
+/* Duplicate of .hover:hover with more specifity. Used for elements like `#magic', for whom
+ * rule `.ident:hover > span' would override rule `.hover:hover' */
+.ident:hover > span.hover:hover {
   background-color: #ee9;
 }
 
@@ -157,30 +156,30 @@ li {
 .ehdr {
   background-color: #99e;
 }
-.ehdr:hover > *:not(.ident) {
+.ehdr:hover > span:not(.ident) {
   background-color: #bbe;
 }
-.ehdr:hover > *.hover:hover:not(.ident) {
+.ehdr:hover > span.hover:hover:not(.ident) {
   background-color: #ee9;
 }
 
 .phdr {
   background-color: #eb9;
 }
-.phdr:hover > * {
+.phdr:hover > span {
   background-color: #ed9;
 }
-.phdr_hover:hover {
+.phdr:hover > span:hover {
   background-color: #ef9;
 }
 
 .shdr {
   background-color: #9be;
 }
-.shdr:hover > * {
+.shdr:hover > span {
   background-color: #9de;
 }
-.shdr_hover:hover {
+.shdr:hover > span:hover {
   background-color: #9fe;
 }
 
@@ -201,12 +200,12 @@ li {
   );
 }
 /* another duplicate of .hover:hover with more specifity */
-.segment > .section.hover:hover {
+.segment > .section:hover {
   background: initial;
   background-color: #ee9;
 }
 
-.segment > .segment_subrange.hover:hover {
+.segment > .segment_subrange:hover {
   background: initial;
   background-color: #f59;
 }
