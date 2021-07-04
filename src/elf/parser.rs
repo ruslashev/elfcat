@@ -88,90 +88,19 @@ pub struct StrTab<'a> {
 }
 
 impl RangeType {
-    // this is a bit of a clusterfuck
-    fn needs_class(&self) -> bool {
-        match self {
-            RangeType::Ident => true,
-            RangeType::FileHeader => true,
-            RangeType::ProgramHeader(_) => true,
-            RangeType::SectionHeader(_) => true,
-            RangeType::PhdrField(_) => true,
-            RangeType::ShdrField(_) => true,
-            RangeType::Segment(_) => true,
-            RangeType::Section(_) => true,
-            RangeType::SegmentSubrange => true,
-            _ => false,
-        }
-    }
-
-    // for those who need_class()
-    fn needs_id(&self) -> bool {
-        match self {
-            RangeType::ProgramHeader(_) => true,
-            RangeType::SectionHeader(_) => true,
-            RangeType::Segment(_) => true,
-            RangeType::Section(_) => true,
-            _ => false,
-        }
-    }
-
-    fn id(&self) -> String {
-        match self {
-            RangeType::ProgramHeader(idx) => format!("bin_phdr{}", idx),
-            RangeType::SectionHeader(idx) => format!("bin_shdr{}", idx),
-            RangeType::HeaderField(class) => String::from(*class),
-            RangeType::Segment(idx) => format!("bin_segment{}", idx),
-            RangeType::Section(idx) => format!("bin_section{}", idx),
-            _ => String::new(),
-        }
-    }
-
-    fn class(&self) -> String {
-        match self {
-            RangeType::Ident => String::from("ident"),
-            RangeType::FileHeader => String::from("ehdr"),
-            RangeType::ProgramHeader(_) => String::from("phdr"),
-            RangeType::SectionHeader(_) => String::from("shdr"),
-            RangeType::PhdrField(field) => String::from(*field),
-            RangeType::ShdrField(field) => String::from(*field),
-            RangeType::Segment(_) => String::from("segment"),
-            RangeType::Section(_) => String::from("section"),
-            RangeType::SegmentSubrange => String::from("segment_subrange"),
-            _ => String::new(),
-        }
-    }
-
-    fn always_highlight(&self) -> bool {
-        match self {
-            RangeType::Section(_) => true,
-            RangeType::SegmentSubrange => true,
-            _ => false,
-        }
-    }
-
     pub fn span_attributes(&self) -> String {
-        if self.needs_class() {
-            format!(
-                "{}class='{}{}'",
-                if self.needs_id() {
-                    format!("id='{}' ", self.id())
-                } else {
-                    String::new()
-                },
-                self.class(),
-                if self.always_highlight() {
-                    " hover"
-                } else {
-                    ""
-                }
-            )
-        } else {
-            format!("id='{}'", self.id())
-                + if self.always_highlight() {
-                    " class='hover'"
-                } else {
-                    ""
-                }
+        match self {
+            RangeType::Ident => format!("class='ident'"),
+            RangeType::FileHeader => format!("class='ehdr'"),
+            RangeType::HeaderField(field) => format!("id='{}'", field),
+            RangeType::ProgramHeader(idx) => format!("id='bin_phdr{}' class='phdr'", idx),
+            RangeType::SectionHeader(idx) => format!("id='bin_shdr{}' class='shdr'", idx),
+            RangeType::PhdrField(field) => format!("class='{}'", field),
+            RangeType::ShdrField(field) => format!("class='{}'", field),
+            RangeType::Segment(idx) => format!("id='bin_segment{}' class='segment'", idx),
+            RangeType::Section(idx) => format!("id='bin_section{}' class='section hover'", idx),
+            RangeType::SegmentSubrange => format!("class='segment_subrange hover'"),
+            _ => String::new(),
         }
     }
 
