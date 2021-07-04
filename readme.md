@@ -72,6 +72,8 @@ elfcat - ELF visualizer. Generates HTML files from ELF binaries.
 
 6. Upcoming features?
 
+   * Fix slow initial page load and janky layout on Chrome
+
    * Ability to tune the width instead of hardcoded 16 bytes
 
    * Visualization of virtual memory mappings
