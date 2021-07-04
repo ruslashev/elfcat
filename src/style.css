@@ -148,7 +148,7 @@ li {
 }
 /* Duplicate of .hover:hover with more specifity. Used for elements like `#magic', for whom
  * rule `.ident:hover > span' would override rule `.hover:hover' */
-.ident:hover > span.hover:hover {
+.ident:hover > span:hover {
   background-color: #ee9;
 }
 
@@ -159,7 +159,7 @@ li {
 .ehdr:hover > span:not(.ident) {
   background-color: #bbe;
 }
-.ehdr:hover > span.hover:hover:not(.ident) {
+.ehdr:hover > span:not(.ident):hover {
   background-color: #ee9;
 }
 

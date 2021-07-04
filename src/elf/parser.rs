@@ -143,17 +143,6 @@ impl RangeType {
 
     fn always_highlight(&self) -> bool {
         match self {
-            RangeType::HeaderField(class) => match *class {
-                "magic" => true,
-                "ver" => true,
-                "abi_ver" => true,
-                "pad" => true,
-                "e_version" => true,
-                "e_flags" => true,
-                "e_ehsize" => true,
-                "e_shstrndx" => true,
-                _ => false,
-            },
             RangeType::Section(_) => true,
             RangeType::SegmentSubrange => true,
             _ => false,
