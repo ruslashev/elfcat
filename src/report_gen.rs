@@ -4,6 +4,7 @@ use std::fmt::Write;
 use std::path::Path;
 
 const INDENT: &str = "  ";
+const DEFAULT_COLUMNS: usize = 16;
 
 fn basename(path: &str) -> &str {
     // Wish expect() could use String. This is messy.
@@ -458,7 +459,7 @@ fn add_offsets_script(o: &mut String, elf: &ParsedElf) {
 
     wnonl!(o, 0, "{}", include_str!("js/offsets.js").indent_lines(3));
 
-    w!(o, 3, "populateOffsets(16)");
+    w!(o, 3, "populateOffsets({})", DEFAULT_COLUMNS);
 
     w!(o, 2, "</script>");
 }
@@ -563,7 +564,7 @@ fn generate_dump_for_byte(idx: usize, dump: &mut String, elf: &ParsedElf) {
         dump.push_str("</span>");
     }
 
-    dump.push_str(if (idx + 1) % 16 == 0 { "\n" } else { " " });
+    dump.push_str(if (idx + 1) % DEFAULT_COLUMNS == 0 { "\n" } else { " " });
 }
 
 // assumes balance == 1
@@ -620,7 +621,7 @@ fn generate_file_dump(elf: &ParsedElf) -> String {
                 dump +=
                     format!("<span {}>..</span>", elf.ranges.data[i][0].span_attributes()).as_str();
 
-                dump += if (i + 1) % 16 == 0 { "\n" } else { " " };
+                dump += if (i + 1) % DEFAULT_COLUMNS == 0 { "\n" } else { " " };
 
                 i = new_idx;
                 continue;
@@ -651,7 +652,7 @@ fn generate_ascii_dump(o: &mut String, elf: &ParsedElf) {
             wnonl!(o, 0, ".");
         }
 
-        if (i + 1) % 16 == 0 {
+        if (i + 1) % DEFAULT_COLUMNS == 0 {
             w!(o, 0, "");
         }
     }
