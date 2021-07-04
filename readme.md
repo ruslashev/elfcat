@@ -80,3 +80,7 @@ elfcat - ELF visualizer. Generates HTML files from ELF binaries.
 
    * Highlight bytes in ASCII column
 
+7. Addendum
+
+   * [List of forks](https://github.com/ruslashev/elfcat/wiki/Forks)
+
