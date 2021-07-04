@@ -1,1 +1,2 @@
 fn_call_width = 90
+single_line_if_else_max_width = 60
