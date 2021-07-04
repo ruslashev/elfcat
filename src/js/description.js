@@ -44,7 +44,7 @@ let descriptions = {
     sh_addralign: "Address alignment of the section (sh_addralign)",
     sh_entsize:   "Size of each entry if section has table of fixed-size entries (sh_entsize)",
     section:      "Section",
-    segment_and_section: "Segment and section",
+    section_in_segment: "Section in segment",
 }
 let separator = "<br>&#x2193<br>";
 
@@ -117,7 +117,7 @@ function iterateParents(el) {
         }
 
         if (have_section_before) {
-            keywords[i] = 'segment_and_section';
+            keywords[i] = 'section_in_segment';
             keywords.splice(j, 1);
         } else {
             ++i;
