@@ -154,7 +154,6 @@ impl RangeType {
                 "e_shstrndx" => true,
                 _ => false,
             },
-            RangeType::Segment(_) => true,
             RangeType::Section(_) => true,
             RangeType::SegmentSubrange => true,
             _ => false,
