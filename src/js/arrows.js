@@ -1,3 +1,7 @@
+const arrows = document.getElementById('arrows');
+var connections = [];
+var batchElems = '';
+
 function getAbsPosition(elem) {
     var x = 0, y = 0;
 
@@ -35,10 +39,8 @@ function addSvgArrow(elem1, elem2) {
     var x2 = off2.x;
     var y2 = off2.y;
 
-    document.getElementById('arrows').innerHTML += '<line '
-        + 'x1="' + x1 + '" y1="' + y1 + '" '
-        + 'x2="' + x2 + '" y2="' + y2 + '" '
-        + '/>';
+    batchElems += '<line x1="' + x1 + '" y1="' + y1 + '" '
+                      + 'x2="' + x2 + '" y2="' + y2 + '"/>';
 }
 
 function jumpToElem(elem) {
@@ -67,10 +69,14 @@ function connect(sel1, sel2) {
     setJumpCallback(elem2, elem1);
 }
 
-var connections = [];
-
 function clearArrows() {
-    document.getElementById('arrows').innerHTML = '';
+    batchElems = '';
+
+    arrows.innerHTML = '';
+}
+
+function pushArrowElems() {
+    arrows.innerHTML = batchElems;
 }
 
 function redrawArrows() {
@@ -81,6 +87,8 @@ function redrawArrows() {
 
         addSvgArrow(conn[0], conn[1]);
     }
+
+    pushArrowElems();
 }
 
 window.onresize = function() {

@@ -1,7 +1,7 @@
 const settings = document.getElementById('settings');
 const help = document.getElementById('help');
-const arrows = document.getElementById('arrows');
 const arrow_input = document.getElementById('arrow_opacity_range');
+/* const arrows is reused from arrows.js */
 
 function toggleVisibility(elem) {
     if (elem.style.display === "none" || elem.style.display === "") {
