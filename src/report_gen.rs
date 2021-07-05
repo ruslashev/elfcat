@@ -459,8 +459,6 @@ fn add_offsets_script(o: &mut String, elf: &ParsedElf) {
 
     wnonl!(o, 0, "{}", include_str!("js/offsets.js").indent_lines(3));
 
-    w!(o, 3, "populateOffsets({})", DEFAULT_COLUMNS);
-
     w!(o, 2, "</script>");
 }
 
@@ -669,7 +667,11 @@ fn generate_body(o: &mut String, elf: &ParsedElf) {
 
     generate_file_info_table(o, elf);
 
-    w!(o, 2, "<div id='offsets'></div>");
+    w!(o, 2, "<div id='offsets'>");
+    for off in (0..elf.contents.len()).step_by(DEFAULT_COLUMNS) {
+        w!(o, 3, "{:x}</br>", off);
+    }
+    w!(o, 2, "</div>");
 
     w!(o, 2, "<div id='bytes'>");
     wnonl!(o, 0, "{}", generate_file_dump(elf));
