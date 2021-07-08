@@ -147,7 +147,7 @@ fn generate_help(o: &mut String) {
 
     w!(o, 4, "<p>Legend</p>");
     w!(o, 4, "<ul>");
-    for (class, desc) in legend_items {
+    for (class, desc) in &legend_items {
         w!(o, 5, "<li><span class='legend_rect {}'></span>{}</li>", class, desc);
     }
     w!(o, 4, "</ul>");
