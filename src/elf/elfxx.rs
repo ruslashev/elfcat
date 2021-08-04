@@ -2,19 +2,12 @@ use super::defs::*;
 use super::parser::*;
 use std::mem::size_of;
 
-pub trait ElfHeader {
-    fn from_le_bytes(buf: &[u8]) -> Result<Self, ReadErr>
-    where
-        Self: Sized;
-    fn from_be_bytes(buf: &[u8]) -> Result<Self, ReadErr>
-    where
-        Self: Sized;
+pub trait ElfHeader: Sized {
+    fn from_le_bytes(buf: &[u8]) -> Result<Self, ReadErr>;
+    fn from_be_bytes(buf: &[u8]) -> Result<Self, ReadErr>;
     fn describe() -> String;
 
-    fn from_bytes(buf: &[u8], endianness: u8) -> Result<Self, String>
-    where
-        Self: Sized,
-    {
+    fn from_bytes(buf: &[u8], endianness: u8) -> Result<Self, String> {
         if endianness == ELF_DATA2LSB {
             Self::from_le_bytes(buf)
         } else {
@@ -25,7 +18,7 @@ pub trait ElfHeader {
 }
 
 // We do this because we can't access struct fields of a generic type
-pub trait ElfXXEhdr<ElfXXAddr, ElfXXHalf, ElfXXWord, ElfXXOff> {
+pub trait ElfXXEhdr<ElfXXAddr, ElfXXHalf, ElfXXWord, ElfXXOff>: ElfHeader {
     fn e_ident(&self) -> [u8; 16];
     fn e_type(&self) -> ElfXXHalf;
     fn e_machine(&self) -> ElfXXHalf;
@@ -42,7 +35,7 @@ pub trait ElfXXEhdr<ElfXXAddr, ElfXXHalf, ElfXXWord, ElfXXOff> {
     fn e_shstrndx(&self) -> ElfXXHalf;
 }
 
-pub trait ElfXXPhdr<ElfXXAddr, ElfXXWord, ElfXXOff, ElfXXXword> {
+pub trait ElfXXPhdr<ElfXXAddr, ElfXXWord, ElfXXOff, ElfXXXword>: ElfHeader {
     fn p_type(&self) -> ElfXXWord;
     fn p_flags(&self) -> ElfXXWord;
     fn p_offset(&self) -> ElfXXOff;
@@ -53,7 +46,7 @@ pub trait ElfXXPhdr<ElfXXAddr, ElfXXWord, ElfXXOff, ElfXXXword> {
     fn p_align(&self) -> ElfXXXword;
 }
 
-pub trait ElfXXShdr<ElfXXAddr, ElfXXWord, ElfXXOff, ElfXXXword> {
+pub trait ElfXXShdr<ElfXXAddr, ElfXXWord, ElfXXOff, ElfXXXword>: ElfHeader {
     fn sh_name(&self) -> ElfXXWord;
     fn sh_type(&self) -> ElfXXWord;
     fn sh_flags(&self) -> ElfXXXword;
@@ -77,9 +70,9 @@ macro_rules! read_field {
 
 pub trait ElfXX<EhdrT, PhdrT, ShdrT, ElfXXAddr, ElfXXHalf, ElfXXWord, ElfXXOff, ElfXXXword>
 where
-    EhdrT: ElfHeader + ElfXXEhdr<ElfXXAddr, ElfXXHalf, ElfXXWord, ElfXXOff>,
-    PhdrT: ElfHeader + ElfXXPhdr<ElfXXAddr, ElfXXWord, ElfXXOff, ElfXXXword>,
-    ShdrT: ElfHeader + ElfXXShdr<ElfXXAddr, ElfXXWord, ElfXXOff, ElfXXXword>,
+    EhdrT: ElfXXEhdr<ElfXXAddr, ElfXXHalf, ElfXXWord, ElfXXOff>,
+    PhdrT: ElfXXPhdr<ElfXXAddr, ElfXXWord, ElfXXOff, ElfXXXword>,
+    ShdrT: ElfXXShdr<ElfXXAddr, ElfXXWord, ElfXXOff, ElfXXXword>,
     u32: From<ElfXXWord>,
     u64: From<ElfXXXword>,
     // This is a bit of a mess
