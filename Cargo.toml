@@ -1,6 +1,6 @@
 [package]
 name = "elfcat"
-version = "0.1.4"
+version = "0.1.5"
 description = "ELF visualizer. Generates HTML files from ELF binaries."
 authors = ["Ruslan Akbashev <ruslashev@gmail.com>"]
 edition = "2018"

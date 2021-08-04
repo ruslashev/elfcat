@@ -1,3 +1,8 @@
+### 0.1.5
+
+ * Fix janky layout on chrome due to word wrapping
+ * Slightly speedup initial page load
+
 ### 0.1.4
 
  * Fix highlighting segments when highlighting sections inside them, causing ambiguity. This removes
