@@ -675,11 +675,11 @@ fn generate_body(o: &mut String, elf: &ParsedElf) {
     }
     w!(o, 2, "</div>");
 
-    w!(o, 2, "<div id='bytes'>");
+    wnonl!(o, 2, "<div id='bytes'>");
     wnonl!(o, 0, "{}", generate_file_dump(elf));
     w!(o, 2, "</div>");
 
-    w!(o, 2, "<div id='ascii'>");
+    wnonl!(o, 2, "<div id='ascii'>");
     generate_ascii_dump(o, elf);
     w!(o, 2, "</div>");
 

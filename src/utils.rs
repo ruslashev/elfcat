@@ -21,6 +21,7 @@ pub fn html_escape(ch: char) -> Option<&'static str> {
         '<' => Some("&lt;"),
         '>' => Some("&gt;"),
         '"' => Some("&quot;"),
+        '\'' => Some("&apos;"),
         _ => None,
     }
 }
