@@ -6,7 +6,7 @@ function listOfParents(el) {
     while (el.tagName !== "HTML") {
         el = el.parentNode;
 
-        list.push(el.id);
+        list.unshift(el.id);
     }
 
     return list;
@@ -15,10 +15,11 @@ function listOfParents(el) {
 function hidePreviousTables() {
     for (let i = 0; i < prevShownTables.length; ++i) {
         prevShownTables[i].style.display = "none";
+        prevShownTables[i].classList.remove("indirect");
     }
 }
 
-function showIfMatches(id, prefix, newPrefix) {
+function showIfMatches(id, prefix, newPrefix, indirect = false) {
     if (!id.startsWith(prefix)) {
         return;
     }
@@ -31,6 +32,12 @@ function showIfMatches(id, prefix, newPrefix) {
     }
 
     table.style.display = "block";
+
+    if (indirect) {
+        table.classList.add("indirect");
+    } else {
+        table.classList.remove("indirect");
+    }
 
     prevShownTables.push(table);
 }
@@ -55,7 +62,7 @@ document.addEventListener("mouseover", function (e) {
         }
 
         showIfMatches(id, prefix, "info_");
-        showIfMatches(id, "bin_segment", "info_phdr");
-        showIfMatches(id, "bin_section", "info_shdr");
+        showIfMatches(id, "bin_segment", "info_phdr", true);
+        showIfMatches(id, "bin_section", "info_shdr", true);
     }
 }, false);

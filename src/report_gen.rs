@@ -194,7 +194,8 @@ fn generate_phdr_info_table(o: &mut String, phdr: &ParsedPhdr, idx: usize) {
         ("Alignment", &hex_dualfmt!(phdr.alignment)),
     ];
 
-    w!(o, 5, "<table class='conceal valign_top' id='info_phdr{}'>", idx);
+    w!(o, 5, "<table class='conceal itable' id='info_phdr{}'>", idx);
+    w!(o, 5, "<th colspan='2' class='phdr_itable'></th>");
 
     for (desc, value) in items.iter() {
         wrow!(o, 6, desc, value);
@@ -223,7 +224,8 @@ fn generate_shdr_info_table(o: &mut String, elf: &ParsedElf, shdr: &ParsedShdr, 
         ("Size of entries", &size_dualfmt!(shdr.entsize)),
     ];
 
-    w!(o, 5, "<table class='conceal valign_top' id='info_shdr{}'>", idx);
+    w!(o, 5, "<table class='conceal itable' id='info_shdr{}'>", idx);
+    w!(o, 5, "<th colspan='2' class='shdr_itable'></th>");
 
     for (desc, value) in items.iter() {
         wrow!(o, 6, desc, value);
@@ -364,8 +366,10 @@ fn has_section_detail(ptype: u32) -> bool {
 
 fn generate_segment_info_tables(o: &mut String, elf: &ParsedElf) {
     for (idx, phdr) in elf.phdrs.iter().enumerate() {
-        w!(o, 5, "<table class='conceal valign_top' id='info_segment{}'>", idx);
-        wrow!(o, 6, "Segment type", &ptype_to_string(phdr.ptype));
+        w!(o, 5, "<table class='conceal itable' id='info_segment{}'>", idx);
+        w!(o, 5, "<th colspan='2' class='segment_itable'></th>");
+
+        wrow!(o, 6, "Type", &ptype_to_string(phdr.ptype));
         wrow!(o, 6, "Size in file", size_dualfmt!(phdr.file_size));
         wrow!(o, 6, "Size in memory", size_dualfmt!(phdr.memsz));
 
@@ -380,8 +384,10 @@ fn generate_segment_info_tables(o: &mut String, elf: &ParsedElf) {
 
 fn generate_section_info_tables(o: &mut String, elf: &ParsedElf) {
     for (idx, shdr) in elf.shdrs.iter().enumerate() {
-        w!(o, 5, "<table class='conceal valign_top' id='info_section{}'>", idx);
-        wrow!(o, 6, "Section type", &shtype_to_string(shdr.shtype));
+        w!(o, 5, "<table class='conceal itable' id='info_section{}'>", idx);
+        w!(o, 5, "<th colspan='2' class='section_itable'></th>");
+
+        wrow!(o, 6, "Type", &shtype_to_string(shdr.shtype));
         wrow!(o, 6, "Size", size_dualfmt!(shdr.size));
 
         if has_section_detail(shdr.shtype) {
@@ -393,7 +399,7 @@ fn generate_section_info_tables(o: &mut String, elf: &ParsedElf) {
     }
 }
 
-fn generate_sticky_info_table(o: &mut String, elf: &ParsedElf) {
+fn generate_sticky_info_tables(o: &mut String, elf: &ParsedElf) {
     w!(o, 2, "<table id='sticky_table' cellspacing='0'>");
     w!(o, 3, "<tr>");
 
@@ -684,7 +690,7 @@ fn generate_body(o: &mut String, elf: &ParsedElf) {
     generate_ascii_dump(o, elf);
     w!(o, 0, "</div>");
 
-    generate_sticky_info_table(o, elf);
+    generate_sticky_info_tables(o, elf);
 
     add_scripts(o, elf);
 

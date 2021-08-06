@@ -107,6 +107,36 @@ li {
 .conceal div {
   word-break: break-word;
 }
+.indirect .phdr_itable::after {
+  content: " (references this segment)";
+}
+.indirect .shdr_itable::after {
+  content: " (references this section)";
+}
+.phdr_itable::before {
+  content: "Program header";
+}
+.shdr_itable::before {
+  content: "Section header";
+}
+.phdr_itable {
+  text-align: left;
+}
+.shdr_itable {
+  text-align: left;
+}
+.segment_itable::before {
+  content: "Segment";
+}
+.section_itable::before {
+  content: "Section";
+}
+.segment_itable {
+  text-align: left;
+}
+.section_itable {
+  text-align: left;
+}
 #offsets {
   display: inline-block;
   text-align: right;
@@ -140,7 +170,7 @@ li {
   position: sticky;
   top: 8px;
 }
-#desc, .valign_top {
+#desc, .itable {
   vertical-align: top;
 }
 .hover:hover {
