@@ -1,9 +1,9 @@
 const arrows = document.getElementById('arrows');
-var connections = [];
-var batchElems = '';
+let connections = [];
+let batchElems = '';
 
 function getAbsPosition(elem) {
-    var x = 0, y = 0;
+    let x = 0, y = 0;
 
     do {
         x += elem.offsetLeft || 0;
@@ -19,7 +19,7 @@ function getAbsPosition(elem) {
 }
 
 function getBoundingBoxSizes(elem) {
-    var rect = elem.getBoundingClientRect();
+    let rect = elem.getBoundingClientRect();
 
     return {
         w: rect.width || elem.offsetWidth,
@@ -28,16 +28,16 @@ function getBoundingBoxSizes(elem) {
 }
 
 function addSvgArrow(elem1, elem2) {
-    var off1 = getAbsPosition(elem1);
-    var off2 = getAbsPosition(elem2);
+    let off1 = getAbsPosition(elem1);
+    let off2 = getAbsPosition(elem2);
 
-    var bb1 = getBoundingBoxSizes(elem1);
+    let bb1 = getBoundingBoxSizes(elem1);
 
-    var x1 = off1.x + bb1.w / 2;
-    var y1 = off1.y;
+    let x1 = off1.x + bb1.w / 2;
+    let y1 = off1.y;
 
-    var x2 = off2.x;
-    var y2 = off2.y;
+    let x2 = off2.x;
+    let y2 = off2.y;
 
     batchElems += '<line x1="' + x1 + '" y1="' + y1 + '" '
                       + 'x2="' + x2 + '" y2="' + y2 + '"/>';
@@ -54,8 +54,8 @@ function setJumpCallback(elemFrom, elemTo) {
 }
 
 function connect(sel1, sel2) {
-    var elem1 = document.querySelector(sel1);
-    var elem2 = document.querySelector(sel2);
+    let elem1 = document.querySelector(sel1);
+    let elem2 = document.querySelector(sel2);
 
     if (elem1 === null || elem2 === null) {
         return;
@@ -82,8 +82,8 @@ function pushArrowElems() {
 function redrawArrows() {
     clearArrows();
 
-    for (var i = 0; i < connections.length; ++i) {
-        var conn = connections[i];
+    for (let i = 0; i < connections.length; ++i) {
+        let conn = connections[i];
 
         addSvgArrow(conn[0], conn[1]);
     }

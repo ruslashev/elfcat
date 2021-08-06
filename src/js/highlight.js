@@ -1,4 +1,4 @@
-var color = "#ee9";
+let color = "#ee9";
 
 function addPairHighlighting(elem, depElem) {
     elem.addEventListener("mouseenter", function(event) {
@@ -13,8 +13,8 @@ function addPairHighlighting(elem, depElem) {
 }
 
 function highlightIds(primaryId, secondaryId) {
-    var primaryElem = document.getElementById(primaryId);
-    var secondaryElem = document.getElementById(secondaryId);
+    let primaryElem = document.getElementById(primaryId);
+    let secondaryElem = document.getElementById(secondaryId);
 
     if (primaryElem === null || secondaryElem === null) {
         return;

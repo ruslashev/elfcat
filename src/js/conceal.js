@@ -1,5 +1,5 @@
 function listOfParents(el) {
-    var list = [el.id];
+    let list = [el.id];
 
     while (el.tagName !== "HTML") {
         el = el.parentNode;
@@ -13,32 +13,36 @@ function listOfParents(el) {
     return list;
 }
 
-var prevTableId;
+let prevTableId;
 
 document.addEventListener("mouseover", function (e) {
-    var event = e || window.event;
-    var target = event.target || event.srcElement;
-    var prefix = 'bin_';
+    let event = e || window.event;
+    let target = event.target || event.srcElement;
+    let prefix = 'bin_';
 
     parents = listOfParents(target);
 
-    for (var i = 0; i < parents.length; i++) {
-        var id = parents[i];
+    for (let i = 0; i < parents.length; i++) {
+        let id = parents[i];
 
-        if (id.startsWith(prefix)) {
-            var tableId = id.replace(prefix, "info_");
-            var target = document.getElementById(tableId);
-
-            if (target !== null) {
-                if (prevTableId) {
-                    prevTableId.style.display = "none";
-                }
-
-                target.style.display = "block";
-                prevTableId = target;
-
-                break;
-            }
+        if (!id.startsWith(prefix)) {
+            continue;
         }
+
+        let tableId = id.replace(prefix, "info_");
+        let target = document.getElementById(tableId);
+
+        if (target === null) {
+            continue;
+        }
+
+        if (prevTableId) {
+            prevTableId.style.display = "none";
+        }
+
+        target.style.display = "block";
+        prevTableId = target;
+
+        break;
     }
 }, false);

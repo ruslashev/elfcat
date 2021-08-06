@@ -79,17 +79,17 @@ function formatDesc(id) {
 }
 
 function iterateParents(el) {
-    var txt = "";
-    var keywords = [];
+    let txt = "";
+    let keywords = [];
 
     do {
         if (el.id !== undefined) {
             keywords.push(el.id);
         }
 
-        var classList = el.classList;
+        let classList = el.classList;
         if (classList !== undefined) {
-            for (var i = 0; i < classList.length; ++i) {
+            for (let i = 0; i < classList.length; ++i) {
                 keywords.push(classList[i]);
             }
         }
@@ -100,15 +100,15 @@ function iterateParents(el) {
     // fix all occurences where segments and sections overlap.
     // once again we are relying on programming by which sections are always inside segments.
     // also, this is O(n^2) ugly.
-    var i = 1;
+    let i = 1;
     while (i < keywords.length) {
         if (keywords[i] !== 'segment') {
             ++i;
             continue;
         }
 
-        var have_section_before = false;
-        var j = 0;
+        let have_section_before = false;
+        let j = 0;
         for (; j < i; ++j) {
             if (keywords[j] == 'section') {
                 have_section_before = true;
@@ -124,8 +124,8 @@ function iterateParents(el) {
         }
     }
 
-    for (var i = 0; i < keywords.length; ++i) {
-        var keyword = keywords[i];
+    for (let i = 0; i < keywords.length; ++i) {
+        let keyword = keywords[i];
 
         if (isValid(keyword)) {
             if (txt === "") {
@@ -140,9 +140,9 @@ function iterateParents(el) {
 }
 
 document.addEventListener("mouseover", function (e) {
-    var event = e || window.event;
+    let event = e || window.event;
 
-    var target = event.target || event.srcElement;
+    let target = event.target || event.srcElement;
 
     if (!target.classList.contains('legend_rect')) {
         document.getElementById('desc').innerHTML = iterateParents(target);
