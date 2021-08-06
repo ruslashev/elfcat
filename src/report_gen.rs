@@ -669,11 +669,14 @@ fn generate_body(o: &mut String, elf: &ParsedElf) {
 
     generate_file_info_table(o, elf);
 
-    w!(o, 2, "<div id='offsets'>");
+    wnonl!(o, 2, "<div id='offsets'>");
     for off in (0..elf.contents.len()).step_by(DEFAULT_COLUMNS) {
-        w!(o, 3, "{:x}</br>", off);
+        wnonl!(o, 0, "{:x}", off);
+        if off != (elf.contents.len() / DEFAULT_COLUMNS) * DEFAULT_COLUMNS {
+            w!(o, 0, "");
+        }
     }
-    w!(o, 2, "</div>");
+    w!(o, 0, "</div>");
 
     wnonl!(o, 2, "<div id='bytes'>");
     wnonl!(o, 0, "{}", generate_file_dump(elf));
@@ -681,7 +684,7 @@ fn generate_body(o: &mut String, elf: &ParsedElf) {
 
     wnonl!(o, 2, "<div id='ascii'>");
     generate_ascii_dump(o, elf);
-    w!(o, 2, "</div>");
+    w!(o, 0, "</div>");
 
     generate_sticky_info_table(o, elf);
 

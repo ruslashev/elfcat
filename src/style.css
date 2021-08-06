@@ -104,6 +104,7 @@ li {
 #offsets {
   display: inline-block;
   text-align: right;
+  white-space: pre;
 }
 #bytes {
   border: 1px solid;
