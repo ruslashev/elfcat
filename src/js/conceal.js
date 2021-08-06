@@ -1,4 +1,3 @@
-const prefix = 'bin_';
 let prevShownTables = [];
 
 function listOfParents(el) {
@@ -19,11 +18,29 @@ function hidePreviousTables() {
     }
 }
 
+function showIfMatches(id, prefix, newPrefix) {
+    if (!id.startsWith(prefix)) {
+        return;
+    }
+
+    let tableId = id.replace(prefix, newPrefix);
+    let table = document.getElementById(tableId);
+
+    if (table === null) {
+        return;
+    }
+
+    table.style.display = "block";
+
+    prevShownTables.push(table);
+}
+
 document.addEventListener("mouseover", function (e) {
     let event = e || window.event;
     let target = event.target || event.srcElement;
     let parents = listOfParents(target);
     let cleared = false;
+    const prefix = 'bin_';
 
     for (let i = 0; i < parents.length; i++) {
         let id = parents[i];
@@ -32,20 +49,13 @@ document.addEventListener("mouseover", function (e) {
             continue;
         }
 
-        let tableId = id.replace(prefix, "info_");
-        let table = document.getElementById(tableId);
-
-        if (table === null) {
-            continue;
-        }
-
         if (!cleared) {
             cleared = true;
             hidePreviousTables();
         }
 
-        table.style.display = "block";
-
-        prevShownTables.push(table);
+        showIfMatches(id, prefix, "info_");
+        showIfMatches(id, "bin_segment", "info_phdr");
+        showIfMatches(id, "bin_section", "info_shdr");
     }
 }, false);
