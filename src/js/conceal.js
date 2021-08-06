@@ -1,26 +1,29 @@
+const prefix = 'bin_';
+let prevShownTables = [];
+
 function listOfParents(el) {
     let list = [el.id];
 
     while (el.tagName !== "HTML") {
         el = el.parentNode;
 
-        // use unshift() instead of push() because we are stupid and have
-        // an assumption that section spans are inside segment spans
-        // so that break; in loop below doesn't have to go away.
-        list.unshift(el.id);
+        list.push(el.id);
     }
 
     return list;
 }
 
-let prevTableId;
+function hidePreviousTables() {
+    for (let i = 0; i < prevShownTables.length; ++i) {
+        prevShownTables[i].style.display = "none";
+    }
+}
 
 document.addEventListener("mouseover", function (e) {
     let event = e || window.event;
     let target = event.target || event.srcElement;
-    let prefix = 'bin_';
-
-    parents = listOfParents(target);
+    let parents = listOfParents(target);
+    let cleared = false;
 
     for (let i = 0; i < parents.length; i++) {
         let id = parents[i];
@@ -30,19 +33,19 @@ document.addEventListener("mouseover", function (e) {
         }
 
         let tableId = id.replace(prefix, "info_");
-        let target = document.getElementById(tableId);
+        let table = document.getElementById(tableId);
 
-        if (target === null) {
+        if (table === null) {
             continue;
         }
 
-        if (prevTableId) {
-            prevTableId.style.display = "none";
+        if (!cleared) {
+            cleared = true;
+            hidePreviousTables();
         }
 
-        target.style.display = "block";
-        prevTableId = target;
+        table.style.display = "block";
 
-        break;
+        prevShownTables.push(table);
     }
 }, false);

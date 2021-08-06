@@ -92,14 +92,17 @@ li {
 }
 #struct_infotables {
   padding-right: 0;
+  display: block;
 }
 #data_infotables {
   padding-left: 0;
+  display: block;
 }
 .conceal {
   display: none;
   border: 1px solid #000;
   max-width: 600px;
+  margin-bottom: 1em;
 }
 #offsets {
   display: inline-block;
