@@ -104,6 +104,9 @@ li {
   max-width: 600px;
   margin-bottom: 1em;
 }
+.conceal div {
+  word-break: break-word;
+}
 #offsets {
   display: inline-block;
   text-align: right;
