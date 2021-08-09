@@ -58,7 +58,12 @@ macro_rules! dec_dualfmt {
 macro_rules! size_dualfmt {
     ($id:expr) => {
         if ($id >= 1024) {
-            format!("<span class='number' title='{:#x}'>{} ({})</span>", $id, $id, crate::utils::human_format_bytes($id as u64))
+            format!(
+                "<span class='number' title='{:#x}'>{} ({})</span>",
+                $id,
+                $id,
+                crate::utils::human_format_bytes($id as u64)
+            )
         } else {
             format!("<span class='number' title='{:#x}'>{}</span>", $id, $id)
         }
@@ -405,13 +410,13 @@ fn generate_sticky_info_tables(o: &mut String, elf: &ParsedElf) {
 
     w!(o, 4, "<td id='desc'></td>");
 
-    w!(o, 4, "<td id='struct_infotables'>");
+    w!(o, 4, "<td class='infotables'>");
     generate_phdr_info_tables(o, elf);
 
     generate_shdr_info_tables(o, elf);
     w!(o, 4, "</td>");
 
-    w!(o, 4, "<td id='data_infotables'>");
+    w!(o, 4, "<td class='infotables'>");
     generate_segment_info_tables(o, elf);
 
     generate_section_info_tables(o, elf);

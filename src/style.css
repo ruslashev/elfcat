@@ -90,12 +90,8 @@ li {
 #desc {
   width: 250px;
 }
-#struct_infotables {
-  padding-right: 0;
-  display: block;
-}
-#data_infotables {
-  padding-left: 0;
+.infotables {
+  padding: 0;
   display: block;
 }
 .conceal {
