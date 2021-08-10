@@ -1,6 +1,13 @@
+### 0.1.6
+
+ * Show all infotables (little squares with information about segment, section, program header and
+   section header) for currently hovered span, not just the first one. This includes program headers
+   that reference a segment and section headers that reference sections.
+
 ### 0.1.5
 
  * Fix janky layout on chrome due to word wrapping
+ * Fix needing one-character extra width for main hexdump
  * Slightly speedup initial page load
 
 ### 0.1.4
