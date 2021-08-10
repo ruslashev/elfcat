@@ -188,60 +188,52 @@ fn generate_right_menu(o: &mut String) {
     w!(o, 3, "</div>");
 }
 
-fn generate_phdr_info_table(o: &mut String, phdr: &ParsedPhdr, idx: usize) {
-    let items = [
-        ("Type", &ptype_to_string(phdr.ptype)),
-        ("Flags", &phdr.flags),
-        ("Offset in file", &hex_dualfmt!(phdr.file_offset)),
-        ("Size in file", &size_dualfmt!(phdr.file_size)),
-        ("Vaddr in memory", &hex_dualfmt!(phdr.vaddr)),
-        ("Size in memory", &size_dualfmt!(phdr.memsz)),
-        ("Alignment", &hex_dualfmt!(phdr.alignment)),
-    ];
-
-    w!(o, 5, "<table class='conceal itable' id='info_phdr{}'>", idx);
-    w!(o, 5, "<th colspan='2' class='phdr_itable'></th>");
-
-    for (desc, value) in items.iter() {
-        wrow!(o, 6, desc, value);
-    }
-
-    w!(o, 5, "</table>");
-}
-
 fn generate_phdr_info_tables(o: &mut String, elf: &ParsedElf) {
     for (idx, phdr) in elf.phdrs.iter().enumerate() {
-        generate_phdr_info_table(o, &phdr, idx);
+        let items = [
+            ("Type", &ptype_to_string(phdr.ptype)),
+            ("Flags", &phdr.flags),
+            ("Offset in file", &hex_dualfmt!(phdr.file_offset)),
+            ("Size in file", &size_dualfmt!(phdr.file_size)),
+            ("Vaddr in memory", &hex_dualfmt!(phdr.vaddr)),
+            ("Size in memory", &size_dualfmt!(phdr.memsz)),
+            ("Alignment", &hex_dualfmt!(phdr.alignment)),
+        ];
+
+        w!(o, 5, "<table class='conceal itable' id='info_phdr{}'>", idx);
+        w!(o, 5, "<th colspan='2' class='phdr_itable'></th>");
+
+        for (desc, value) in items.iter() {
+            wrow!(o, 6, desc, value);
+        }
+
+        w!(o, 5, "</table>");
     }
-}
-
-fn generate_shdr_info_table(o: &mut String, elf: &ParsedElf, shdr: &ParsedShdr, idx: usize) {
-    let items = [
-        ("Name", elf.shnstrtab.get(shdr.name)),
-        ("Type", &shtype_to_string(shdr.shtype)),
-        ("Flags", &shflags_to_string(shdr.flags)),
-        ("Vaddr in memory", &hex_dualfmt!(shdr.addr)),
-        ("Offset in file", &hex_dualfmt!(shdr.file_offset)),
-        ("Size in file", &size_dualfmt!(shdr.size)),
-        ("Linked section", &format!("{}", shdr.link)),
-        ("Extra info", &dec_dualfmt!(shdr.link)),
-        ("Alignment", &hex_dualfmt!(shdr.addralign)),
-        ("Size of entries", &size_dualfmt!(shdr.entsize)),
-    ];
-
-    w!(o, 5, "<table class='conceal itable' id='info_shdr{}'>", idx);
-    w!(o, 5, "<th colspan='2' class='shdr_itable'></th>");
-
-    for (desc, value) in items.iter() {
-        wrow!(o, 6, desc, value);
-    }
-
-    w!(o, 5, "</table>");
 }
 
 fn generate_shdr_info_tables(o: &mut String, elf: &ParsedElf) {
     for (idx, shdr) in elf.shdrs.iter().enumerate() {
-        generate_shdr_info_table(o, elf, &shdr, idx);
+        let items = [
+            ("Name", elf.shnstrtab.get(shdr.name)),
+            ("Type", &shtype_to_string(shdr.shtype)),
+            ("Flags", &shflags_to_string(shdr.flags)),
+            ("Vaddr in memory", &hex_dualfmt!(shdr.addr)),
+            ("Offset in file", &hex_dualfmt!(shdr.file_offset)),
+            ("Size in file", &size_dualfmt!(shdr.size)),
+            ("Linked section", &format!("{}", shdr.link)),
+            ("Extra info", &dec_dualfmt!(shdr.link)),
+            ("Alignment", &hex_dualfmt!(shdr.addralign)),
+            ("Size of entries", &size_dualfmt!(shdr.entsize)),
+        ];
+
+        w!(o, 5, "<table class='conceal itable' id='info_shdr{}'>", idx);
+        w!(o, 5, "<th colspan='2' class='shdr_itable'></th>");
+
+        for (desc, value) in items.iter() {
+            wrow!(o, 6, desc, value);
+        }
+
+        w!(o, 5, "</table>");
     }
 }
 
