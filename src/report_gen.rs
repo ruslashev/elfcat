@@ -557,7 +557,9 @@ fn generate_dump_for_byte(idx: usize, dump: &mut String, elf: &ParsedElf) {
         dump.push_str("</span>");
     }
 
-    dump.push_str(if (idx + 1) % DEFAULT_COLUMNS == 0 { "\n" } else { " " });
+    if idx != elf.contents.len() - 1 {
+        dump.push_str(if (idx + 1) % DEFAULT_COLUMNS == 0 { "\n" } else { " " });
+    }
 }
 
 fn generate_file_dump(elf: &ParsedElf) -> String {
@@ -615,7 +617,7 @@ fn generate_body(o: &mut String, elf: &ParsedElf) {
 
     wnonl!(o, 2, "<div id='bytes'>");
     wnonl!(o, 0, "{}", generate_file_dump(elf));
-    w!(o, 2, "</div>");
+    w!(o, 0, "</div>");
 
     wnonl!(o, 2, "<div id='ascii'>");
     generate_ascii_dump(o, elf);
