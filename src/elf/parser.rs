@@ -90,8 +90,8 @@ pub struct StrTab<'a> {
 impl RangeType {
     pub fn span_attributes(&self) -> String {
         match self {
-            RangeType::Ident => format!("class='ident'"),
-            RangeType::FileHeader => format!("class='ehdr'"),
+            RangeType::Ident => "class='ident'".to_string(),
+            RangeType::FileHeader => "class='ehdr'".to_string(),
             RangeType::HeaderField(field) => format!("id='{}'", field),
             RangeType::ProgramHeader(idx) => format!("id='bin_phdr{}' class='phdr'", idx),
             RangeType::SectionHeader(idx) => format!("id='bin_shdr{}' class='shdr'", idx),
@@ -99,7 +99,7 @@ impl RangeType {
             RangeType::ShdrField(field) => format!("class='{}'", field),
             RangeType::Segment(idx) => format!("id='bin_segment{}' class='segment'", idx),
             RangeType::Section(idx) => format!("id='bin_section{}' class='section hover'", idx),
-            RangeType::SegmentSubrange => format!("class='segment_subrange hover'"),
+            RangeType::SegmentSubrange => "class='segment_subrange hover'".to_string(),
             _ => String::new(),
         }
     }
@@ -144,7 +144,7 @@ impl ParsedElf<'_> {
             return Err(String::from("file is smaller than ELF header's e_ident"));
         }
 
-        let ident = ParsedIdent::from_bytes(&buf);
+        let ident = ParsedIdent::from_bytes(buf);
 
         if ident.magic != [0x7f, b'E', b'L', b'F'] {
             return Err(String::from("mismatched magic: not an ELF file"));
@@ -169,9 +169,9 @@ impl ParsedElf<'_> {
         elf.push_ident_info(&ident)?;
 
         if ident.class == ELF_CLASS32 {
-            Elf32::parse(&buf, &ident, &mut elf)?;
+            Elf32::parse(buf, &ident, &mut elf)?;
         } else {
-            Elf64::parse(&buf, &ident, &mut elf)?;
+            Elf64::parse(buf, &ident, &mut elf)?;
         }
 
         elf.add_ident_ranges();
@@ -283,14 +283,14 @@ impl ParsedElf<'_> {
         if let Some(shdr) = shdr {
             let section = &self.contents[shdr.file_offset..shdr.file_offset + shdr.size];
 
-            self.strtab.populate(&section, shdr.size);
+            self.strtab.populate(section, shdr.size);
         }
 
         if self.shstrndx != SHN_UNDEF {
             let shdr = &self.shdrs[self.shstrndx as usize];
             let section = &self.contents[shdr.file_offset..shdr.file_offset + shdr.size];
 
-            self.shnstrtab.populate(&section, shdr.size);
+            self.shnstrtab.populate(section, shdr.size);
         }
     }
 

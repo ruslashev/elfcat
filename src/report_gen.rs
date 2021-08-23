@@ -319,10 +319,10 @@ fn generate_strtab_data(o: &mut String, section: &[u8]) {
 
             let maybe = std::str::from_utf8(&section[curr_start..=end]);
 
-            if maybe.is_ok() && section[curr_start] != 0 {
-                let string = maybe.unwrap();
-
-                w!(o, 9, "{}", string);
+            if let Ok(string) = maybe {
+                if section[curr_start] != 0 {
+                    w!(o, 9, "{}", string);
+                }
             }
 
             curr_start = i + 1;
@@ -345,20 +345,12 @@ fn generate_section_info_table(o: &mut String, elf: &ParsedElf, shdr: &ParsedShd
     }
 }
 
-// this is ugly
 fn has_segment_detail(ptype: u32) -> bool {
-    match ptype {
-        PT_INTERP => true,
-        PT_NOTE => true,
-        _ => false,
-    }
+    matches!(ptype, PT_INTERP | PT_NOTE)
 }
 
 fn has_section_detail(ptype: u32) -> bool {
-    match ptype {
-        SHT_STRTAB => true,
-        _ => false,
-    }
+    matches!(ptype, SHT_STRTAB)
 }
 
 fn generate_segment_info_tables(o: &mut String, elf: &ParsedElf) {
@@ -372,7 +364,7 @@ fn generate_segment_info_tables(o: &mut String, elf: &ParsedElf) {
 
         if has_segment_detail(phdr.ptype) {
             w!(o, 6, "<tr><td><br></td></tr>");
-            generate_segment_info_table(o, elf, &phdr);
+            generate_segment_info_table(o, elf, phdr);
         }
 
         w!(o, 5, "</table>");
@@ -389,7 +381,7 @@ fn generate_section_info_tables(o: &mut String, elf: &ParsedElf) {
 
         if has_section_detail(shdr.shtype) {
             w!(o, 6, "<tr><td><br></td></tr>");
-            generate_section_info_table(o, elf, &shdr);
+            generate_section_info_table(o, elf, shdr);
         }
 
         w!(o, 5, "</table>");
