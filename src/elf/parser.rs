@@ -103,14 +103,6 @@ impl RangeType {
             _ => String::new(),
         }
     }
-
-    pub fn skippable(&self) -> bool {
-        match self {
-            RangeType::Segment(_) => true,
-            RangeType::Section(_) => true,
-            _ => false,
-        }
-    }
 }
 
 impl Ranges {
