@@ -1,3 +1,7 @@
+### 0.1.7
+
+ * Fix extra space at the end of main hexdump div
+
 ### 0.1.6
 
  * Show all infotables (little squares with information about segment, section, program header and
