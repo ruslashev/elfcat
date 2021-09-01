@@ -1,29 +1,10 @@
 use crate::elf::defs::*;
 use crate::elf::parser::{Note, ParsedElf, ParsedPhdr, ParsedShdr, RangeType};
+use crate::utils;
 use std::fmt::Write;
-use std::path::Path;
 
 const INDENT: &str = "  ";
 const DEFAULT_COLUMNS: usize = 16;
-
-fn basename(path: &str) -> &str {
-    // Wish expect() could use String. This is messy.
-    match Path::new(path).file_name() {
-        Some(name) => name.to_str().unwrap(),
-        None => panic!("basename: failed for path \"{}\"", path),
-    }
-}
-
-fn stem(path: &str) -> &str {
-    match Path::new(path).file_stem() {
-        Some(stem) => stem.to_str().unwrap(),
-        None => panic!("stem: failed for path \"{}\"", path),
-    }
-}
-
-pub fn construct_filename(filename: &str) -> String {
-    stem(basename(filename)).to_string() + ".html"
-}
 
 fn indent(level: usize, line: &str) -> String {
     if line.is_empty() {
@@ -62,7 +43,7 @@ macro_rules! size_dualfmt {
                 "<span class='number' title='{:#x}'>{} ({})</span>",
                 $id,
                 $id,
-                crate::utils::human_format_bytes($id as u64)
+                utils::human_format_bytes($id as u64)
             )
         } else {
             format!("<span class='number' title='{:#x}'>{}</span>", $id, $id)
@@ -93,18 +74,20 @@ macro_rules! wnonl {
     }
 }
 
-fn generate_head(o: &mut String, elf: &ParsedElf) {
+fn generate_head(o: &mut String, elf: &ParsedElf) -> Option<()> {
     let stylesheet: String = include_str!("style.css").indent_lines(3);
     let viewport = "width=900, initial-scale=1";
 
     w!(o, 1, "<head>");
     w!(o, 2, "<meta charset='utf-8'>");
     w!(o, 2, "<meta name='viewport' content='{}'>", viewport);
-    w!(o, 2, "<title>{}</title>", basename(&elf.filename));
+    w!(o, 2, "<title>{}</title>", utils::basename(&elf.filename)?);
     w!(o, 2, "<style>");
     wnonl!(o, 0, "{}", stylesheet);
     w!(o, 2, "</style>");
     w!(o, 1, "</head>");
+
+    Some(())
 }
 
 fn generate_svg_element(o: &mut String) {
@@ -577,7 +560,7 @@ fn generate_ascii_dump(o: &mut String, elf: &ParsedElf) {
         if b.is_ascii_graphic() {
             let ch = *b as char;
 
-            match crate::utils::html_escape(ch) {
+            match utils::html_escape(ch) {
                 Some(escaped) => {
                     wnonl!(o, 0, "{}", escaped);
                 }
@@ -630,7 +613,7 @@ fn generate_body(o: &mut String, elf: &ParsedElf) {
     w!(o, 1, "</body>");
 }
 
-pub fn generate_report(elf: &ParsedElf) -> String {
+pub fn generate_report(elf: &ParsedElf) -> Option<String> {
     let mut output = String::new();
 
     w!(&mut output, 0, "<!doctype html>");
@@ -641,5 +624,5 @@ pub fn generate_report(elf: &ParsedElf) -> String {
 
     w!(&mut output, 0, "</html>");
 
-    output
+    Some(output)
 }

@@ -1,3 +1,5 @@
+use std::path::Path;
+
 pub fn human_format_bytes(bytes: u64) -> String {
     let base: u64 = 1024;
 
@@ -42,4 +44,29 @@ where
 
         self.unwrap()
     }
+}
+
+impl<T> PrintableError<T> for Option<T> {
+    fn unwrap_or_exit(self, message: &str) -> T {
+        if self.is_none() {
+            eprintln!("Failed to {}", message);
+            std::process::exit(1);
+        }
+
+        self.unwrap()
+    }
+}
+
+pub fn basename(path: &str) -> Option<&str> {
+    Path::new(path).file_name()?.to_str()
+}
+
+fn stem(path: &str) -> Option<&str> {
+    Path::new(path).file_stem()?.to_str()
+}
+
+pub fn construct_filename(filename: &str) -> Option<String> {
+    let name = stem(basename(filename)?)?.to_string() + ".html";
+
+    Some(name)
 }
