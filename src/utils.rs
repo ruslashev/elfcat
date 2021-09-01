@@ -28,15 +28,15 @@ pub fn html_escape(ch: char) -> Option<&'static str> {
     }
 }
 
-pub trait PrintableError<T> {
-    fn unwrap_or_exit(self, message: &str) -> T;
+pub trait MaybeError<T> {
+    fn or_exit(self, message: &str) -> T;
 }
 
-impl<T, E> PrintableError<T> for Result<T, E>
+impl<T, E> MaybeError<T> for Result<T, E>
 where
     E: std::fmt::Display + std::fmt::Debug,
 {
-    fn unwrap_or_exit(self, message: &str) -> T {
+    fn or_exit(self, message: &str) -> T {
         if let Err(e) = self {
             eprintln!("Failed to {}: {}", message, e);
             std::process::exit(1);
@@ -46,8 +46,8 @@ where
     }
 }
 
-impl<T> PrintableError<T> for Option<T> {
-    fn unwrap_or_exit(self, message: &str) -> T {
+impl<T> MaybeError<T> for Option<T> {
+    fn or_exit(self, message: &str) -> T {
         if self.is_none() {
             eprintln!("Failed to {}", message);
             std::process::exit(1);

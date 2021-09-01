@@ -3,16 +3,16 @@ mod report_gen;
 mod utils;
 
 use elf::parser::ParsedElf;
-use utils::PrintableError;
+use utils::MaybeError;
 
 fn main() {
     let filename = parse_arguments();
-    let contents = std::fs::read(&filename).unwrap_or_exit(&format!("read file \"{}\"", filename));
-    let elf = ParsedElf::from_bytes(&filename, &contents).unwrap_or_exit("parse ELF");
-    let report_filename = utils::construct_filename(&filename).unwrap_or_exit("construct filename");
-    let report = report_gen::generate_report(&elf).unwrap_or_exit("generate report");
+    let contents = std::fs::read(&filename).or_exit(&format!("read file \"{}\"", filename));
+    let elf = ParsedElf::from_bytes(&filename, &contents).or_exit("parse ELF");
+    let report_filename = utils::construct_filename(&filename).or_exit("construct filename");
+    let report = report_gen::generate_report(&elf).or_exit("generate report");
 
-    std::fs::write(report_filename, report).unwrap_or_exit("write report");
+    std::fs::write(report_filename, report).or_exit("write report");
 }
 
 fn parse_arguments() -> String {
