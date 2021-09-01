@@ -25,3 +25,21 @@ pub fn html_escape(ch: char) -> Option<&'static str> {
         _ => None,
     }
 }
+
+pub trait PrintableError<T> {
+    fn unwrap_or_exit(self, message: &str) -> T;
+}
+
+impl<T, E> PrintableError<T> for Result<T, E>
+where
+    E: std::fmt::Display + std::fmt::Debug,
+{
+    fn unwrap_or_exit(self, message: &str) -> T {
+        if let Err(e) = self {
+            eprintln!("Failed to {}: {}", message, e);
+            std::process::exit(1);
+        }
+
+        self.unwrap()
+    }
+}
