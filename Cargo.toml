@@ -7,3 +7,6 @@ edition = "2018"
 repository = "https://github.com/ruslashev/elfcat"
 license = "Zlib"
 readme = "readme.md"
+
+[dependencies]
+elfcat_derive = { path = "elfcat_derive" }

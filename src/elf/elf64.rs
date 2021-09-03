@@ -2,12 +2,15 @@ use super::elfxx::*;
 use super::parser::*;
 use std::convert::TryInto;
 
+use elfcat_derive::ElfHeaderMethods;
+
 type Elf64Addr = u64;
 type Elf64Off = u64;
 type Elf64Half = u16;
 type Elf64Word = u32;
 type Elf64Xword = u64;
 
+#[derive(ElfHeaderMethods)]
 pub struct Elf64Ehdr {
     e_ident: [u8; 16],
     e_type: Elf64Half,
