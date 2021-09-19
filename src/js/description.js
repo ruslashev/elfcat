@@ -48,6 +48,10 @@ let descriptions = {
 }
 let separator = "<br>&#x2193<br>";
 
+function stripFileInfoPrefix(str) {
+    return str.replace("fileinfo_", "");
+}
+
 function stripInfoPrefix(str) {
     return str.replace("info_", "");
 }
@@ -58,6 +62,7 @@ function stripBinPrefix(str) {
 
 function hasDescription(id) {
     return descriptions[id] !== undefined
+        || descriptions[stripFileInfoPrefix(id)] !== undefined
         || descriptions[stripInfoPrefix(id)] !== undefined
         || descriptions[stripBinPrefix(id)] !== undefined;
 }
@@ -71,11 +76,15 @@ function formatDesc(id) {
         return descriptions[id];
     }
 
-    if (descriptions[stripBinPrefix(id)] !== undefined) {
-        return descriptions[stripBinPrefix(id)];
+    if (descriptions[stripFileInfoPrefix(id)] !== undefined) {
+        return descriptions[stripFileInfoPrefix(id)];
     }
 
-    return descriptions[stripInfoPrefix(id)];
+    if (descriptions[stripInfoPrefix(id)] !== undefined) {
+        return descriptions[stripInfoPrefix(id)];
+    }
+
+    return descriptions[stripBinPrefix(id)];
 }
 
 function iterateParents(el) {

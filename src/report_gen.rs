@@ -116,7 +116,7 @@ fn generate_file_info_table(o: &mut String, elf: &ParsedElf) {
     w!(o, 2, "<table>");
 
     for (id, desc, value) in elf.information.iter() {
-        wnonl!(o, 3, "<tr id='info_{}'> ", id);
+        wnonl!(o, 3, "<tr id='fileinfo_{}'> ", id);
         wnonl!(o, 0, "<td>{}:</td> ", desc);
         wnonl!(o, 0, "<td>{}</td> ", value);
         w!(o, 0, "</tr>");
@@ -418,7 +418,7 @@ fn add_highlight_script(o: &mut String) {
     wnonl!(o, 0, "{}", include_str!("js/highlight.js").indent_lines(3));
 
     for id in ids.iter() {
-        w!(o, 3, "highlightIds('{}', 'info_{}')", id, id);
+        w!(o, 3, "highlightIds('{}', 'fileinfo_{}')", id, id);
     }
 
     w!(o, 2, "</script>");

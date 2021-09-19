@@ -123,9 +123,9 @@ where
             "ph",
             "Program headers",
             format!(
-                "<span class='number' title='{:#x}' id='info_e_phnum'>{}</span> * \
-                 <span class='number' title='{:#x}' id='info_e_phentsize'>{}</span> @ \
-                 <span class='number' title='{:#x}' id='info_e_phoff'>{}</span>",
+                "<span class='number' title='{:#x}' id='fileinfo_e_phnum'>{}</span> * \
+                 <span class='number' title='{:#x}' id='fileinfo_e_phentsize'>{}</span> @ \
+                 <span class='number' title='{:#x}' id='fileinfo_e_phoff'>{}</span>",
                 ehdr.e_phnum(),
                 ehdr.e_phnum(),
                 ehdr.e_phentsize(),
@@ -139,9 +139,9 @@ where
             "sh",
             "Section headers",
             format!(
-                "<span class='number' title='{:#x}' id='info_e_shnum'>{}</span> * \
-                 <span class='number' title='{:#x}' id='info_e_shentsize'>{}</span> @ \
-                 <span class='number' title='{:#x}' id='info_e_shoff'>{}</span>",
+                "<span class='number' title='{:#x}' id='fileinfo_e_shnum'>{}</span> * \
+                 <span class='number' title='{:#x}' id='fileinfo_e_shentsize'>{}</span> @ \
+                 <span class='number' title='{:#x}' id='fileinfo_e_shoff'>{}</span>",
                 ehdr.e_shnum(),
                 ehdr.e_shnum(),
                 ehdr.e_shentsize(),
