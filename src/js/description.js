@@ -60,18 +60,11 @@ function stripBinPrefix(str) {
     return str.replace("bin_", "");
 }
 
-function hasDescription(id) {
-    return descriptions[id] !== undefined
-        || descriptions[stripFileInfoPrefix(id)] !== undefined
-        || descriptions[stripInfoPrefix(id)] !== undefined
-        || descriptions[stripBinPrefix(id)] !== undefined;
-}
+function getDesc(id) {
+    if (id === "") {
+        return null;
+    }
 
-function isValid(id) {
-    return id !== "" && hasDescription(id);
-}
-
-function formatDesc(id) {
     if (descriptions[id] !== undefined) {
         return descriptions[id];
     }
@@ -84,7 +77,11 @@ function formatDesc(id) {
         return descriptions[stripInfoPrefix(id)];
     }
 
-    return descriptions[stripBinPrefix(id)];
+    if (descriptions[stripBinPrefix(id)] !== undefined) {
+        return descriptions[stripBinPrefix(id)];
+    }
+
+    return null;
 }
 
 function iterateParents(el) {
@@ -135,12 +132,13 @@ function iterateParents(el) {
 
     for (let i = 0; i < keywords.length; ++i) {
         let keyword = keywords[i];
+        let desc = getDesc(keyword);
 
-        if (isValid(keyword)) {
+        if (desc !== null) {
             if (txt === "") {
-                txt = formatDesc(keyword);
+                txt = desc;
             } else {
-                txt = formatDesc(keyword) + separator + txt;
+                txt = desc + separator + txt;
             }
         }
     }
