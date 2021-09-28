@@ -197,16 +197,17 @@ fn generate_phdr_info_tables(o: &mut String, elf: &ParsedElf) {
 fn generate_shdr_info_tables(o: &mut String, elf: &ParsedElf) {
     for (idx, shdr) in elf.shdrs.iter().enumerate() {
         let items = [
-            ("Name", elf.shnstrtab.get(shdr.name)),
-            ("Type", &shtype_to_string(shdr.shtype)),
-            ("Flags", &shflags_to_string(shdr.flags)),
-            ("Vaddr in memory", &hex_dualfmt!(shdr.addr)),
-            ("Offset in file", &hex_dualfmt!(shdr.file_offset)),
-            ("Size in file", &size_dualfmt!(shdr.size)),
-            ("Linked section", &format!("{}", shdr.link)),
-            ("Extra info", &dec_dualfmt!(shdr.link)),
-            ("Alignment", &hex_dualfmt!(shdr.addralign)),
-            ("Size of entries", &size_dualfmt!(shdr.entsize)),
+            ("Index", format!("{}", idx)),
+            ("Name", elf.shnstrtab.get(shdr.name).to_owned()),
+            ("Type", shtype_to_string(shdr.shtype)),
+            ("Flags", shflags_to_string(shdr.flags)),
+            ("Vaddr in memory", hex_dualfmt!(shdr.addr)),
+            ("Offset in file", hex_dualfmt!(shdr.file_offset)),
+            ("Size in file", size_dualfmt!(shdr.size)),
+            ("Linked section", format!("{}", shdr.link)),
+            ("Extra info", dec_dualfmt!(shdr.link)),
+            ("Alignment", hex_dualfmt!(shdr.addralign)),
+            ("Size of entries", size_dualfmt!(shdr.entsize)),
         ];
 
         w!(o, 5, "<table class='conceal itable' id='info_shdr{}'>", idx);
@@ -464,6 +465,12 @@ fn add_arrows_script(o: &mut String, elf: &ParsedElf) {
 
     for i in 0..elf.shdrs.len() {
         w!(o, 3, "connect('.bin_shdr{} > .sh_offset', '.bin_section{}');", i, i);
+
+        let link = elf.shdrs[i].link;
+
+        if link != 0 {
+            w!(o, 3, "connect('.bin_shdr{} > .sh_link', '.bin_shdr{}');", i, link);
+        }
     }
 
     w!(o, 3, "pushArrowElems();");
