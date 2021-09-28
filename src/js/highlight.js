@@ -13,12 +13,15 @@ function addPairHighlighting(elem, depElem) {
 }
 
 function highlightIds(primaryId, secondaryId) {
-    let primaryElem = document.getElementById(primaryId);
-    let secondaryElem = document.getElementById(secondaryId);
+    let primaryElems = document.getElementsByClassName(primaryId);
+    let secondaryElems = document.getElementsByClassName(secondaryId);
 
-    if (primaryElem === null || secondaryElem === null) {
+    if (primaryElems.length === 0 || secondaryElems.length === 0) {
         return;
     }
+
+    let primaryElem = primaryElems[0];
+    let secondaryElem = secondaryElems[0];
 
     addPairHighlighting(primaryElem, secondaryElem);
     addPairHighlighting(secondaryElem, primaryElem);

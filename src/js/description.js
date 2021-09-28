@@ -89,10 +89,6 @@ function iterateParents(el) {
     let keywords = [];
 
     do {
-        if (el.id !== undefined) {
-            keywords.push(el.id);
-        }
-
         let classList = el.classList;
         if (classList !== undefined) {
             for (let i = 0; i < classList.length; ++i) {

@@ -92,13 +92,13 @@ impl RangeType {
         match self {
             RangeType::Ident => "class='ident'".to_string(),
             RangeType::FileHeader => "class='ehdr'".to_string(),
-            RangeType::HeaderField(field) => format!("id='{}'", field),
-            RangeType::ProgramHeader(idx) => format!("id='bin_phdr{}' class='phdr'", idx),
-            RangeType::SectionHeader(idx) => format!("id='bin_shdr{}' class='shdr'", idx),
+            RangeType::HeaderField(field) => format!("class='{}'", field),
+            RangeType::ProgramHeader(idx) => format!("class='bin_phdr{} phdr'", idx),
+            RangeType::SectionHeader(idx) => format!("class='bin_shdr{} shdr'", idx),
             RangeType::PhdrField(field) => format!("class='{}'", field),
             RangeType::ShdrField(field) => format!("class='{}'", field),
-            RangeType::Segment(idx) => format!("id='bin_segment{}' class='segment'", idx),
-            RangeType::Section(idx) => format!("id='bin_section{}' class='section hover'", idx),
+            RangeType::Segment(idx) => format!("class='bin_segment{} segment'", idx),
+            RangeType::Section(idx) => format!("class='bin_section{} section hover'", idx),
             RangeType::SegmentSubrange => "class='segment_subrange hover'".to_string(),
             _ => String::new(),
         }

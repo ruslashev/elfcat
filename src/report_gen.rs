@@ -116,7 +116,7 @@ fn generate_file_info_table(o: &mut String, elf: &ParsedElf) {
     w!(o, 2, "<table>");
 
     for (id, desc, value) in elf.information.iter() {
-        wnonl!(o, 3, "<tr id='fileinfo_{}'> ", id);
+        wnonl!(o, 3, "<tr class='fileinfo_{}'> ", id);
         wnonl!(o, 0, "<td>{}:</td> ", desc);
         wnonl!(o, 0, "<td>{}</td> ", value);
         w!(o, 0, "</tr>");
@@ -418,7 +418,7 @@ fn add_highlight_script(o: &mut String) {
     wnonl!(o, 0, "{}", include_str!("js/highlight.js").indent_lines(3));
 
     for id in ids.iter() {
-        w!(o, 3, "highlightIds('{}', 'fileinfo_{}')", id, id);
+        w!(o, 3, "highlightIds('fileinfo_{}', '{}')", id, id);
     }
 
     w!(o, 2, "</script>");
@@ -455,15 +455,15 @@ fn add_arrows_script(o: &mut String, elf: &ParsedElf) {
 
     wnonl!(o, 0, "{}", include_str!("js/arrows.js").indent_lines(3));
 
-    w!(o, 3, "connect('#e_phoff', '#bin_phdr0');");
-    w!(o, 3, "connect('#e_shoff', '#bin_shdr0');");
+    w!(o, 3, "connect('.e_phoff', '.bin_phdr0');");
+    w!(o, 3, "connect('.e_shoff', '.bin_shdr0');");
 
     for i in 0..elf.phdrs.len() {
-        w!(o, 3, "connect('#bin_phdr{} > .p_offset', '#bin_segment{}');", i, i);
+        w!(o, 3, "connect('.bin_phdr{} > .p_offset', '.bin_segment{}');", i, i);
     }
 
     for i in 0..elf.shdrs.len() {
-        w!(o, 3, "connect('#bin_shdr{} > .sh_offset', '#bin_section{}');", i, i);
+        w!(o, 3, "connect('.bin_shdr{} > .sh_offset', '.bin_section{}');", i, i);
     }
 
     w!(o, 3, "pushArrowElems();");

@@ -1,12 +1,22 @@
 let prevShownTables = [];
 
+function getFirstClass(el) {
+    let cls = el.classList[0];
+
+    if (cls === undefined) {
+        return "";
+    } else {
+        return cls;
+    }
+}
+
 function listOfParents(el) {
-    let list = [el.id];
+    let list = [getFirstClass(el)];
 
     while (el.tagName !== "HTML") {
         el = el.parentNode;
 
-        list.unshift(el.id);
+        list.unshift(getFirstClass(el));
     }
 
     return list;
