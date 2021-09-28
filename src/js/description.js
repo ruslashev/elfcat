@@ -60,25 +60,25 @@ function stripBinPrefix(str) {
     return str.replace("bin_", "");
 }
 
-function getDesc(id) {
-    if (id === "") {
+function getDesc(cl) {
+    if (cl === "") {
         return null;
     }
 
-    if (descriptions[id] !== undefined) {
-        return descriptions[id];
+    if (descriptions[cl] !== undefined) {
+        return descriptions[cl];
     }
 
-    if (descriptions[stripFileInfoPrefix(id)] !== undefined) {
-        return descriptions[stripFileInfoPrefix(id)];
+    if (descriptions[stripFileInfoPrefix(cl)] !== undefined) {
+        return descriptions[stripFileInfoPrefix(cl)];
     }
 
-    if (descriptions[stripInfoPrefix(id)] !== undefined) {
-        return descriptions[stripInfoPrefix(id)];
+    if (descriptions[stripInfoPrefix(cl)] !== undefined) {
+        return descriptions[stripInfoPrefix(cl)];
     }
 
-    if (descriptions[stripBinPrefix(id)] !== undefined) {
-        return descriptions[stripBinPrefix(id)];
+    if (descriptions[stripBinPrefix(cl)] !== undefined) {
+        return descriptions[stripBinPrefix(cl)];
     }
 
     return null;

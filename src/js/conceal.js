@@ -29,12 +29,12 @@ function hidePreviousTables() {
     }
 }
 
-function showIfMatches(id, prefix, newPrefix, indirect = false) {
-    if (!id.startsWith(prefix)) {
+function showIfMatches(cl, prefix, newPrefix, indirect = false) {
+    if (!cl.startsWith(prefix)) {
         return;
     }
 
-    let tableId = id.replace(prefix, newPrefix);
+    let tableId = cl.replace(prefix, newPrefix);
     let table = document.getElementById(tableId);
 
     if (table === null) {
@@ -60,9 +60,9 @@ document.addEventListener("mouseover", function (e) {
     const prefix = 'bin_';
 
     for (let i = 0; i < parents.length; i++) {
-        let id = parents[i];
+        let cl = parents[i];
 
-        if (!id.startsWith(prefix)) {
+        if (!cl.startsWith(prefix)) {
             continue;
         }
 
@@ -71,8 +71,8 @@ document.addEventListener("mouseover", function (e) {
             hidePreviousTables();
         }
 
-        showIfMatches(id, prefix, "info_");
-        showIfMatches(id, "bin_segment", "info_phdr", true);
-        showIfMatches(id, "bin_section", "info_shdr", true);
+        showIfMatches(cl, prefix, "info_");
+        showIfMatches(cl, "bin_segment", "info_phdr", true);
+        showIfMatches(cl, "bin_section", "info_shdr", true);
     }
 }, false);

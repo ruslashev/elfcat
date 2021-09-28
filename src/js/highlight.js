@@ -12,9 +12,9 @@ function addPairHighlighting(elem, depElem) {
     }, false);
 }
 
-function highlightIds(primaryId, secondaryId) {
-    let primaryElems = document.getElementsByClassName(primaryId);
-    let secondaryElems = document.getElementsByClassName(secondaryId);
+function highlightClasses(primaryClass, secondaryClass) {
+    let primaryElems = document.getElementsByClassName(primaryClass);
+    let secondaryElems = document.getElementsByClassName(secondaryClass);
 
     if (primaryElems.length === 0 || secondaryElems.length === 0) {
         return;

@@ -115,8 +115,8 @@ fn generate_svg_element(o: &mut String) {
 fn generate_file_info_table(o: &mut String, elf: &ParsedElf) {
     w!(o, 2, "<table>");
 
-    for (id, desc, value) in elf.information.iter() {
-        wnonl!(o, 3, "<tr class='fileinfo_{}'> ", id);
+    for (cl, desc, value) in elf.information.iter() {
+        wnonl!(o, 3, "<tr class='fileinfo_{}'> ", cl);
         wnonl!(o, 0, "<td>{}:</td> ", desc);
         wnonl!(o, 0, "<td>{}</td> ", value);
         w!(o, 0, "</tr>");
@@ -394,7 +394,7 @@ fn generate_sticky_info_tables(o: &mut String, elf: &ParsedElf) {
 }
 
 fn add_highlight_script(o: &mut String) {
-    let ids = [
+    let classes = [
         "class",
         "data",
         "abi",
@@ -417,8 +417,8 @@ fn add_highlight_script(o: &mut String) {
 
     wnonl!(o, 0, "{}", include_str!("js/highlight.js").indent_lines(3));
 
-    for id in ids.iter() {
-        w!(o, 3, "highlightIds('fileinfo_{}', '{}')", id, id);
+    for cl in classes.iter() {
+        w!(o, 3, "highlightClasses('fileinfo_{}', '{}')", cl, cl);
     }
 
     w!(o, 2, "</script>");
