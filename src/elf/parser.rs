@@ -286,8 +286,10 @@ impl ParsedElf<'_> {
             self.strtab.populate(section, shdr.size);
         }
 
-        if self.shstrndx != SHN_UNDEF {
-            let shdr = &self.shdrs[self.shstrndx as usize];
+        let idx = self.shstrndx as usize;
+
+        if self.shstrndx != SHN_UNDEF && idx < self.shdrs.len() {
+            let shdr = &self.shdrs[idx];
             let section = &self.contents[shdr.file_offset..shdr.file_offset + shdr.size];
 
             self.shnstrtab.populate(section, shdr.size);
