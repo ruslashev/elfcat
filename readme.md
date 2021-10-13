@@ -60,31 +60,19 @@ elfcat - ELF visualizer. Generates HTML files from ELF binaries.
 
    Zlib.
 
-5. When I try this on huge files, it slows down my browser!
+5. Upcoming features?
 
-   Sorry about that. There used to be a feature where segments and sections
-   would be collapsed into a couple characters instead of showing full contents,
-   but it was disabled because it:
-
-    * broke when these would overlap
-
-    * in a way, defeats the purpose: seeing specific bytes is a feature.
-
-6. Upcoming features?
-
-   * Fix slow initial page load on Chrome
+   * Better text renderer to fix bad performance when opening big files
 
    * Ability to tune the width instead of hardcoded 16 bytes
 
    * Visualization of virtual memory mappings
 
-   * Use WebGL or canvas for renderering
-
    * Dark theme
 
    * Highlight bytes in ASCII column
 
-7. Addendum
+6. Addendum
 
    * [List of forks](https://github.com/ruslashev/elfcat/wiki/Forks)
 
