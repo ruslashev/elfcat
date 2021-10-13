@@ -1,3 +1,8 @@
+### 0.1.8
+
+ * Add pretty-printing on errors instead of just panicking
+ * Visualize section headers' links to other section headers with arrows
+
 ### 0.1.7
 
  * Fix extra space at the end of main hexdump div
