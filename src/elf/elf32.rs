@@ -225,7 +225,7 @@ impl ElfXX<Elf32Ehdr, Elf32Phdr, Elf32Shdr, Elf32Addr, Elf32Half, Elf32Word, Elf
     }
 
     fn add_phdr_ranges(start: usize, ranges: &mut Ranges) {
-        ranges.add_range(start +  0, 4, RangeType::PhdrField("p_type"));
+        ranges.add_range(start,      4, RangeType::PhdrField("p_type"));
         ranges.add_range(start +  4, 4, RangeType::PhdrField("p_offset"));
         ranges.add_range(start +  8, 4, RangeType::PhdrField("p_vaddr"));
         ranges.add_range(start + 12, 4, RangeType::PhdrField("p_paddr"));
@@ -236,7 +236,7 @@ impl ElfXX<Elf32Ehdr, Elf32Phdr, Elf32Shdr, Elf32Addr, Elf32Half, Elf32Word, Elf
     }
 
     fn add_shdr_ranges(start: usize, ranges: &mut Ranges) {
-        ranges.add_range(start +  0, 4, RangeType::ShdrField("sh_name"));
+        ranges.add_range(start,      4, RangeType::ShdrField("sh_name"));
         ranges.add_range(start +  4, 4, RangeType::ShdrField("sh_type"));
         ranges.add_range(start +  8, 4, RangeType::ShdrField("sh_flags"));
         ranges.add_range(start + 12, 4, RangeType::ShdrField("sh_addr"));

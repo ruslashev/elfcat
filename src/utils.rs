@@ -34,15 +34,16 @@ pub trait MaybeError<T> {
 
 impl<T, E> MaybeError<T> for Result<T, E>
 where
-    E: std::fmt::Display + std::fmt::Debug,
+    E: std::fmt::Display,
 {
     fn or_exit(self, message: &str) -> T {
-        if let Err(e) = self {
-            eprintln!("Failed to {}: {}", message, e);
-            std::process::exit(1);
+        match self {
+            Ok(t) => t,
+            Err(e) => {
+                eprintln!("Failed to {}: {}", message, e);
+                std::process::exit(1);
+            }
         }
-
-        self.unwrap()
     }
 }
 

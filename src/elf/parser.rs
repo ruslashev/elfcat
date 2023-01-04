@@ -92,15 +92,15 @@ impl RangeType {
         match self {
             RangeType::Ident => "class='ident'".to_string(),
             RangeType::FileHeader => "class='ehdr'".to_string(),
-            RangeType::HeaderField(field) => format!("class='{}'", field),
             RangeType::ProgramHeader(idx) => format!("class='bin_phdr{} phdr'", idx),
             RangeType::SectionHeader(idx) => format!("class='bin_shdr{} shdr'", idx),
-            RangeType::PhdrField(field) => format!("class='{}'", field),
-            RangeType::ShdrField(field) => format!("class='{}'", field),
             RangeType::Segment(idx) => format!("class='bin_segment{} segment'", idx),
             RangeType::Section(idx) => format!("class='bin_section{} section hover'", idx),
             RangeType::SegmentSubrange => "class='segment_subrange hover'".to_string(),
-            _ => String::new(),
+            RangeType::HeaderField(field)
+            | RangeType::PhdrField(field)
+            | RangeType::ShdrField(field) => format!("class='{}'", field),
+            RangeType::End => String::new(),
         }
     }
 }
@@ -267,18 +267,8 @@ impl ParsedElf<'_> {
         ranges.add_range(9, 7, RangeType::HeaderField("pad"));
     }
 
-    fn find_strtab_shdr(shdrs: &[ParsedShdr]) -> Option<&ParsedShdr> {
-        for shdr in shdrs {
-            if shdr.shtype == SHT_STRTAB {
-                return Some(shdr);
-            }
-        }
-
-        None
-    }
-
     fn parse_string_tables(&mut self) {
-        let shdr = ParsedElf::find_strtab_shdr(&self.shdrs);
+        let shdr = self.shdrs.iter().find(|&shdr| shdr.shtype == SHT_STRTAB);
 
         if let Some(shdr) = shdr {
             let section = &self.contents[shdr.file_offset..shdr.file_offset + shdr.size];

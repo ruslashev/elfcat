@@ -1,3 +1,9 @@
+#![allow(
+    clippy::uninlined_format_args,
+    clippy::module_name_repetitions,
+    clippy::wildcard_imports
+)]
+
 mod elf;
 mod report_gen;
 mod utils;
@@ -10,7 +16,7 @@ fn main() {
     let contents = std::fs::read(&filename).or_exit(&format!("read file \"{}\"", filename));
     let elf = ParsedElf::from_bytes(&filename, &contents).or_exit("parse ELF");
     let report_filename = utils::construct_filename(&filename).or_exit("construct filename");
-    let report = report_gen::generate_report(&elf).or_exit("generate report");
+    let report = report_gen::generate_report(&elf);
 
     std::fs::write(report_filename, report).or_exit("write report");
 }

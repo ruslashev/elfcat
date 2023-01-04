@@ -227,7 +227,7 @@ impl ElfXX<Elf64Ehdr, Elf64Phdr, Elf64Shdr, Elf64Addr, Elf64Half, Elf64Word, Elf
     }
 
     fn add_phdr_ranges(start: usize, ranges: &mut Ranges) {
-        ranges.add_range(start +  0, 4, RangeType::PhdrField("p_type"));
+        ranges.add_range(start,      4, RangeType::PhdrField("p_type"));
         ranges.add_range(start +  4, 4, RangeType::PhdrField("p_flags"));
         ranges.add_range(start +  8, 8, RangeType::PhdrField("p_offset"));
         ranges.add_range(start + 16, 8, RangeType::PhdrField("p_vaddr"));
@@ -238,7 +238,7 @@ impl ElfXX<Elf64Ehdr, Elf64Phdr, Elf64Shdr, Elf64Addr, Elf64Half, Elf64Word, Elf
     }
 
     fn add_shdr_ranges(start: usize, ranges: &mut Ranges) {
-        ranges.add_range(start +  0, 4, RangeType::ShdrField("sh_name"));
+        ranges.add_range(start,      4, RangeType::ShdrField("sh_name"));
         ranges.add_range(start +  4, 4, RangeType::ShdrField("sh_type"));
         ranges.add_range(start +  8, 8, RangeType::ShdrField("sh_flags"));
         ranges.add_range(start + 16, 8, RangeType::ShdrField("sh_addr"));

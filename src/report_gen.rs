@@ -115,7 +115,7 @@ fn generate_svg_element(o: &mut String) {
 fn generate_file_info_table(o: &mut String, elf: &ParsedElf) {
     w!(o, 2, "<table>");
 
-    for (cl, desc, value) in elf.information.iter() {
+    for (cl, desc, value) in &elf.information {
         wnonl!(o, 3, "<tr class='fileinfo_{}'> ", cl);
         wnonl!(o, 0, "<td>{}:</td> ", desc);
         wnonl!(o, 0, "<td>{}</td> ", value);
@@ -186,7 +186,7 @@ fn generate_phdr_info_tables(o: &mut String, elf: &ParsedElf) {
         w!(o, 5, "<table class='conceal itable' id='info_phdr{}'>", idx);
         w!(o, 5, "<th colspan='2' class='phdr_itable'></th>");
 
-        for (desc, value) in items.iter() {
+        for (desc, value) in &items {
             wrow!(o, 6, desc, value);
         }
 
@@ -213,7 +213,7 @@ fn generate_shdr_info_tables(o: &mut String, elf: &ParsedElf) {
         w!(o, 5, "<table class='conceal itable' id='info_shdr{}'>", idx);
         w!(o, 5, "<th colspan='2' class='shdr_itable'></th>");
 
-        for (desc, value) in items.iter() {
+        for (desc, value) in &items {
             wrow!(o, 6, desc, value);
         }
 
@@ -246,19 +246,16 @@ fn generate_note_data(o: &mut String, note: &Note) {
 
     wrow!(o, 6, "Type", format!("{:#x}", note.ntype));
 
-    match note.ntype {
-        NT_GNU_BUILD_ID => {
-            let mut hash = String::new();
+    if note.ntype == NT_GNU_BUILD_ID {
+        let mut hash = String::new();
 
-            for byte in note.desc.iter() {
-                append_hex_byte(&mut hash, *byte);
-            }
+        for byte in &note.desc {
+            append_hex_byte(&mut hash, *byte);
+        }
 
-            wrow!(o, 6, "Build ID", hash);
-        }
-        _ => {
-            wrow!(o, 6, "Desc", format_string_slice(&note.desc[..]));
-        }
+        wrow!(o, 6, "Build ID", hash);
+    } else {
+        wrow!(o, 6, "Desc", format_string_slice(&note.desc[..]));
     }
 }
 
@@ -321,11 +318,8 @@ fn generate_strtab_data(o: &mut String, section: &[u8]) {
 fn generate_section_info_table(o: &mut String, elf: &ParsedElf, shdr: &ParsedShdr) {
     let section = &elf.contents[shdr.file_offset..shdr.file_offset + shdr.size];
 
-    match shdr.shtype {
-        SHT_STRTAB => {
-            generate_strtab_data(o, section);
-        }
-        _ => {}
+    if shdr.shtype == SHT_STRTAB {
+        generate_strtab_data(o, section);
     }
 }
 
@@ -418,8 +412,8 @@ fn add_highlight_script(o: &mut String) {
 
     wnonl!(o, 0, "{}", include_str!("js/highlight.js").indent_lines(3));
 
-    for cl in classes.iter() {
-        w!(o, 3, "highlightClasses('fileinfo_{}', '{}')", cl, cl);
+    for class in &classes {
+        w!(o, 3, "highlightClasses('fileinfo_{}', '{}')", class, class);
     }
 
     w!(o, 2, "</script>");
@@ -541,7 +535,7 @@ fn generate_file_dump(elf: &ParsedElf) -> String {
         }
 
         if idx < 4 {
-            dump.push_str(&format_magic(byte))
+            dump.push_str(&format_magic(byte));
         } else {
             append_hex_byte(&mut dump, byte);
         }
@@ -563,13 +557,10 @@ fn generate_ascii_dump(o: &mut String, elf: &ParsedElf) {
         if b.is_ascii_graphic() {
             let ch = *b as char;
 
-            match utils::html_escape(ch) {
-                Some(escaped) => {
-                    wnonl!(o, 0, "{}", escaped);
-                }
-                None => {
-                    wnonl!(o, 0, "{}", ch);
-                }
+            if let Some(escaped) = utils::html_escape(ch) {
+                wnonl!(o, 0, "{}", escaped);
+            } else {
+                wnonl!(o, 0, "{}", ch);
             }
         } else {
             wnonl!(o, 0, ".");
@@ -616,7 +607,7 @@ fn generate_body(o: &mut String, elf: &ParsedElf) {
     w!(o, 1, "</body>");
 }
 
-pub fn generate_report(elf: &ParsedElf) -> Option<String> {
+pub fn generate_report(elf: &ParsedElf) -> String {
     let mut output = String::new();
 
     w!(&mut output, 0, "<!doctype html>");
@@ -627,5 +618,5 @@ pub fn generate_report(elf: &ParsedElf) -> Option<String> {
 
     w!(&mut output, 0, "</html>");
 
-    Some(output)
+    output
 }
