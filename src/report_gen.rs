@@ -205,7 +205,7 @@ fn generate_shdr_info_tables(o: &mut String, elf: &ParsedElf) {
             ("Offset in file", hex_dualfmt!(shdr.file_offset)),
             ("Size in file", size_dualfmt!(shdr.size)),
             ("Linked section", format!("{}", shdr.link)),
-            ("Extra info", dec_dualfmt!(shdr.link)),
+            ("Extra info", dec_dualfmt!(shdr.info)),
             ("Alignment", hex_dualfmt!(shdr.addralign)),
             ("Size of entries", size_dualfmt!(shdr.entsize)),
         ];
